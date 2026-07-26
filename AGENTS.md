@@ -10,8 +10,9 @@ database and turns it into evidence-based training & body-composition analytics
 composer install
 npm install
 cp .env.example .env && php artisan key:generate
-touch database/database.sqlite
+# point .env at a Postgres database you have created
 php artisan migrate
+php artisan app:demo   # a populated account, so nothing is blank while you work
 composer dev           # server + queue worker + logs + vite, all at once
 ```
 
@@ -36,7 +37,7 @@ height/age/sex) → click **Sync Hevy**. Or from the CLI:
 Run the checks before committing:
 
 ```bash
-php artisan test        # 115 tests
+php artisan test        # 121 tests
 ./vendor/bin/pint       # code style (PSR-12 via Laravel Pint)
 npm run build           # production assets
 ```
@@ -46,7 +47,7 @@ npm run build           # production assets
 | Concern | Choice |
 |---|---|
 | Backend | Laravel 13 (PHP 8.3+) |
-| Database | SQLite (zero-config; file at `database/database.sqlite`) |
+| Database | PostgreSQL 16+ (dev, CI and production alike — one set of behaviours) |
 | Auth | Laravel Breeze (Blade), multi-user |
 | Frontend | Blade + Alpine.js + [Alpine AJAX](https://alpine-ajax.js.org) |
 | Styling | Tailwind CSS **only** (v3) |
@@ -150,6 +151,11 @@ a query in Science, it's in the wrong place.
 ## Conventions cheat-sheet
 
 - Weights/measurements are stored in **kg**; dates as `Y-m-d`.
+- Timestamps are stored in **UTC**. Anything that buckets by day or week must
+  convert to the athlete's zone first — use `$user->resolvedTimezone()` and
+  `PeriodService`. Bucketing in UTC silently misfiles evening sessions.
+- Every claim the UI makes should be backed by a test. Several metrics here were
+  confidently wrong for months because nothing asserted them against real data.
 - Money-free: never store secrets in code; use `.env` + `config/services.php`.
 - Prefer readable names over comments; comment the *why*, not the *what*.
 - Keep methods small and single-purpose (SRP). If a class mixes DB + math +

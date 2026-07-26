@@ -1,58 +1,121 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Hevy Analytics
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Turns your [Hevy](https://hevy.com) training log into evidence-based analytics:
+weekly hard sets per muscle graded against hypertrophy landmarks, strength
+percentiles against a real powerlifting cohort, body-composition trends that say
+when they are not reliable, and nutrition targets that adapt to what your weight
+is actually doing.
 
-## About Laravel
+It syncs from the Hevy API into your own database. Nothing is computed in the
+cloud, and no training data leaves the app unless you turn on the optional AI
+review.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Running it locally
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+You need PHP 8.3+, Composer, Node 22+, and Postgres 16+.
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Point `.env` at a Postgres database you have created, then:
 
-## Contributing
+```bash
+php artisan migrate
+php artisan app:demo      # a populated account to look at
+composer dev              # server + queue worker + logs + vite
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Sign in at <http://127.0.0.1:8000> with `demo@example.test` / `password`.
 
-## Code of Conduct
+> **Run `composer dev`, not `php artisan serve` on its own.** Syncing is a queued
+> job. Without a worker the app will say "Sync queued" and nothing will happen.
+> The dashboard warns you when that is the case, but it is easier to just start
+> the worker.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Using your own Hevy data
 
-## Security Vulnerabilities
+Register an account, verify your email (in local development the link is written
+to `storage/logs/laravel.log`), then open **Profile** and add:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- your Hevy API key — stored encrypted, never logged, never sent to the AI provider
+- height, age, sex — these drive FFMI, BMR and macro targets
+- your timezone — decides which day and week each session counts toward
 
-## License
+Then press **Sync Hevy**, or run `php artisan hevy:sync you@example.com`.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## Checks
+
+```bash
+php artisan test          # 121 tests
+./vendor/bin/pint --test  # code style
+npm run build             # production assets
+npm run test:browser      # Playwright, needs the app running
+```
+
+CI runs all four on every pull request, against Postgres on PHP 8.3 and 8.4.
+
+The browser tests exist for a specific reason: charts silently rendered as blank
+boxes for months and nothing in a PHP test suite could see it. A blank canvas is
+still a canvas, so those tests read pixels.
+
+---
+
+## How it fits together
+
+```
+app/
+├─ Science/     Pure formulas. No database, no framework. Unit-tested.
+├─ Services/    Orchestration: combines models, Science and external APIs.
+├─ Http/        Thin controllers — validate, call a service, return a view.
+├─ Jobs/        Queued work (syncing).
+└─ Models/      Eloquent models: data and relationships only.
+```
+
+The rule is that layers only call downward:
+`Controller → Service → (Model | Science)`. `Science/` never touches the
+database; controllers never contain formulas. If you find yourself doing maths in
+a controller or writing a query in `Science/`, it belongs somewhere else.
+
+`AGENTS.md` is the full map — read that before changing code.
+
+---
+
+## What it will not do
+
+- It will not invent data. Projections refuse to forecast from too few points or
+  too short a span, and trends report when the fit is too scattered to trust.
+- It will not estimate a one-rep max from a set far outside the range those
+  formulas were validated on.
+- It will not score a woman with the men's body-fat equation, or bucket your
+  week using someone else's timezone.
+
+Being quietly wrong is worse than being visibly unsure, and this codebase has the
+scars to prove it.
+
+---
+
+## Optional integrations
+
+| Service | What it adds | Without it |
+|---|---|---|
+| Hevy API | All training data | Nothing to analyse |
+| DeepSeek, or any OpenAI-compatible endpoint | Written analysis of your metrics | Every metric still works; the AI page is disabled |
+| FitnessVolt / OpenPowerlifting | Strength percentiles against real lifters | Falls back to a built-in model |
+
+AI usage is capped per user and app-wide (`config/services.php` → `ai`), counted
+by requests attempted rather than analyses stored, so failed calls cannot be used
+to run up a bill.
+
+---
+
+## Licence
+
+MIT.
