@@ -1,14 +1,4 @@
-<section>
-    <header>
-        <h2 class="text-lg font-medium text-ink">
-            {{ __('Profile Information') }}
-        </h2>
-
-        <p class="mt-1 text-sm text-body">
-            {{ __("Update your account's profile information and email address.") }}
-        </p>
-    </header>
-
+<x-ui.card :title="__('Profile Information')" :subtitle="__('Your name, email, and the details that power FFMI, BMR and macro targets.')">
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
         @csrf
     </form>
@@ -133,4 +123,4 @@
             @endif
         </div>
     </form>
-</section>
+</x-ui.card>

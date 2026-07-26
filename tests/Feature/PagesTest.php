@@ -57,6 +57,52 @@ class PagesTest extends TestCase
         $this->actingAs($this->user)->get($path)->assertOk();
     }
 
+    /**
+     * A page needs exactly one <h1>: it is what a screen reader announces as
+     * "where am I". Every page in this app opened at <h2> instead, because the
+     * layout shell was copy-pasted sixteen times from a starter template that
+     * put the page title in the header slot as an <h2>.
+     */
+    #[DataProvider('pageProvider')]
+    public function test_page_has_exactly_one_top_level_heading(string $path): void
+    {
+        // The AJAX fragments render a partial, not a page, so they have no h1.
+        if (str_ends_with($path, '/data')) {
+            $this->markTestSkipped('partial, not a full page');
+        }
+
+        $html = $this->actingAs($this->user)->get($path)->assertOk()->getContent();
+
+        $this->assertSame(1, preg_match_all('/<h1[\s>]/i', $html), "{$path} must have exactly one <h1>.");
+    }
+
+    /**
+     * Heading levels may not skip: an <h4> directly under an <h2> leaves a
+     * screen-reader user guessing whether they missed a section.
+     */
+    #[DataProvider('pageProvider')]
+    public function test_page_does_not_skip_heading_levels(string $path): void
+    {
+        if (str_ends_with($path, '/data')) {
+            $this->markTestSkipped('partial, not a full page');
+        }
+
+        $html = $this->actingAs($this->user)->get($path)->assertOk()->getContent();
+
+        preg_match_all('/<h([1-6])[\s>]/i', $html, $m);
+        $levels = array_map('intval', $m[1]);
+
+        $previous = 0;
+        foreach ($levels as $level) {
+            $this->assertLessThanOrEqual(
+                $previous + 1,
+                $level,
+                "{$path} jumps from <h{$previous}> to <h{$level}>, skipping a level.",
+            );
+            $previous = $level;
+        }
+    }
+
     public function test_goal_can_be_stored(): void
     {
         $this->actingAs($this->user)->post('/goals', ['type' => 'cut'])->assertRedirect();

@@ -78,6 +78,7 @@ return [
     ],
 
     'nutrition' => [
+        'recompute' => 'Recompute targets',
         'maintenance' => 'Maintenance (TDEE)',
         'target_calories' => 'Target calories',
         'protein' => 'Protein',
@@ -109,11 +110,17 @@ return [
     ],
 
     'ai' => [
+        'generate' => 'Generate analysis',
+        'regenerate' => 'Regenerate',
         'unavailable' => "AI analysis isn't available on your account yet.",
         'quota' => ':remaining of :limit analyses left this month.',
         'quota_spent' => 'You have used all :limit AI analyses for this month. Your allowance resets on :date.',
         'temporarily_unavailable' => 'AI analysis is temporarily unavailable while we top up capacity. Please try again later.',
         'unchanged' => 'Showing your latest analysis — your data has not changed since it was generated.',
+    ],
+
+    'routines' => [
+        'edit_progression' => 'Edit / stage progression →',
     ],
 
     'write' => [
@@ -238,6 +245,41 @@ return [
         'body_question' => 'Is my body changing the way I want?',
         'outlook' => 'Outlook',
         'outlook_question' => 'Where does this end up?',
+    ],
+
+    /*
+     | Page titles, plus the question each page exists to answer. The subtitle is
+     | not decoration: "Muscle analysis" tells you nothing you could act on,
+     | whereas "Which muscles are under-trained, and by how much" tells you what
+     | the page is for before you have read a single number.
+     */
+    'pages' => [
+        'body' => 'Body composition',
+        'body_sub' => 'Weight, body fat and lean mass — the trend, not the daily noise',
+        'muscle' => 'Muscle analysis',
+        'muscle_sub' => 'Which muscles are under-trained, and by how much',
+        'performance' => 'Performance over time',
+        'performance_sub' => 'Whether the weight on the bar is actually going up',
+        'levels' => 'Strength levels',
+        'levels_sub' => 'How your lifts compare to other lifters your age, weight and sex',
+        'routines' => 'Routines',
+        'routines_sub' => 'Which of your routines are progressing, and which have stalled',
+        'routine_edit' => 'Edit: :name',
+        'nutrition' => 'Nutrition',
+        'nutrition_sub' => 'Calorie and macro targets derived from your own data',
+        'photos' => 'Progress photos',
+        'photos_sub' => 'The measurement a scale cannot make',
+        'projections' => 'Projections',
+        'projections_sub' => 'Where your current rate of change leads — estimates, not promises',
+        'goals' => 'Goals',
+        'goals_sub' => 'Set the target that every other page measures you against',
+        'ai' => 'AI deep analysis',
+        'ai_sub' => 'A written read of your recent training and body data',
+        'guide' => 'Guide',
+        'guide_sub' => 'What every metric on this site means, and why it matters',
+        'write' => 'Write operations',
+        'write_sub' => 'Changes staged for Hevy — review the payload before anything is sent',
+        'profile' => 'Profile & settings',
     ],
 
     'tips' => [

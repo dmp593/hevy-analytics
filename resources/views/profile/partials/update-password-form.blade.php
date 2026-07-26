@@ -1,14 +1,4 @@
-<section>
-    <header>
-        <h2 class="text-lg font-medium text-ink">
-            {{ __('Update Password') }}
-        </h2>
-
-        <p class="mt-1 text-sm text-body">
-            {{ __('Ensure your account is using a long, random password to stay secure.') }}
-        </p>
-    </header>
-
+<x-ui.card :title="__('Update Password')" :subtitle="__('Ensure your account is using a long, random password to stay secure.')">
     <form method="post" action="{{ route('password.update') }}" class="mt-6 space-y-6">
         @csrf
         @method('put')
@@ -45,4 +35,4 @@
             @endif
         </div>
     </form>
-</section>
+</x-ui.card>

@@ -59,6 +59,39 @@ class DesignTokensTest extends TestCase
     }
 
     /**
+     * Tailwind generates utilities by scanning source text for complete class
+     * names. "max-w-{$width}" is not a class name it can see, so the utility is
+     * never emitted and the element silently renders with no constraint at all
+     * — no build warning, no runtime error, just a page that is the wrong width.
+     *
+     * A whole class name held in a variable ({{ $tone }}) is fine and common.
+     * What breaks is a literal prefix glued to an interpolated tail.
+     */
+    #[DataProvider('viewFiles')]
+    public function test_no_class_name_is_built_by_string_interpolation(string $file): void
+    {
+        // A Tailwind-ish prefix, then '-', then interpolation: bg-{$x}, max-w-{{ $y }}.
+        $pattern = '/[a-z][a-z0-9]*(?:-[a-z0-9]+)*-(?:\{\{\s*\$|\{\$)/';
+
+        $offenders = [];
+        foreach (file($file) as $i => $line) {
+            if (! preg_match('/\bclass\s*=|@apply|\'class\'\s*=>/', $line)) {
+                continue;
+            }
+            if (preg_match($pattern, $line)) {
+                $offenders[] = 'line '.($i + 1).': '.trim($line);
+            }
+        }
+
+        $this->assertSame([], $offenders, sprintf(
+            "%s builds a class name by interpolation, so Tailwind never emits it:\n  %s\n".
+            'Map the value to complete literal class names instead.',
+            $file,
+            implode("\n  ", $offenders),
+        ));
+    }
+
+    /**
      * Every token referenced by @theme inline has to exist in both :root and
      * .dark, or the utility silently resolves to nothing in one of the themes —
      * which reads as "inherited colour", not as an error.

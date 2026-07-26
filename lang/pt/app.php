@@ -78,6 +78,7 @@ return [
     ],
 
     'nutrition' => [
+        'recompute' => 'Recalcular alvos',
         'maintenance' => 'Manutenção (TDEE)',
         'target_calories' => 'Calorias-alvo',
         'protein' => 'Proteína',
@@ -109,11 +110,17 @@ return [
     ],
 
     'ai' => [
+        'generate' => 'Gerar análise',
+        'regenerate' => 'Gerar de novo',
         'unavailable' => 'A análise por IA ainda não está disponível na sua conta.',
         'quota' => 'Restam :remaining de :limit análises este mês.',
         'quota_spent' => 'Usou as :limit análises por IA deste mês. O limite volta a zero a :date.',
         'temporarily_unavailable' => 'A análise por IA está temporariamente indisponível enquanto reforçamos a capacidade. Tente novamente mais tarde.',
         'unchanged' => 'A mostrar a análise mais recente — os seus dados não mudaram desde que foi gerada.',
+    ],
+
+    'routines' => [
+        'edit_progression' => 'Editar / preparar progressão →',
     ],
 
     'write' => [
@@ -238,6 +245,35 @@ return [
         'body_question' => 'O meu corpo está a mudar como quero?',
         'outlook' => 'Perspetiva',
         'outlook_question' => 'Onde é que isto vai dar?',
+    ],
+
+    'pages' => [
+        'body' => 'Composição corporal',
+        'body_sub' => 'Peso, massa gorda e massa magra — a tendência, não o ruído diário',
+        'muscle' => 'Análise muscular',
+        'muscle_sub' => 'Que músculos estão sub-treinados, e por quanto',
+        'performance' => 'Desempenho ao longo do tempo',
+        'performance_sub' => 'Se o peso na barra está mesmo a subir',
+        'levels' => 'Níveis de força',
+        'levels_sub' => 'Como os teus levantamentos comparam com atletas da tua idade, peso e sexo',
+        'routines' => 'Rotinas',
+        'routines_sub' => 'Que rotinas estão a progredir, e quais estagnaram',
+        'routine_edit' => 'Editar: :name',
+        'nutrition' => 'Nutrição',
+        'nutrition_sub' => 'Alvos de calorias e macros derivados dos teus próprios dados',
+        'photos' => 'Fotografias de progresso',
+        'photos_sub' => 'A medição que uma balança não consegue fazer',
+        'projections' => 'Projeções',
+        'projections_sub' => 'Onde o teu ritmo atual leva — estimativas, não promessas',
+        'goals' => 'Objetivos',
+        'goals_sub' => 'Define o alvo com que todas as outras páginas te comparam',
+        'ai' => 'Análise profunda com IA',
+        'ai_sub' => 'Uma leitura escrita do teu treino e dados corporais recentes',
+        'guide' => 'Guia',
+        'guide_sub' => 'O que significa cada métrica deste site, e porque importa',
+        'write' => 'Operações de escrita',
+        'write_sub' => 'Alterações preparadas para o Hevy — revê o conteúdo antes de enviar',
+        'profile' => 'Perfil e definições',
     ],
 
     'tips' => [

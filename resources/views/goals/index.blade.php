@@ -1,7 +1,8 @@
-<x-app-layout>
-    <x-slot name="header"><h2 class="font-semibold text-xl text-ink">Goals</h2></x-slot>
-
-    <div class="py-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8" x-data="{ type: '{{ $active->type ?? 'lean_bulk' }}', presets: @js($presets) }">
+<x-ui.page :title="__('app.pages.goals')" :subtitle="__('app.pages.goals_sub')" width="5xl">
+    {{-- x-data lives on a plain element, not on <x-ui.page>: the expression
+         contains @js(), and routing that through a component attribute
+         re-escapes the JSON into something Alpine cannot parse. --}}
+    <div x-data="{ type: '{{ $active->type ?? 'lean_bulk' }}', presets: @js($presets) }">
         <x-flash />
 
         <form method="POST" action="{{ route('goals.store') }}">
@@ -63,4 +64,4 @@
             </x-panel>
         @endif
     </div>
-</x-app-layout>
+</x-ui.page>
