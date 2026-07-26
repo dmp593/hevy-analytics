@@ -37,6 +37,10 @@ class AiQuota
     {
         return $this->user->aiUsageEvents()
             ->where('created_at', '>=', Carbon::now()->startOfMonth())
+            // Only calls billed to the operator. An athlete spending their own
+            // API key is not spending ours, so rationing them would be charging
+            // twice for the same request.
+            ->where('billed_to_app', true)
             ->count();
     }
 
@@ -84,6 +88,8 @@ class AiQuota
             return false;
         }
 
-        return AiUsageEvent::where('created_at', '>=', Carbon::now()->startOfMonth())->count() >= $ceiling;
+        return AiUsageEvent::where('created_at', '>=', Carbon::now()->startOfMonth())
+            ->where('billed_to_app', true)
+            ->count() >= $ceiling;
     }
 }

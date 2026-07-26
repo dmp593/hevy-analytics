@@ -39,22 +39,23 @@ return [
         'base_url' => env('HEVY_BASE_URL', 'https://api.hevyapp.com'),
     ],
 
-    'deepseek' => [
-        'key' => env('DEEPSEEK_API_KEY'),
-        'base_url' => env('DEEPSEEK_BASE_URL', 'https://api.deepseek.com'),
-        // `deepseek-chat` was retired on 24 July 2026 and now remaps to
-        // V4-Flash. Pin the model explicitly rather than relying on an alias.
-        'model' => env('DEEPSEEK_MODEL', 'deepseek-v4-flash'),
-        'max_tokens' => (int) env('DEEPSEEK_MAX_TOKENS', 2000),
-    ],
-
     /*
-     * Hard caps on AI generation. These bound third-party spend: without them,
-     * unlimited accounts each able to force an uncached call have nothing
-     * between them and the operator's API balance but a per-minute throttle.
-     * Set the global ceiling to 0 to disable the circuit breaker.
+     * The operator's own AI provider — the "included with your subscription"
+     * path. Athletes may instead supply their own key in Settings, in which case
+     * this is not used and the limits below do not apply to them.
+     *
+     * The limits bound third-party spend: without them, accounts each able to
+     * force an uncached call have nothing between them and the operator's API
+     * balance but a per-minute throttle. Set the global ceiling to 0 to disable
+     * the circuit breaker.
      */
     'ai' => [
+        'provider' => env('AI_PROVIDER', 'deepseek'),
+        'key' => env('AI_API_KEY', env('DEEPSEEK_API_KEY')),
+        'model' => env('AI_MODEL', env('DEEPSEEK_MODEL', 'deepseek-v4-flash')),
+        // Empty falls back to the provider's default endpoint in ProviderRegistry.
+        'base_url' => env('AI_BASE_URL', env('DEEPSEEK_BASE_URL')),
+
         'monthly_limit_per_user' => (int) env('AI_MONTHLY_LIMIT_PER_USER', 30),
         'monthly_limit_global' => (int) env('AI_MONTHLY_LIMIT_GLOBAL', 5000),
     ],

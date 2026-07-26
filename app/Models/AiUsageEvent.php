@@ -18,7 +18,13 @@ class AiUsageEvent extends Model
         'outcome',
         'prompt_tokens',
         'completion_tokens',
+        'billed_to_app',
     ];
+
+    protected function casts(): array
+    {
+        return ['billed_to_app' => 'boolean'];
+    }
 
     public function user(): BelongsTo
     {

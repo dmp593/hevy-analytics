@@ -37,7 +37,7 @@ class AbuseControlsTest extends TestCase
 
     public function test_ai_generation_is_refused_once_the_monthly_quota_is_spent(): void
     {
-        config(['services.deepseek.key' => 'test-key', 'services.ai.monthly_limit_per_user' => 2]);
+        config(['services.ai.key' => 'test-key', 'services.ai.monthly_limit_per_user' => 2]);
 
         $user = User::factory()->create();
         $user->forceFill(['hevy_api_key' => 'k'])->save();
@@ -71,7 +71,7 @@ class AbuseControlsTest extends TestCase
 
     public function test_a_billed_call_that_returns_nothing_still_consumes_quota(): void
     {
-        config(['services.deepseek.key' => 'test-key', 'services.ai.monthly_limit_per_user' => 3]);
+        config(['services.ai.key' => 'test-key', 'services.ai.monthly_limit_per_user' => 3]);
 
         $user = User::factory()->create();
 

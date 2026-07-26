@@ -8,6 +8,8 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MuscleController;
 use App\Http\Controllers\NutritionController;
 use App\Http\Controllers\PerformanceController;
+use App\Http\Controllers\AiSettingsController;
+use App\Http\Controllers\DataExportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgressPhotoController;
 use App\Http\Controllers\ProjectionController;
@@ -72,6 +74,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // AI provider settings. Separate from the profile form because the two are
+    // saved independently: changing a training preference should not require
+    // re-submitting an API key, and vice versa.
+    Route::put('/settings/ai', [AiSettingsController::class, 'update'])->name('settings.ai.update');
+    Route::delete('/settings/ai/{provider}', [AiSettingsController::class, 'destroy'])->name('settings.ai.destroy');
+
+    // GDPR: everything the app holds about you, and the ability to take it away.
+    Route::get('/settings/export', [DataExportController::class, 'download'])->name('settings.export');
 });
 
 require __DIR__.'/auth.php';

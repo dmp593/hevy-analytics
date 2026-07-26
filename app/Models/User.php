@@ -120,6 +120,12 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(WriteOperation::class);
     }
 
+    /** The athlete's own AI provider keys, encrypted at rest. */
+    public function aiCredentials(): HasMany
+    {
+        return $this->hasMany(AiCredential::class);
+    }
+
     public function aiAnalyses(): HasMany
     {
         return $this->hasMany(AiAnalysis::class);
