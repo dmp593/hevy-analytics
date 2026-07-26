@@ -1,45 +1,102 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+/*
+ | Source files to scan for class names. Tailwind v4 auto-detects most of this,
+ | but the Blade views and the framework's own pagination templates are stated
+ | explicitly so a future .gitignore change cannot silently empty the stylesheet.
+ */
+@source '../views/**/*.blade.php';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    /*
+     | A system font stack rather than a webfont from a third-party CDN. A remote
+     | font is the same failure mode the Chart.js CDN was: when the request does
+     | not land, the page silently degrades. It is also a third-party request on
+     | every page load, which is a disclosure we would rather not owe EU users.
+     */
+    --font-sans:
+        ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/*
+ | Tailwind v4 changed the default border colour from gray-200 to currentColor,
+ | which would put a coloured 1px line around every element relying on the
+ | default. This restores the v3 behaviour.
+ |
+ | It is a compatibility shim, not a design decision: the design-system work will
+ | give every bordered element an explicit border colour, and this block can then
+ | be deleted.
+ */
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentcolor);
+    }
+}
 
 /*
  |--------------------------------------------------------------------------
  | Component classes
  |--------------------------------------------------------------------------
  | Small, semantic building blocks composed from Tailwind utilities. They keep
- | markup readable (e.g. `class="btn btn-primary"`) while the styling stays
- | one place. Use these for repeated primitives; keep layout utilities inline.
+ | markup readable (e.g. `class="btn-primary"`) while the styling stays in one
+ | place. Use these for repeated primitives; keep layout utilities inline.
+ |
+ | These live in @layer components rather than @utility deliberately. A custom
+ | @utility cannot be @apply'd inside another custom @utility in v4 — doing so
+ | silently drops the rest of the declaration, which is how .btn-primary ended up
+ | rendering with no background colour during this migration.
  */
 @layer components {
-    /* Buttons */
-    .btn {
-        @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2;
+    /* Buttons — shared shape, then one rule per variant. */
+    .btn,
+    .btn-primary,
+    .btn-dark,
+    .btn-ghost {
+        @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-semibold transition;
+        @apply focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2;
     }
+
     .btn-sm {
         @apply px-3 py-1.5 text-xs;
     }
+
     .btn-primary {
-        @apply btn bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500;
+        @apply bg-indigo-600 text-white hover:bg-indigo-700 focus-visible:ring-indigo-500;
     }
+
     .btn-dark {
-        @apply btn bg-gray-800 text-white hover:bg-gray-700 focus:ring-gray-500;
+        @apply bg-gray-800 text-white hover:bg-gray-700 focus-visible:ring-gray-500;
     }
+
     .btn-ghost {
-        @apply btn bg-white text-gray-600 hover:bg-gray-50 border border-gray-200;
+        @apply border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 focus-visible:ring-gray-400;
     }
 
     /* Forms */
     .form-label {
         @apply block text-xs font-medium text-gray-600;
     }
+
     .form-control {
-        @apply mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500;
+        @apply mt-1 block w-full rounded-md border-gray-300 text-sm shadow-xs;
+        @apply focus:border-indigo-500 focus:ring-indigo-500;
     }
 
     /* Tables */
     .table-head {
-        @apply text-left text-xs uppercase tracking-wide text-gray-500 border-b;
+        @apply border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500;
     }
+
     .table-row {
         @apply border-b border-gray-50;
     }

@@ -10,7 +10,7 @@ $tones = [
 ];
 @endphp
 
-<div {{ $attributes->merge(['class' => 'rounded-xl border border-gray-200 p-4 shadow-sm '.($tones[$tone] ?? $tones['default'])]) }}>
+<div {{ $attributes->merge(['class' => 'rounded-xl border border-gray-200 p-4 shadow-xs '.($tones[$tone] ?? $tones['default'])]) }}>
     <div class="text-xs font-medium uppercase tracking-wide text-gray-500">
         {{ $label }}@if($tip)<x-info :title="$tipTitle ?? $label" :text="$tip" />@endif
     </div>

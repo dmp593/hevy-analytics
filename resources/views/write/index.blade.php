@@ -10,7 +10,7 @@
                 <div class="py-4 border-b border-gray-100 last:border-0" x-data="{ open: false }">
                     <div class="flex items-center justify-between">
                         <div>
-                            <span class="font-mono text-xs rounded bg-gray-100 px-2 py-0.5">{{ $op->method }}</span>
+                            <span class="font-mono text-xs rounded-sm bg-gray-100 px-2 py-0.5">{{ $op->method }}</span>
                             <span class="font-medium text-sm ml-2">{{ $op->operation }}</span>
                             <span class="text-xs text-gray-400 ml-2">{{ $op->endpoint }}</span>
                         </div>

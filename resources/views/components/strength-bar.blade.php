@@ -52,10 +52,10 @@
     @if(count($pops) > 1)
         <div class="mt-1 flex flex-wrap gap-2 text-[11px]">
             @if(isset($pops['gym']))
-                <span class="rounded bg-sky-50 text-sky-700 px-2 py-0.5">Gym: {{ $fmt($pops['gym']['percentile']) }}%@if(!empty($pops['gym']['sample'])) <span class="text-sky-400">(n={{ number_format($pops['gym']['sample']) }})</span>@endif</span>
+                <span class="rounded-sm bg-sky-50 text-sky-700 px-2 py-0.5">Gym: {{ $fmt($pops['gym']['percentile']) }}%@if(!empty($pops['gym']['sample'])) <span class="text-sky-400">(n={{ number_format($pops['gym']['sample']) }})</span>@endif</span>
             @endif
             @if(isset($pops['verified']))
-                <span class="rounded bg-purple-50 text-purple-700 px-2 py-0.5">Verified/competition: {{ $fmt($pops['verified']['percentile']) }}%@if(!empty($pops['verified']['sample'])) <span class="text-purple-400">(n={{ number_format($pops['verified']['sample']) }})</span>@endif</span>
+                <span class="rounded-sm bg-purple-50 text-purple-700 px-2 py-0.5">Verified/competition: {{ $fmt($pops['verified']['percentile']) }}%@if(!empty($pops['verified']['sample'])) <span class="text-purple-400">(n={{ number_format($pops['verified']['sample']) }})</span>@endif</span>
             @endif
         </div>
     @endif
@@ -63,7 +63,7 @@
     @if($showThresholds && !empty($eval['thresholds_kg']))
         <div class="mt-2 grid grid-cols-5 gap-1 text-center text-[10px]">
             @foreach($levels as $i => $lvl)
-                <div class="rounded bg-gray-50 py-1">
+                <div class="rounded-sm bg-gray-50 py-1">
                     <div class="text-gray-400">{{ $lvl }}</div>
                     <div class="font-semibold text-gray-700">{{ $eval['thresholds_kg'][$i] }}kg</div>
                 </div>

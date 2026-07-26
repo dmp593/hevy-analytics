@@ -50,7 +50,7 @@ npm run build           # production assets
 | Database | PostgreSQL 16+ (dev, CI and production alike — one set of behaviours) |
 | Auth | Laravel Breeze (Blade), multi-user |
 | Frontend | Blade + Alpine.js + [Alpine AJAX](https://alpine-ajax.js.org) |
-| Styling | Tailwind CSS **only** (v3) |
+| Styling | Tailwind CSS **only** (v4, configured in `resources/css/app.css`) |
 | Charts | Chart.js, bundled via Vite (never a CDN — see `resources/js/components/chart.js`) |
 | AI | DeepSeek (OpenAI-compatible), optional |
 
@@ -123,6 +123,11 @@ a query in Science, it's in the wrong place.
 - **CSS:** compose Tailwind utilities in markup. For repeated primitives use the
   semantic classes in `app.css` (`.btn-primary`, `.form-control`, `.form-label`,
   `.table-head`, `.badge`). Add a new one only when a pattern repeats 3+ times.
+- **Tailwind v4 has no `tailwind.config.js`.** Theme tokens live in `@theme`,
+  plugins in `@plugin`, and scanned paths in `@source`, all inside
+  `resources/css/app.css`. Component classes go in `@layer components`, not
+  `@utility`: a custom `@utility` cannot be `@apply`'d inside another one, and
+  doing so silently drops the rest of the declaration.
 
 ## Testing
 

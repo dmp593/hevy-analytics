@@ -91,13 +91,13 @@
                             ];
                         @endphp
                         @foreach($signals as $s)
-                            <div class="flex justify-between rounded bg-gray-50 px-2 py-1">
+                            <div class="flex justify-between rounded-sm bg-gray-50 px-2 py-1">
                                 <span class="text-gray-500">{{ $s['label'] }}</span>
                                 <span class="font-semibold {{ $s['tone'] }}">{{ $s['text'] }}</span>
                             </div>
                         @endforeach
                         @if($triangulation['lift'])
-                            <div class="col-span-2 flex justify-between rounded bg-gray-50 px-2 py-1">
+                            <div class="col-span-2 flex justify-between rounded-sm bg-gray-50 px-2 py-1">
                                 <span class="text-gray-500">Top lift ({{ $triangulation['lift']['exercise'] }})</span>
                                 <span class="font-semibold {{ $triangulation['lift']['trend'] === 'up' ? 'text-green-600' : 'text-amber-600' }}">
                                     strength {{ $triangulation['lift']['trend'] }}

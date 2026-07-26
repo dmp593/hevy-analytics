@@ -20,7 +20,7 @@ $barColor = fn (string $status) => [
                 <span class="font-medium capitalize">{{ str_replace('_', ' ', $m['muscle']) }}</span>
                 <span class="text-gray-500">{{ $m['per_week'] }}/wk · <span class="capitalize">{{ str_replace('_', ' ', $m['status']) }}</span></span>
             </div>
-            <div class="h-2.5 rounded bg-gray-100 overflow-hidden">
+            <div class="h-2.5 rounded-sm bg-gray-100 overflow-hidden">
                 <div class="h-full {{ $barColor($m['status']) }}" style="width: {{ $pct }}%"></div>
             </div>
             @if($showLandmarks)

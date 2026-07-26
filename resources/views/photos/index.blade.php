@@ -44,7 +44,7 @@
             <div class="lg:col-span-2 space-y-4">
                 <div class="flex items-center justify-between">
                     <label class="inline-flex items-center gap-2 text-sm">
-                        <input type="checkbox" x-model="compare" class="rounded border-gray-300">
+                        <input type="checkbox" x-model="compare" class="rounded-sm border-gray-300">
                         Compare mode <span class="text-xs text-gray-400">(pick two photos)</span>
                     </label>
                 </div>
@@ -72,14 +72,14 @@
                                      @click="pick({{ $p->id }})"
                                      :class="(a === {{ $p->id }} || b === {{ $p->id }}) ? 'ring-2 ring-indigo-500 rounded-lg' : ''">
                                     <img src="{{ route('photos.file', $p) }}" loading="lazy" class="w-full h-40 object-cover rounded-lg border" alt="">
-                                    <span class="absolute top-1 left-1 text-[10px] bg-black/60 text-white px-1.5 py-0.5 rounded">{{ ucfirst($p->angle) }}</span>
+                                    <span class="absolute top-1 left-1 text-[10px] bg-black/60 text-white px-1.5 py-0.5 rounded-sm">{{ ucfirst($p->angle) }}</span>
                                     <form method="POST" action="{{ route('photos.destroy', $p) }}" @click.stop
                                           onsubmit="return confirm('Delete this photo?')"
                                           class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition">
                                         @csrf @method('DELETE')
-                                        <button class="text-[10px] bg-red-600 text-white px-1.5 py-0.5 rounded">✕</button>
+                                        <button class="text-[10px] bg-red-600 text-white px-1.5 py-0.5 rounded-sm">✕</button>
                                     </form>
-                                    @if($p->weight_kg)<span class="absolute bottom-1 left-1 text-[10px] bg-black/60 text-white px-1.5 py-0.5 rounded">{{ $p->weight_kg }}kg</span>@endif
+                                    @if($p->weight_kg)<span class="absolute bottom-1 left-1 text-[10px] bg-black/60 text-white px-1.5 py-0.5 rounded-sm">{{ $p->weight_kg }}kg</span>@endif
                                 </div>
                             @endforeach
                         </div>

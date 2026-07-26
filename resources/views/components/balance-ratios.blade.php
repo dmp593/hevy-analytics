@@ -23,12 +23,12 @@
                 @endif
             </div>
             @if($known)
-                <div class="flex h-2 rounded overflow-hidden bg-gray-100">
+                <div class="flex h-2 rounded-sm overflow-hidden bg-gray-100">
                     <div class="bg-indigo-500" style="width: {{ $b['value_a'] / $total * 100 }}%"></div>
                     <div class="bg-sky-300" style="width: {{ $b['value_b'] / $total * 100 }}%"></div>
                 </div>
             @else
-                <div class="h-2 rounded bg-gray-100"></div>
+                <div class="h-2 rounded-sm bg-gray-100"></div>
             @endif
         </div>
     @endforeach

@@ -12,7 +12,7 @@
             @focus="show()" @blur="hide()" @click.prevent="open = !open"
             @keydown.escape.window="open = false"
             :aria-expanded="open"
-            class="ml-1 h-4 w-4 inline-flex items-center justify-center rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold leading-none hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1"
+            class="ml-1 h-4 w-4 inline-flex items-center justify-center rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold leading-none hover:bg-gray-300 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1"
             aria-label="More info">i</button>
     {{-- A centred, fixed-width panel hanging off a card at the edge of the grid
          pushed the document wider than the viewport, so every page scrolled

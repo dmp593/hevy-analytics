@@ -24,7 +24,7 @@
                     <div class="font-medium text-sm">{{ $ex->title }}</div>
                     <div class="mt-1 flex flex-wrap gap-2">
                         @foreach($ex->sets ?? [] as $set)
-                            <span class="text-xs rounded bg-gray-100 px-2 py-1">
+                            <span class="text-xs rounded-sm bg-gray-100 px-2 py-1">
                                 {{ $set['type'] ?? 'normal' }}:
                                 {{ $set['weight_kg'] ?? '—' }}kg × {{ $set['reps'] ?? ($set['rep_range']['start'] ?? '—') }}
                             </span>
