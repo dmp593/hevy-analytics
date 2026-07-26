@@ -80,6 +80,7 @@ class DemoSeeder
         $this->seedRoutines($user, $templates);
         $this->seedTraining($user, $templates, $weeks);
         $this->seedBody($user, $weeks);
+        $this->seedIntake($user);
 
         return $user->refresh();
     }
@@ -128,6 +129,8 @@ class DemoSeeder
         $user->routines()->delete();
         $user->exerciseTemplates()->delete();
         $user->goals()->delete();
+        $user->intakeLogs()->delete();
+        $user->nutritionTargets()->delete();
     }
 
     /** @return array<string, string> exercise title => hevy_id */
@@ -270,5 +273,47 @@ class DemoSeeder
         }
 
         DB::table((new BodyMeasurement)->getTable())->insert($rows);
+    }
+
+    /**
+     * Daily intake for the last four weeks.
+     *
+     * Without this the demo account can never show adaptive maintenance, which
+     * needs seven logged days before it will say anything — so the app's single
+     * most defensible metric was invisible in the one account people look at.
+     *
+     * The intake is deliberately set ABOVE the athlete's true maintenance by a
+     * known amount. seedBody grows weight at 0.09 kg/week, which at 7700 kcal
+     * per kg is a surplus of about 99 kcal/day; putting average intake at 3,150
+     * therefore implies a measured maintenance near 3,050, comfortably clear of
+     * the Mifflin/Katch estimate for this profile. The demo then shows the
+     * measurement disagreeing with the formula, which is the whole point of it.
+     */
+    private function seedIntake(User $user): void
+    {
+        $rows = [];
+        $today = Carbon::now($user->resolvedTimezone())->startOfDay();
+
+        for ($i = 27; $i >= 0; $i--) {
+            $date = $today->copy()->subDays($i);
+
+            // Weekday-shaped variation: nobody eats an identical number daily,
+            // and a flat line would make the average look fabricated.
+            $swing = sin($i / 1.7) * 180 + ($date->isWeekend() ? 220 : -40);
+            $calories = (int) round(3150 + $swing);
+
+            $rows[] = [
+                'user_id' => $user->id,
+                'date' => $date->toDateString(),
+                'calories' => $calories,
+                'protein_g' => (int) round(165 + $swing / 40),
+                'fat_g' => (int) round(70 + $swing / 90),
+                'carb_g' => (int) round(430 + $swing / 8),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        DB::table('intake_logs')->insert($rows);
     }
 }

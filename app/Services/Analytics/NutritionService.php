@@ -46,13 +46,19 @@ class NutritionService
             $formula = 'mifflin_st_jeor';
         }
 
-        $tdee = Macros::tdee($bmr, $this->user->activity_level ?? 1.55);
+        $formulaTdee = Macros::tdee($bmr, $this->user->activity_level ?? 1.55);
+        $tdee = $formulaTdee;
 
         // Adaptive correction: if we can estimate real maintenance from intake +
         // weight change, blend it toward the formula estimate.
+        //
+        // The blend overwrites $tdee, so the formula figure has to be kept
+        // separately or it is gone: the stored 'tdee' is then a hybrid wearing a
+        // formula's name, and neither half can be recovered to explain the
+        // difference to the athlete.
         $adaptive = $this->adaptiveMaintenance();
         if ($adaptive !== null) {
-            $tdee = round($tdee * 0.5 + $adaptive * 0.5, 1);
+            $tdee = round($formulaTdee * 0.5 + $adaptive * 0.5, 1);
         }
 
         $targetCalories = Macros::targetCalories($tdee, $profile->calorie_adjustment_pct);
@@ -76,6 +82,7 @@ class NutritionService
                 'fat_g_per_kg' => $profile->fat_g_per_kg,
                 'fiber_g' => Macros::fiberG($targetCalories),
                 'adaptive_maintenance' => $adaptive,
+                'formula_tdee' => $formulaTdee,
                 'target_rate_pct_bw_per_week' => $profile->target_rate_pct_bw_per_week,
             ],
         ];

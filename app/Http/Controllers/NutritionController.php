@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Services\Analytics\NutritionService;
+use App\Services\Analytics\NutritionVerdict;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 
 class NutritionController extends Controller
@@ -13,11 +15,21 @@ class NutritionController extends Controller
         $service = new NutritionService($user);
         $target = $service->computeTargets();
 
+        // The measurement needs 7 logged days to exist. Counting them here lets
+        // the page say how many are still missing rather than only that the
+        // targets are an estimate.
+        $loggedDays = $user->intakeLogs()
+            ->where('date', '>=', Carbon::now()->subDays(28))
+            ->whereNotNull('calories')
+            ->count();
+
         return view('nutrition.index', [
             'target' => $target,
             'goal' => $user->activeGoal(),
             'adherence' => $service->adherence(),
             'adaptive' => $service->adaptiveMaintenance(),
+            'loggedDays' => $loggedDays,
+            'verdict' => (new NutritionVerdict($target, $loggedDays))->verdict(),
             'recentLogs' => $user->intakeLogs()->orderByDesc('date')->limit(14)->get(),
             'history' => $user->nutritionTargets()->orderByDesc('date')->limit(30)->get(),
         ]);
