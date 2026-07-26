@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\AI\AiQuota;
 use App\Services\Hevy\HevyWriter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
@@ -40,15 +41,8 @@ class AbuseControlsTest extends TestCase
         $user = User::factory()->create();
         $user->forceFill(['hevy_api_key' => 'k'])->save();
 
-        foreach (range(1, 2) as $i) {
-            $user->aiAnalyses()->create([
-                'scope' => 'deep_analysis',
-                'params' => [],
-                'data_hash' => 'hash-'.$i,
-                'prompt' => 'p',
-                'response' => 'r',
-                'model' => 'test',
-            ]);
+        foreach (range(1, 2) as $ignored) {
+            $user->aiUsageEvents()->create(['scope' => 'deep_analysis', 'outcome' => 'success']);
         }
 
         $quota = new AiQuota($user);
@@ -66,15 +60,81 @@ class AbuseControlsTest extends TestCase
         config(['services.ai.monthly_limit_global' => 1]);
 
         $first = User::factory()->create();
-        $first->aiAnalyses()->create([
-            'scope' => 'deep_analysis', 'params' => [], 'data_hash' => 'h',
-            'prompt' => 'p', 'response' => 'r', 'model' => 'test',
-        ]);
+        $first->aiUsageEvents()->create(['scope' => 'deep_analysis', 'outcome' => 'success']);
 
         $second = User::factory()->create();
 
         $this->assertTrue(AiQuota::globalCeilingReached());
         $this->assertFalse((new AiQuota($second))->allows());
+    }
+
+    public function test_a_billed_call_that_returns_nothing_still_consumes_quota(): void
+    {
+        config(['services.deepseek.key' => 'test-key', 'services.ai.monthly_limit_per_user' => 3]);
+
+        $user = User::factory()->create();
+
+        // 200 OK with empty content: the provider billed the tokens and no
+        // analysis is stored. Counting stored analyses let this run forever.
+        Http::fake(['*' => Http::response(['choices' => [['message' => ['content' => '']]]], 200)]);
+
+        for ($i = 0; $i < 10; $i++) {
+            $this->actingAs($user)->post('/ai/generate', ['force' => 1]);
+        }
+
+        $calls = Http::recorded(fn ($r) => str_contains($r->url(), 'chat/completions'))->count();
+
+        $this->assertSame(3, $calls, 'the quota must stop billed calls even when none of them produce an analysis');
+        $this->assertSame(3, (new AiQuota($user))->usedThisMonth());
+        $this->assertSame(0, $user->aiAnalyses()->count());
+    }
+
+    public function test_rapid_sync_clicks_queue_only_one_job(): void
+    {
+        Queue::fake();
+
+        $user = User::factory()->create();
+        $user->forceFill(['hevy_api_key' => 'k'])->save();
+
+        foreach (range(1, 5) as $ignored) {
+            $this->actingAs($user)->post('/sync');
+        }
+
+        Queue::assertPushed(SyncHevyJob::class, 1);
+    }
+
+    public function test_a_write_stuck_mid_call_is_recoverable(): void
+    {
+        $timeout = true;
+        Http::fake(function () use (&$timeout) {
+            if ($timeout) {
+                throw new ConnectionException('cURL error 28: Operation timed out');
+            }
+
+            return Http::response(['id' => 'x'], 200);
+        });
+
+        $user = User::factory()->create();
+        $user->forceFill(['hevy_api_key' => 'k'])->save();
+
+        $op = $user->writeOperations()->create([
+            'operation' => 'workout.create',
+            'method' => 'POST',
+            'endpoint' => '/v1/workouts',
+            'payload' => ['title' => 'Test'],
+            'status' => 'pending',
+            'idempotency_key' => (string) Str::uuid(),
+        ]);
+
+        (new HevyWriter($user))->execute($op);
+
+        // A transport failure previously left the row claimed as 'running'
+        // forever, and 'running' is not an executable status.
+        $this->assertSame('failed', $op->fresh()->status);
+
+        $timeout = false;
+        $retried = (new HevyWriter($user))->execute($op->fresh());
+        $this->assertSame('success', $retried->status);
     }
 
     public function test_sync_is_queued_rather_than_run_in_the_request(): void

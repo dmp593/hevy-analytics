@@ -2,16 +2,34 @@
 
 <div class="space-y-4">
     @foreach($items as $b)
-        @php $total = ($b['value_a'] + $b['value_b']) ?: 1; @endphp
+        @php
+            $total = ($b['value_a'] + $b['value_b']) ?: 1;
+            $unit = $b['unit'] ?? '';
+            $known = ($b['has_data'] ?? true) && $b['ratio'] !== null;
+        @endphp
         <div>
-            <div class="flex justify-between text-xs mb-1">
-                <span>{{ $b['label_a'] }} ({{ number_format($b['value_a']) }}) vs {{ $b['label_b'] }} ({{ number_format($b['value_b']) }})</span>
-                <span class="{{ $b['balanced'] ? 'text-green-600' : 'text-amber-600' }} font-semibold">{{ $b['ratio'] ?? '—' }}</span>
+            <div class="flex justify-between items-baseline gap-3 text-xs mb-1">
+                <span>
+                    {{ $b['label_a'] }} ({{ $b['value_a'] }}) vs {{ $b['label_b'] }} ({{ $b['value_b'] }})
+                    @if($unit)<span class="text-gray-400">{{ $unit }}</span>@endif
+                </span>
+                @if($known)
+                    {{-- Status is not colour-only: the word carries it too. --}}
+                    <span class="font-semibold whitespace-nowrap {{ $b['balanced'] ? 'text-green-700' : 'text-amber-700' }}">
+                        {{ $b['ratio'] }} · {{ $b['balanced'] ? 'balanced' : 'skewed' }}
+                    </span>
+                @else
+                    <span class="text-gray-500 whitespace-nowrap">not enough data yet</span>
+                @endif
             </div>
-            <div class="flex h-2 rounded overflow-hidden bg-gray-100">
-                <div class="bg-indigo-500" style="width: {{ $b['value_a'] / $total * 100 }}%"></div>
-                <div class="bg-sky-300" style="width: {{ $b['value_b'] / $total * 100 }}%"></div>
-            </div>
+            @if($known)
+                <div class="flex h-2 rounded overflow-hidden bg-gray-100">
+                    <div class="bg-indigo-500" style="width: {{ $b['value_a'] / $total * 100 }}%"></div>
+                    <div class="bg-sky-300" style="width: {{ $b['value_b'] / $total * 100 }}%"></div>
+                </div>
+            @else
+                <div class="h-2 rounded bg-gray-100"></div>
+            @endif
         </div>
     @endforeach
 </div>

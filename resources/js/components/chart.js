@@ -55,16 +55,31 @@ function sweepDetached() {
 export default function chart() {
     return {
         onMerged: null,
+        lastConfig: null,
 
         mount() {
             this.draw();
 
             // ajax:merged bubbles from the swapped target, so listening on the
             // document also catches a canvas that was reused in place.
+            //
+            // The handler unregisters ITSELF once its canvas leaves the document.
+            // Alpine never calls destroy() for a component that existed at
+            // initial page load — its wrapper carries no _x_marker on the first
+            // Alpine.start() pass — so relying on that lifecycle leaked a
+            // listener per chart for the life of the page.
             this.onMerged = (event) => {
+                if (!this.$el.isConnected) {
+                    this.destroy();
+
+                    return;
+                }
+
                 if (event.target === this.$el || event.target.contains?.(this.$el)) {
-                    // Let the DOM settle before re-reading the config.
-                    requestAnimationFrame(() => this.draw());
+                    // setTimeout rather than requestAnimationFrame: rAF does not
+                    // fire in a backgrounded tab, which is exactly when a slow
+                    // filter response lands.
+                    setTimeout(() => this.draw(), 0);
                 }
             };
 
@@ -92,6 +107,13 @@ export default function chart() {
                 return;
             }
 
+            // A freshly-swapped canvas both mounts (x-init) and receives the
+            // ajax:merged it is nested inside, so without this it would be built
+            // twice per filter apply.
+            if (raw === this.lastConfig && instances.get(canvas)) {
+                return;
+            }
+
             let config;
             try {
                 config = JSON.parse(raw);
@@ -101,6 +123,7 @@ export default function chart() {
             }
 
             destroyFor(canvas);
+            this.lastConfig = raw;
 
             const options = config.options ?? {};
 

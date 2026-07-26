@@ -20,9 +20,12 @@
 
     // A <canvas> is opaque to assistive technology. Describe what it plots and
     // the range it covers so the chart is not simply missing for screen readers.
+    // Labels are not guaranteed to be a 0-indexed list, so read the ends by key
+    // rather than by position.
+    $labelList = array_values((array) $labels);
     $seriesNames = collect($datasets)->pluck('label')->filter()->implode(', ');
-    $first = $labels[0] ?? null;
-    $last = count($labels) ? $labels[count($labels) - 1] : null;
+    $first = $labelList[0] ?? null;
+    $last = $labelList ? end($labelList) : null;
 
     $description = $summary ?? trim(sprintf(
         '%s chart%s%s.',

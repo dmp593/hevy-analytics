@@ -89,6 +89,61 @@ class AnalyticsCorrectnessTest extends TestCase
         $this->assertEqualsWithDelta(4.0, $chest['per_week'], 0.01);
     }
 
+    public function test_weekly_sets_are_not_diluted_by_a_wide_filter_window(): void
+    {
+        $user = $this->makeAthlete();
+        $this->seedExerciseTemplates($user, ['bench' => ['Bench Press', 'chest', []]]);
+
+        // Four weeks of training, then viewed through a ten-year window.
+        for ($week = 3; $week >= 0; $week--) {
+            $this->seedWorkout(
+                $user,
+                Carbon::now()->subWeeks($week)->startOfWeek()->addDay()->setTime(18, 0),
+                ['bench'],
+                setsPerExercise: 4,
+            );
+        }
+
+        $wide = new FilterCriteria(
+            from: Carbon::now()->subYears(10),
+            to: Carbon::now()->endOfDay(),
+        );
+
+        $chest = collect((new VolumeAnalytics($user, $wide))->weeklySetsPerMuscle())
+            ->firstWhere('muscle', 'chest');
+
+        // Dividing by the requested window rather than the athlete's history
+        // reported this as 0.03 sets/week and flagged them "below maintenance".
+        $this->assertEqualsWithDelta(4.0, $chest['per_week'], 0.5);
+    }
+
+    public function test_a_new_account_is_not_punished_for_having_little_history(): void
+    {
+        $user = $this->makeAthlete();
+        $this->seedExerciseTemplates($user, ['bench' => ['Bench Press', 'chest', []]]);
+
+        // Three weeks old, viewed through the default six-month window.
+        for ($week = 2; $week >= 0; $week--) {
+            $this->seedWorkout(
+                $user,
+                Carbon::now()->subWeeks($week)->startOfWeek()->addDay()->setTime(18, 0),
+                ['bench'],
+                setsPerExercise: 5,
+            );
+        }
+
+        $default = new FilterCriteria(
+            from: Carbon::now()->subMonths(6)->startOfDay(),
+            to: Carbon::now()->endOfDay(),
+        );
+
+        $chest = collect((new VolumeAnalytics($user, $default))->weeklySetsPerMuscle())
+            ->firstWhere('muscle', 'chest');
+
+        // 15 sets across ~3 weeks of training, not across 26 weeks of window.
+        $this->assertGreaterThan(3.0, $chest['per_week']);
+    }
+
     public function test_muscle_balance_is_measured_in_sets_not_tonnage(): void
     {
         $user = $this->makeAthlete();
@@ -155,6 +210,24 @@ class AnalyticsCorrectnessTest extends TestCase
         $this->assertTrue($result['available']);
         $this->assertSame(1.0, $result['r2']);
         $this->assertSame('weak', $result['quality']);
+    }
+
+    public function test_projection_refuses_a_steep_line_through_a_few_consecutive_days(): void
+    {
+        // Four daily weigh-ins during a water-weight swing previously
+        // extrapolated 80 kg to 186 kg over a year.
+        $series = [];
+        foreach (range(0, 3) as $i) {
+            $series[] = [
+                'label' => Carbon::parse('2026-01-01')->addDays($i)->toDateString(),
+                'value' => 80 + $i * 0.6,
+            ];
+        }
+
+        $result = (new ProjectionService)->project($series);
+
+        $this->assertFalse($result['available']);
+        $this->assertStringContainsString('days', $result['reason']);
     }
 
     public function test_projection_handles_quarter_and_semester_bucket_labels(): void

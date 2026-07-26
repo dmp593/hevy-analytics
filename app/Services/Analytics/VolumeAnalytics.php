@@ -111,41 +111,64 @@ class VolumeAnalytics
     }
 
     /**
-     * Number of whole weeks the analysis window covers, used as the divisor for
-     * "per week" figures.
+     * Number of whole weeks to divide by for "per week" figures.
      *
-     * Prefer the requested filter window over the observed data span: a user who
-     * trained on days 1 and 3 of a 28-day window has still only trained for one
-     * week's worth of sessions across four weeks, and dividing by the observed
-     * 3-day span would overstate their weekly volume ~9x. Falls back to the data
-     * span when the filter is open-ended.
+     * Neither the raw filter window nor the raw data span is right on its own:
+     *
+     *  - Dividing by the filter window punishes a new account. Someone three
+     *    weeks into training, viewed through the default six-month window, would
+     *    have their volume divided by 26.
+     *  - Dividing by the data span overstates anyone who trained in a short
+     *    burst, and mis-counts dense data: measuring first-session to
+     *    last-session under-counts by a week, which the old code papered over
+     *    with a blanket +1 that then over-counted every other case by 20%.
+     *
+     * So: start at the later of the window opening and the athlete's first
+     * session — they cannot train before they began — and end at the window
+     * close, capped at today. Counting past the last session is deliberate:
+     * someone who has stopped training should watch their weekly average fall.
      */
     public function weeksInRange(?Collection $rows = null): int
     {
-        [$from, $to] = $this->windowBounds($rows);
-
-        if ($from === null || $to === null) {
+        $dates = ($rows ?? $this->rows())->pluck('start_time')->filter();
+        if ($dates->isEmpty()) {
             return 1;
         }
 
-        return max(1, (int) round($from->diffInDays($to) / 7));
-    }
+        $firstSession = Carbon::parse($dates->min());
 
-    /** @return array{0: ?Carbon, 1: ?Carbon} */
-    private function windowBounds(?Collection $rows): array
-    {
-        if ($this->filter->from && $this->filter->to) {
-            return [$this->filter->from->copy(), $this->filter->to->copy()];
+        $end = $this->filter->to?->copy() ?? Carbon::parse($dates->max());
+        if ($end->greaterThan(Carbon::now())) {
+            $end = Carbon::now();
         }
 
-        $dates = ($rows ?? $this->rows())->pluck('start_time')->filter();
-        if ($dates->isEmpty()) {
-            return [null, null];
+        $windowStart = $this->filter->from?->copy();
+
+        // Compare against the athlete's FIRST EVER session, not the first in
+        // range: rows are already filtered to the window, so the earliest row is
+        // never before the window opens and the comparison would always fail.
+        $firstEver = $this->user->workouts()->min('start_time');
+        $trainedBeforeWindow = $windowStart !== null
+            && $firstEver !== null
+            && Carbon::parse($firstEver)->lessThanOrEqualTo($windowStart);
+
+        // Which edge binds changes how the weeks are counted, and getting this
+        // wrong is what produced both the original 20% understatement and its
+        // over-correction.
+        if ($trainedBeforeWindow) {
+            // The window opens after training began, so the window IS the period.
+            // 28 requested days is 4 weeks, no fencepost adjustment.
+            $days = max(0, $windowStart->diffInDays($end));
+
+            return max(1, (int) round($days / 7));
         }
 
-        return [
-            $this->filter->from?->copy() ?? Carbon::parse($dates->min()),
-            $this->filter->to?->copy() ?? Carbon::parse($dates->max()),
-        ];
+        // Training began inside the window, so the athlete's history is the
+        // period. Measuring first-session to last spans one week fewer than it
+        // covers -- four weekly sessions span 21 days but occupy 4 weeks -- so
+        // count the days inclusively.
+        $days = max(0, $firstSession->diffInDays($end));
+
+        return max(1, (int) ceil(($days + 1) / 7));
     }
 }

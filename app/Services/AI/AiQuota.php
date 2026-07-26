@@ -2,7 +2,7 @@
 
 namespace App\Services\AI;
 
-use App\Models\AiAnalysis;
+use App\Models\AiUsageEvent;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 
@@ -27,9 +27,15 @@ class AiQuota
         return (int) config('services.ai.monthly_limit_per_user', 30);
     }
 
+    /**
+     * Counts requests ATTEMPTED, not analyses stored. A provider response that
+     * is 200 but empty, or any failure after the tokens were spent, costs money
+     * and produces no analysis — counting results let ten forced calls consume
+     * zero allowance.
+     */
     public function usedThisMonth(): int
     {
-        return $this->user->aiAnalyses()
+        return $this->user->aiUsageEvents()
             ->where('created_at', '>=', Carbon::now()->startOfMonth())
             ->count();
     }
@@ -77,6 +83,6 @@ class AiQuota
             return false;
         }
 
-        return AiAnalysis::where('created_at', '>=', Carbon::now()->startOfMonth())->count() >= $ceiling;
+        return AiUsageEvent::where('created_at', '>=', Carbon::now()->startOfMonth())->count() >= $ceiling;
     }
 }

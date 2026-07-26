@@ -36,18 +36,30 @@ class BodyCompAnalytics
         };
     }
 
+    /**
+     * The two Navy equations use different measurement sites: men's takes the
+     * abdomen at the navel, women's takes the natural (narrowest) waist. Feeding
+     * the abdomen into the women's equation overstates body fat by several
+     * points, so pick the right column per sex and only fall back when the
+     * preferred one is missing.
+     */
     private function navyFor(BodyMeasurement $m): ?float
     {
         $height = $this->user->height_cm;
-        $abdomen = $m->abdomen ?? $m->waist;
-        if (! $height || ! $m->neck_cm || ! $abdomen) {
+        $isFemale = BodyComposition::isFemale($this->user->sex);
+
+        $circumference = $isFemale
+            ? ($m->waist ?? $m->abdomen)
+            : ($m->abdomen ?? $m->waist);
+
+        if (! $height || ! $m->neck_cm || ! $circumference) {
             return null;
         }
 
         return BodyComposition::navyBodyFat(
             $this->user->sex ?? 'male',
             (float) $m->neck_cm,
-            (float) $abdomen,
+            (float) $circumference,
             (float) $height,
             $m->hips !== null ? (float) $m->hips : null,
         );
@@ -163,10 +175,15 @@ class BodyCompAnalytics
         $waist = $this->latestValue('waist');
         $hips = $this->latestValue('hips');
 
+        // Women's Navy equation takes the natural waist, men's the abdomen.
+        $navySite = BodyComposition::isFemale($this->user->sex)
+            ? ($waist ?? $abdomen)
+            : $abdomen;
+
         $navyBf = BodyComposition::navyBodyFat(
             $this->user->sex ?? 'male',
             $neck,
-            $abdomen,
+            $navySite,
             $height !== null ? (float) $height : null,
             $hips,
         );

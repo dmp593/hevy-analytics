@@ -17,6 +17,13 @@ class ProjectionService
     /** Below this many points a straight line through the data means nothing. */
     private const MIN_POINTS = 4;
 
+    /**
+     * Points alone are not enough: four weigh-ins on four consecutive days can
+     * fit a steep line that, extrapolated a year out, turns 80 kg into 186 kg.
+     * The data has to span real time before a trend is worth stating.
+     */
+    private const MIN_SPAN_DAYS = 21;
+
     public function project(array $series, bool $dampen = false): array
     {
         $points = array_values(array_filter($series, fn ($p) => isset($p['value']) && is_numeric($p['value'])));
@@ -51,6 +58,18 @@ class ProjectionService
         // All points landing on one date gives a vertical fit with no meaning.
         if (count($x) < self::MIN_POINTS || count(array_unique($x)) < 2) {
             return ['available' => false, 'reason' => 'Not enough distinct dates to establish a trend.'];
+        }
+
+        $spanDays = max($x) - min($x);
+        if ($spanDays < self::MIN_SPAN_DAYS) {
+            return [
+                'available' => false,
+                'reason' => sprintf(
+                    'Your data covers %d days. Projections need at least %d days so a short-term swing is not mistaken for a trend.',
+                    (int) $spanDays,
+                    self::MIN_SPAN_DAYS,
+                ),
+            ];
         }
 
         $reg = LinearRegression::fit($x, $y);

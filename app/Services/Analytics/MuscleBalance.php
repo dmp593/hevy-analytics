@@ -19,8 +19,8 @@ class MuscleBalance
 
     private const LOWER = ['quadriceps', 'hamstrings', 'glutes', 'calves', 'abductors', 'adductors'];
 
-    /** Combined weekly sets across both sides below which a ratio is noise. */
-    private const MIN_WEEKLY_SETS = 4.0;
+    /** Combined sets across both sides in the window below which a ratio is noise. */
+    private const MIN_TOTAL_SETS = 12.0;
 
     public function __construct(
         private readonly User $user,
@@ -39,21 +39,31 @@ class MuscleBalance
      */
     public function ratios(): array
     {
-        $sets = collect((new VolumeAnalytics($this->user, $this->filter))->weeklySetsPerMuscle())
-            ->keyBy('muscle')
-            ->map(fn ($x) => (float) $x['per_week']);
+        $rows = collect((new VolumeAnalytics($this->user, $this->filter))->weeklySetsPerMuscle())
+            ->keyBy('muscle');
 
-        $push = $this->sum($sets, self::PUSH);
-        $pull = $this->sum($sets, self::PULL);
-        $quads = $this->sum($sets, self::QUADS);
-        $posterior = $this->sum($sets, self::POSTERIOR_CHAIN);
-        $upper = $this->sum($sets, self::UPPER);
-        $lower = $this->sum($sets, self::LOWER);
+        $perWeek = $rows->map(fn ($x) => (float) $x['per_week']);
+        // Totals drive the "is there enough data" gate. Per-week values shrink
+        // as the window widens, so gating on them would let the chosen date
+        // range decide whether a ratio exists at all.
+        $totals = $rows->map(fn ($x) => (float) $x['total_sets']);
+
+        $group = fn (array $muscles) => [
+            $this->sum($perWeek, $muscles),
+            $this->sum($totals, $muscles),
+        ];
+
+        [$pushWk, $pushTotal] = $group(self::PUSH);
+        [$pullWk, $pullTotal] = $group(self::PULL);
+        [$quadWk, $quadTotal] = $group(self::QUADS);
+        [$postWk, $postTotal] = $group(self::POSTERIOR_CHAIN);
+        [$upperWk, $upperTotal] = $group(self::UPPER);
+        [$lowerWk, $lowerTotal] = $group(self::LOWER);
 
         return [
-            'push_pull' => $this->ratio($push, $pull, 'Push', 'Pull'),
-            'quad_posterior' => $this->ratio($quads, $posterior, 'Quads', 'Posterior chain'),
-            'upper_lower' => $this->ratio($upper, $lower, 'Upper', 'Lower'),
+            'push_pull' => $this->ratio($pushWk, $pullWk, $pushTotal + $pullTotal, 'Push', 'Pull'),
+            'quad_posterior' => $this->ratio($quadWk, $postWk, $quadTotal + $postTotal, 'Quads', 'Posterior chain'),
+            'upper_lower' => $this->ratio($upperWk, $lowerWk, $upperTotal + $lowerTotal, 'Upper', 'Lower'),
         ];
     }
 
@@ -67,9 +77,9 @@ class MuscleBalance
      * comparison to mean anything; below that we report it as indeterminate
      * rather than flagging a beginner's first week as "imbalanced".
      */
-    private function ratio(float $a, float $b, string $labelA, string $labelB): array
+    private function ratio(float $a, float $b, float $totalSets, string $labelA, string $labelB): array
     {
-        $enoughData = $a + $b >= self::MIN_WEEKLY_SETS;
+        $enoughData = $totalSets >= self::MIN_TOTAL_SETS;
         $ratio = ($enoughData && $b > 0) ? round($a / $b, 2) : null;
         $balanced = $ratio !== null && $ratio >= 0.8 && $ratio <= 1.25;
 

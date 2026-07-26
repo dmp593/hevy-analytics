@@ -34,7 +34,9 @@ class StrengthAnalytics
                 continue;
             }
             $e = OneRepMax::estimate($r->weight_kg, $r->reps, $r->rpe);
-            if ($e === null || ! OneRepMax::isReliable((float) $r->reps)) {
+            // Reliability must consider RPE as well as reps: a low-RPE set's
+            // e1RM is inflated by inferred reps-in-reserve, not by a lift.
+            if ($e === null || ! OneRepMax::isReliableSet((float) $r->reps, $r->rpe !== null ? (float) $r->rpe : null)) {
                 continue;
             }
             $day = Carbon::parse($r->start_time)->toDateString();
@@ -66,7 +68,7 @@ class StrengthAnalytics
                 ];
             }
             $e = OneRepMax::estimate($r->weight_kg, $r->reps, $r->rpe);
-            if ($e !== null && OneRepMax::isReliable((float) $r->reps)) {
+            if ($e !== null && OneRepMax::isReliableSet((float) $r->reps, $r->rpe !== null ? (float) $r->rpe : null)) {
                 $byExercise[$key]['best_e1rm'] = max($byExercise[$key]['best_e1rm'], $e);
             }
             $byExercise[$key]['best_weight'] = max($byExercise[$key]['best_weight'], (float) ($r->weight_kg ?? 0));

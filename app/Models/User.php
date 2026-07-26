@@ -107,4 +107,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(AiAnalysis::class);
     }
+
+    public function aiUsageEvents(): HasMany
+    {
+        return $this->hasMany(AiUsageEvent::class);
+    }
 }

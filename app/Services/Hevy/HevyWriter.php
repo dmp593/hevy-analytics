@@ -13,6 +13,9 @@ use Illuminate\Support\Str;
  */
 class HevyWriter
 {
+    /** A 'running' claim older than this is assumed abandoned and may be retaken. */
+    private const STALE_CLAIM_MINUTES = 10;
+
     public function __construct(private readonly User $user) {}
 
     private function client(): HevyClient
@@ -48,10 +51,17 @@ class HevyWriter
             return $op;
         }
 
+        // Claim it, or reclaim a stale claim. A crash or timeout mid-call used to
+        // leave the row in 'running' forever with no way back, because 'running'
+        // is not an executable status.
         $claimed = WriteOperation::query()
             ->whereKey($op->getKey())
-            ->whereIn('status', ['pending', 'confirmed', 'failed'])
-            ->update(['status' => 'running']);
+            ->where(function ($q) {
+                $q->whereIn('status', ['pending', 'confirmed', 'failed'])
+                    ->orWhere(fn ($stale) => $stale->where('status', 'running')
+                        ->where('updated_at', '<', now()->subMinutes(self::STALE_CLAIM_MINUTES)));
+            })
+            ->update(['status' => 'running', 'updated_at' => now()]);
 
         if ($claimed === 0) {
             return $op->refresh();
@@ -66,15 +76,27 @@ class HevyWriter
 
         $key = $op->idempotency_key;
 
-        $response = match ($op->operation) {
-            'workout.create' => $client->createWorkout($payload, $key),
-            'workout.update' => $client->updateWorkout($targetId, $payload, $key),
-            'routine.create' => $client->createRoutine($payload, $key),
-            'routine.update' => $client->updateRoutine($targetId, $payload, $key),
-            'routine_folder.create' => $client->createRoutineFolder($payload, $key),
-            'exercise_template.create' => $client->createExerciseTemplate($payload, $key),
-            default => null,
-        };
+        try {
+            $response = match ($op->operation) {
+                'workout.create' => $client->createWorkout($payload, $key),
+                'workout.update' => $client->updateWorkout($targetId, $payload, $key),
+                'routine.create' => $client->createRoutine($payload, $key),
+                'routine.update' => $client->updateRoutine($targetId, $payload, $key),
+                'routine_folder.create' => $client->createRoutineFolder($payload, $key),
+                'exercise_template.create' => $client->createExerciseTemplate($payload, $key),
+                default => null,
+            };
+        } catch (\Throwable $e) {
+            // A transport failure tells us nothing about whether Hevy applied the
+            // change, so record it and stop rather than leaving the row claimed.
+            // For a create, retrying blind is exactly how duplicates happen.
+            $op->update([
+                'status' => 'failed',
+                'response' => ['error' => $e->getMessage()],
+            ]);
+
+            return $op;
+        }
 
         if ($response === null) {
             $op->update(['status' => 'failed', 'response' => ['error' => 'Unknown operation']]);

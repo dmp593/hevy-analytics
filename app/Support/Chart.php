@@ -8,6 +8,9 @@ namespace App\Support;
  */
 class Chart
 {
+    /** Used when a multi() set does not name a colour. */
+    public const DEFAULT_COLOR = '#4f46e5';
+
     /** Extract the x-axis labels from a series. */
     public static function labels(array $series): array
     {
@@ -58,12 +61,15 @@ class Chart
         $labels = [];
         foreach ($sets as $set) {
             foreach ($set['series'] ?? [] as $point) {
-                $labels[(string) $point['label']] = true;
+                $labels[] = (string) $point['label'];
             }
         }
 
-        $labels = array_keys($labels);
-        sort($labels);
+        // Collected as a list, not as array keys: PHP silently casts a numeric
+        // string key to an integer, which would turn a year label like "2026"
+        // back into an int and defeat the string comparison below.
+        $labels = array_values(array_unique($labels));
+        sort($labels, SORT_STRING);
 
         $datasets = [];
         foreach ($sets as $set) {
@@ -73,7 +79,7 @@ class Chart
             }
 
             $fill = $set['fill'] ?? false;
-            $color = $set['color'];
+            $color = $set['color'] ?? self::DEFAULT_COLOR;
 
             $datasets[] = [
                 'label' => $set['label'],

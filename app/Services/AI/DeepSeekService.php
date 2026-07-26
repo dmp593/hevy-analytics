@@ -43,6 +43,16 @@ class DeepSeekService
         $userPrompt = "Here is the athlete's current data as JSON. Analyse it and respond in Markdown.\n\n"
             .json_encode($metrics, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
+        // Recorded BEFORE the call and never rolled back: once the request is on
+        // the wire the tokens are spent whatever comes back, so the allowance has
+        // to move even when the outcome is useless.
+        $usage = $user->aiUsageEvents()->create([
+            'scope' => $scope,
+            'provider' => 'deepseek',
+            'model' => config('services.deepseek.model'),
+            'outcome' => 'attempted',
+        ]);
+
         $response = Http::baseUrl(rtrim(config('services.deepseek.base_url'), '/'))
             ->withToken(config('services.deepseek.key'))
             ->timeout(120)
@@ -59,13 +69,23 @@ class DeepSeekService
             ]);
 
         if (! $response->successful()) {
+            $usage->update(['outcome' => 'failed']);
+
             return null;
         }
 
         $content = $response->json('choices.0.message.content');
         if (! $content) {
+            $usage->update(['outcome' => 'failed']);
+
             return null;
         }
+
+        $usage->update([
+            'outcome' => 'success',
+            'prompt_tokens' => $response->json('usage.prompt_tokens'),
+            'completion_tokens' => $response->json('usage.completion_tokens'),
+        ]);
 
         return $user->aiAnalyses()->create([
             'scope' => $scope,

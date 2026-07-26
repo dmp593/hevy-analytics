@@ -176,14 +176,25 @@ class ScienceTest extends TestCase
 
     // --- Regression: e1RM must not blow up outside its validated rep range ---
 
-    public function test_e1rm_is_clamped_outside_the_reliable_rep_range(): void
+    public function test_e1rm_is_clamped_outside_the_formulas_usable_range(): void
     {
         // Brzycki's denominator (37 - reps) approaches zero: unclamped this
         // returned ~1910 kg from a 100 kg set.
         $absurd = OneRepMax::estimate(100, 36);
         $this->assertNotNull($absurd);
         $this->assertLessThan(200.0, $absurd);
-        $this->assertSame(OneRepMax::estimate(100, 12), $absurd);
+        $this->assertSame(OneRepMax::estimate(100, OneRepMax::MAX_FORMULA_REPS), $absurd);
+    }
+
+    public function test_clamping_does_not_erase_the_rpe_signal(): void
+    {
+        // The numerical guard sits above the reliability threshold, so a set
+        // taken to failure and one left well short still differ.
+        $toFailure = OneRepMax::estimate(100, 12, 10.0);
+        $wellShort = OneRepMax::estimate(100, 12, 8.0);
+
+        $this->assertNotSame($toFailure, $wellShort);
+        $this->assertGreaterThan($toFailure, $wellShort);
     }
 
     public function test_e1rm_never_decreases_as_reps_increase(): void

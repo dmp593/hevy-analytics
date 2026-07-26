@@ -23,10 +23,9 @@ class SyncController extends Controller
             return back()->with('error', 'Add your Hevy API key in Profile first.');
         }
 
-        if ($user->syncLogs()->where('status', 'running')->where('started_at', '>=', now()->subMinutes(15))->exists()) {
-            return back()->with('status', 'A sync is already running. This page will show the new data once it finishes.');
-        }
-
+        // Deduplication lives on the job (ShouldBeUnique), not here: the sync_log
+        // row is written inside the job, so at this point there is nothing yet to
+        // detect and rapid clicks all looked like the first one.
         SyncHevyJob::dispatch($user->id, $request->boolean('force'));
 
         return back()->with('status', 'Sync started. Your data will appear here shortly — refresh in a moment.');
