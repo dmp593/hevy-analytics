@@ -22,7 +22,7 @@
                 <x-stat label="BMR ({{ $target->bmr_formula === 'katch_mcardle' ? 'Katch-McArdle' : 'Mifflin' }})" :value="number_format($target->bmr)" unit="kcal" />
                 <x-stat label="Maintenance (TDEE)" :value="number_format($target->tdee)" unit="kcal" :sub="$adaptive ? 'adaptive '.number_format($adaptive) : null" />
                 <x-stat label="Target calories" :value="number_format($target->target_calories)" unit="kcal" tone="accent"
-                        :sub="sprintf('%+.0f%% · %+.2f%%BW/wk', $basis['adjustment_pct'] ?? 0, $basis['target_rate_pct_bw_per_week'] ?? 0)" />
+                        :sub="sprintf('%+.0f%%', $basis['adjustment_pct'] ?? 0).' · '.__('app.units.bw_per_week', ['value' => sprintf('%+.2f', $basis['target_rate_pct_bw_per_week'] ?? 0)])" />
                 <x-stat label="Protein" :value="$target->protein_g" unit="g" tone="good" :sub="($basis['protein_g_per_kg'] ?? '').' g/kg'" />
                 <x-stat label="Fat" :value="$target->fat_g" unit="g" :sub="($basis['fat_g_per_kg'] ?? '').' g/kg'" />
                 <x-stat label="Carbs" :value="$target->carb_g" unit="g" :sub="'fiber ~'.($basis['fiber_g'] ?? '—').'g'" />

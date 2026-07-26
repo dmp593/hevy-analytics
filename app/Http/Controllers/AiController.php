@@ -29,7 +29,7 @@ class AiController extends Controller
         $user = $request->user();
 
         if (! $this->deepSeek->configured()) {
-            return redirect()->route('ai')->with('error', 'AI analysis is not configured yet.');
+            return redirect()->route('ai')->with('error', __('app.ai.unavailable'));
         }
 
         $metrics = MetricsSummary::build($user);
@@ -37,7 +37,7 @@ class AiController extends Controller
         // A cached analysis costs nothing to return, so the allowance only gates
         // calls that would actually go out to the provider.
         if (! $request->boolean('force') && $this->deepSeek->cached($user, 'deep_analysis', $metrics)) {
-            return redirect()->route('ai')->with('status', 'Showing your latest analysis — your data has not changed since it was generated.');
+            return redirect()->route('ai')->with('status', __('app.ai.unchanged'));
         }
 
         $quota = new AiQuota($user);

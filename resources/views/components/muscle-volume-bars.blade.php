@@ -17,8 +17,8 @@ $barColor = fn (string $status) => [
         @php $l = $m['landmarks']; $pct = min(100, $m['per_week'] / max(1, $l['mrv']) * 100); @endphp
         <div>
             <div class="flex justify-between text-xs mb-0.5">
-                <span class="font-medium capitalize">{{ str_replace('_', ' ', $m['muscle']) }}</span>
-                <span class="text-gray-500">{{ $m['per_week'] }}/wk · <span class="capitalize">{{ str_replace('_', ' ', $m['status']) }}</span></span>
+                <span class="font-medium">{{ \App\Support\Labels::muscle($m['muscle']) }}</span>
+                <span class="text-gray-500">{{ __('app.volume_status.per_week', ['count' => $m['per_week']]) }} · <span>{{ \App\Support\Labels::volumeStatus($m['status']) }}</span></span>
             </div>
             <div class="h-2.5 rounded-sm bg-gray-100 overflow-hidden">
                 <div class="h-full {{ $barColor($m['status']) }}" style="width: {{ $pct }}%"></div>

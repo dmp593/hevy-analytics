@@ -61,9 +61,9 @@ class MuscleBalance
         [$lowerWk, $lowerTotal] = $group(self::LOWER);
 
         return [
-            'push_pull' => $this->ratio($pushWk, $pullWk, $pushTotal + $pullTotal, 'Push', 'Pull'),
-            'quad_posterior' => $this->ratio($quadWk, $postWk, $quadTotal + $postTotal, 'Quads', 'Posterior chain'),
-            'upper_lower' => $this->ratio($upperWk, $lowerWk, $upperTotal + $lowerTotal, 'Upper', 'Lower'),
+            'push_pull' => $this->ratio($pushWk, $pullWk, $pushTotal + $pullTotal, 'push', 'pull'),
+            'quad_posterior' => $this->ratio($quadWk, $postWk, $quadTotal + $postTotal, 'quads', 'posterior'),
+            'upper_lower' => $this->ratio($upperWk, $lowerWk, $upperTotal + $lowerTotal, 'upper', 'lower'),
         ];
     }
 
@@ -76,6 +76,9 @@ class MuscleBalance
      * A ratio is only meaningful once both sides carry enough sets for the
      * comparison to mean anything; below that we report it as indeterminate
      * rather than flagging a beginner's first week as "imbalanced".
+     *
+     * $labelA/$labelB are translation KEYS, not display text: a service has no
+     * business deciding what language the user reads.
      */
     private function ratio(float $a, float $b, float $totalSets, string $labelA, string $labelB): array
     {
@@ -88,7 +91,6 @@ class MuscleBalance
             'label_b' => $labelB,
             'value_a' => round($a, 1),
             'value_b' => round($b, 1),
-            'unit' => 'sets/wk',
             'ratio' => $ratio,
             'balanced' => $balanced,
             'has_data' => $enoughData,

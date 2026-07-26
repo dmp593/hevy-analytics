@@ -39,10 +39,9 @@ class ProgressPhotoController extends Controller
         ]);
 
         if ($request->user()->progressPhotos()->count() >= self::MAX_PHOTOS_PER_USER) {
-            return back()->with('error', sprintf(
-                'You have reached the limit of %d progress photos. Delete some older ones to add more.',
-                self::MAX_PHOTOS_PER_USER,
-            ));
+            return back()->with('error', __('app.photos.limit_reached', [
+                'limit' => self::MAX_PHOTOS_PER_USER,
+            ]));
         }
 
         $path = $request->file('photo')->store("progress-photos/{$request->user()->id}", 'local');

@@ -21,7 +21,7 @@ class SyncController extends Controller
         $user = $request->user();
 
         if (! $user->hasHevyKey()) {
-            return back()->with('error', 'Add your Hevy API key in Profile first.');
+            return back()->with('error', __('app.sync.needs_key'));
         }
 
         $status = new SyncStatus($user);
@@ -41,6 +41,6 @@ class SyncController extends Controller
         // what actually holds under concurrent requests.
         SyncHevyJob::dispatch($user->id, $request->boolean('force'), $log->id);
 
-        return back()->with('status', 'Sync queued — refresh in a moment to see your new data.');
+        return back()->with('status', __('app.sync.queued'));
     }
 }

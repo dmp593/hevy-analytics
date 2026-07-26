@@ -37,10 +37,10 @@ class SyncStatus
 
         return match ($latest->status) {
             'queued' => $this->queuedState($latest),
-            'running' => ['state' => 'running', 'message' => 'Syncing your Hevy data…', 'log' => $latest],
+            'running' => ['state' => 'running', 'message' => __('app.sync.running'), 'log' => $latest],
             'failed' => [
                 'state' => 'failed',
-                'message' => 'Your last sync failed: '.($latest->error ?: 'unknown error'),
+                'message' => __('app.sync.failed', ['error' => $latest->error ?: 'unknown error']),
                 'log' => $latest,
             ],
             default => ['state' => 'synced', 'message' => null, 'log' => $latest],
@@ -60,15 +60,14 @@ class SyncStatus
         if ($stalled) {
             return [
                 'state' => 'stalled',
-                'message' => 'Your sync is queued but nothing has picked it up. If you are running this app '
-                    .'yourself, start a queue worker: php artisan queue:work',
+                'message' => __('app.sync.stalled'),
                 'log' => $log,
             ];
         }
 
         return [
             'state' => 'queued',
-            'message' => 'Sync queued — refresh in a moment to see your new data.',
+            'message' => __('app.sync.queued'),
             'log' => $log,
         ];
     }

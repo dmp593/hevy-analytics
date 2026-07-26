@@ -153,6 +153,27 @@ a query in Science, it's in the wrong place.
   OpenPowerlifting (`php artisan strength:build-opl-standards`) → offline model.
   Everything degrades gracefully if a source is down.
 
+## Localisation
+
+Every user-facing string goes through `__('app.…')` and lives in `lang/en/app.php`.
+Adding a language means adding `config/locales.php` entry + a `lang/<code>/`
+directory — nothing else in the codebase needs to know which languages exist.
+
+Rules that matter:
+
+- **Services return KEYS, not sentences.** `MuscleBalance` emits `push`/`pull`,
+  `MuscleLandmarks::classify()` emits `below_maintenance`. The view turns them
+  into words via `App\Support\Labels`. A service has no business deciding what
+  language the reader speaks.
+- **Never `sprintf` a user-facing string.** Use `:placeholders`, so a translator
+  never has to reproduce a format specifier.
+- **`LocalisationTest` is the guard.** It fails if any language is missing a key
+  or a file, if a placeholder is dropped, or if a translation file looks like a
+  copied English placeholder. Adding an English string without translating it
+  breaks the build — deliberately.
+- Dates go through Carbon, which the `SetLocale` middleware localises. Do not
+  hand-format month or day names.
+
 ## Conventions cheat-sheet
 
 - Weights/measurements are stored in **kg**; dates as `Y-m-d`.

@@ -102,6 +102,16 @@ scars to prove it.
 
 ---
 
+## Languages
+
+English and Portuguese, switchable from the header (guests included) or from
+Profile. A signed-in user's choice follows them between devices; otherwise the
+app honours the browser's `Accept-Language`.
+
+Adding a language is one config entry and one `lang/<code>/` directory. The test
+suite fails if any language falls behind English on keys, files or placeholders,
+so a partially translated language cannot ship unnoticed.
+
 ## Optional integrations
 
 | Service | What it adds | Without it |

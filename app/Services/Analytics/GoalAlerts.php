@@ -12,6 +12,20 @@ class GoalAlerts
 {
     public function __construct(private readonly User $user) {}
 
+    /**
+     * Rates formatted once, so every alert reads the same and a translator
+     * never has to reproduce a sprintf format string.
+     *
+     * @return array<string, string>
+     */
+    private function rates(float $observed, float $target): array
+    {
+        return [
+            'observed' => number_format($observed, 2),
+            'target' => number_format($target, 2),
+        ];
+    }
+
     /** @return array<int, array{level:string, title:string, message:string}> */
     public function all(): array
     {
@@ -31,66 +45,73 @@ class GoalAlerts
 
             if ($isBulk) {
                 if ($observed > $targetRate * 1.6) {
-                    $alerts[] = $this->alert('warning', 'Gaining too fast',
-                        sprintf('Weight is rising %.2f%%BW/week vs target %.2f%%. Excess likely fat — trim ~150-250 kcal.', $observed, $targetRate));
+                    $alerts[] = $this->alert('warning', __('app.alerts.gaining_too_fast'),
+                        __('app.alerts.gaining_too_fast_body', $this->rates($observed, $targetRate)));
                 } elseif ($observed < $targetRate * 0.3) {
-                    $alerts[] = $this->alert('info', 'Bulk stalling',
-                        sprintf('Only %.2f%%BW/week gained (target %.2f%%). Add ~150-250 kcal to keep building.', $observed, $targetRate));
+                    $alerts[] = $this->alert('info', __('app.alerts.bulk_stalling'),
+                        __('app.alerts.bulk_stalling_body', $this->rates($observed, $targetRate)));
                 } else {
-                    $alerts[] = $this->alert('success', 'On track',
-                        sprintf('Gaining %.2f%%BW/week — right in the lean-bulk band.', $observed));
+                    $alerts[] = $this->alert('success', __('app.alerts.on_track'),
+                        __('app.alerts.on_track_bulk_body', $this->rates($observed, $targetRate)));
                 }
             } elseif ($isCut) {
                 if ($observed > $targetRate * 0.3) {
-                    $alerts[] = $this->alert('warning', 'Cut too slow / gaining',
-                        sprintf('Losing only %.2f%%BW/week (target %.2f%%). Reduce ~200 kcal.', $observed, $targetRate));
+                    $alerts[] = $this->alert('warning', __('app.alerts.cut_too_slow'),
+                        __('app.alerts.cut_too_slow_body', $this->rates($observed, $targetRate)));
                 } elseif ($observed < $targetRate * 1.6) {
-                    $alerts[] = $this->alert('warning', 'Cutting too aggressively',
-                        sprintf('Dropping %.2f%%BW/week (target %.2f%%) — muscle-loss risk. Add calories.', $observed, $targetRate));
+                    $alerts[] = $this->alert('warning', __('app.alerts.cut_too_fast'),
+                        __('app.alerts.cut_too_fast_body', $this->rates($observed, $targetRate)));
                 } else {
-                    $alerts[] = $this->alert('success', 'On track',
-                        sprintf('Losing %.2f%%BW/week — sustainable cut pace.', $observed));
+                    $alerts[] = $this->alert('success', __('app.alerts.on_track'),
+                        __('app.alerts.on_track_cut_body', $this->rates($observed, $targetRate)));
                 }
             }
         }
 
         if ($part && $part['p_ratio'] !== null && $targetRate > 0.05 && $part['p_ratio'] < 0.5) {
             $caveat = ($part['source'] ?? 'scale') === 'scale'
-                ? ' Note: body-fat comes from a BIA scale (noisy) — confirm with the mirror, waist tape and strength.'
+                ? ' '.__('app.alerts.bia_caveat')
                 : '';
 
             if ($part['reliable']) {
-                $alerts[] = $this->alert('warning', 'Poor gain partitioning',
-                    sprintf('Estimated ~%d%% of recent weight gain was lean mass, based on a trend over %d readings.%s',
-                        (int) round($part['p_ratio'] * 100), $part['fat_points'], $caveat));
+                $alerts[] = $this->alert('warning', __('app.alerts.poor_partitioning'),
+                    __('app.alerts.poor_partitioning_body', [
+                        'percent' => (int) round($part['p_ratio'] * 100),
+                        'readings' => $part['fat_points'],
+                    ]).$caveat);
             } else {
-                $alerts[] = $this->alert('info', 'Partitioning estimate (low confidence)',
-                    sprintf('Rough estimate suggests ~%d%% of gain was lean, but there isn\'t enough consistent data to trust it yet.%s',
-                        (int) round($part['p_ratio'] * 100), $caveat));
+                $alerts[] = $this->alert('info', __('app.alerts.poor_partitioning_low'),
+                    __('app.alerts.poor_partitioning_low_body', [
+                        'percent' => (int) round($part['p_ratio'] * 100),
+                    ]).$caveat);
             }
         }
 
         if ($part && $part['reliable'] && $part['delta_fat_pct'] !== null && $part['delta_fat_pct'] > 1.5) {
-            $alerts[] = $this->alert('warning', 'Body-fat climbing',
-                sprintf('Body fat trending up ~%.1f points recently. Watch the surplus size.', $part['delta_fat_pct']));
+            $alerts[] = $this->alert('warning', __('app.alerts.fat_climbing'),
+                __('app.alerts.fat_climbing_body', ['points' => number_format($part['delta_fat_pct'], 1)]));
         }
 
         $status = $bc->status();
         if ($status['waist_to_height'] !== null && $status['waist_to_height'] > 0.5) {
-            $alerts[] = $this->alert('info', 'Waist-to-height above 0.5',
-                'Waist-to-height ratio exceeds the 0.5 health guideline — monitor waist during the bulk.');
+            $alerts[] = $this->alert('info', __('app.alerts.waist_high'), __('app.alerts.waist_high_body'));
         }
 
         foreach ($status['symmetry'] as $s) {
             if ($s['diff_pct'] > 5) {
-                $alerts[] = $this->alert('info', ucfirst($s['part']).' asymmetry',
-                    sprintf('%s differs %.1f%% left vs right — consider unilateral work.', ucfirst($s['part']), $s['diff_pct']));
+                $part_name = __('app.muscles.'.$s['part']);
+                $part_name = str_contains($part_name, 'app.muscles.') ? ucfirst($s['part']) : $part_name;
+
+                $alerts[] = $this->alert('info', __('app.alerts.asymmetry', ['part' => $part_name]),
+                    __('app.alerts.asymmetry_body', [
+                        'part' => $part_name,
+                        'percent' => number_format($s['diff_pct'], 1),
+                    ]));
             }
         }
 
         if (empty($alerts)) {
-            $alerts[] = $this->alert('info', 'Not enough data yet',
-                'Log a few more body measurements over time to unlock trend-based alerts.');
+            $alerts[] = $this->alert('info', __('app.alerts.no_data'), __('app.alerts.no_data_body'));
         }
 
         return $alerts;

@@ -17,8 +17,20 @@ class GoalType
         ];
     }
 
+    /**
+     * Display name in the reader's language.
+     *
+     * The English strings in all() stay as the source of truth for descriptions
+     * and as the fallback for a goal type that has not been translated yet.
+     */
     public static function label(string $type): string
     {
+        $translated = __('app.goals.'.$type);
+
+        if (is_string($translated) && ! str_starts_with($translated, 'app.goals.')) {
+            return $translated;
+        }
+
         return self::all()[$type]['label'] ?? ucfirst(str_replace('_', ' ', $type));
     }
 

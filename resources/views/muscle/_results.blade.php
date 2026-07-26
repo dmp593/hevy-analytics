@@ -13,7 +13,7 @@
                     :labels="array_map(fn($x) => ucfirst(str_replace('_',' ',$x['muscle'])), $volumePerMuscle)"
                     :datasets="[['label' => 'Tonnage', 'data' => array_column($volumePerMuscle, 'tonnage')]]" />
             @else
-                <x-empty-chart :height="300">No sets logged in this range yet.</x-empty-chart>
+                <x-empty-chart :height="300">{{ __('app.chart.no_sets') }}</x-empty-chart>
             @endif
         </x-panel>
 

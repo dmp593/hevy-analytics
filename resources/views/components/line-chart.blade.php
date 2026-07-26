@@ -4,7 +4,7 @@
     'color' => '#4f46e5',
     'fill' => true,
     'height' => 260,
-    'empty' => 'No data for this range.',
+    'empty' => null,
 ])
 
 @if(count($series))
@@ -15,5 +15,5 @@
         :legend="false"
     />
 @else
-    <x-empty-chart :height="$height">{{ $empty }}</x-empty-chart>
+    <x-empty-chart :height="$height">{{ $empty ?? __('app.chart.no_data') }}</x-empty-chart>
 @endif

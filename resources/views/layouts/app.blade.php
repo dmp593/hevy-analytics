@@ -5,7 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        {{-- Per-page title: every page shared one, which is poor for tabs, history and screen readers. --}}
+        <title>{{ isset($title) ? $title.' · ' : '' }}{{ __('app.brand') }}</title>
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])

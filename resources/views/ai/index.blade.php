@@ -17,11 +17,11 @@
 
         @unless($configured)
             <div class="mb-4 rounded-md bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
-                AI analysis isn't available on your account yet.
+                {{ __('app.ai.unavailable') }}
             </div>
         @else
             <p class="mb-4 text-xs text-gray-500">
-                {{ $quotaRemaining }} of {{ $quotaLimit }} analyses left this month.
+                {{ __('app.ai.quota', ['remaining' => $quotaRemaining, 'limit' => $quotaLimit]) }}
             </p>
         @endunless
 

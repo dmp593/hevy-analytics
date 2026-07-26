@@ -1,7 +1,7 @@
 @props([
     'sets' => [],
     'height' => 260,
-    'empty' => 'No data for this range.',
+    'empty' => null,
 ])
 
 @php
@@ -11,5 +11,5 @@
 @if (count($chart['labels']))
     <x-chart :labels="$chart['labels']" :datasets="$chart['datasets']" :height="$height" />
 @else
-    <x-empty-chart :height="$height">{{ $empty }}</x-empty-chart>
+    <x-empty-chart :height="$height">{{ $empty ?? __('app.chart.no_data') }}</x-empty-chart>
 @endif

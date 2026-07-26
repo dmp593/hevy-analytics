@@ -21,12 +21,12 @@
 
     <div class="grid lg:grid-cols-2 gap-6 mb-6">
         <x-panel title="Volume trend" subtitle="Tonnage by {{ $filter->period }}">
-            <x-line-chart :series="$tonnageSeries" label="Tonnage (kg)" color="#4f46e5"
+            <x-line-chart :series="$tonnageSeries" :label="__('app.series.tonnage')" color="#4f46e5"
                           empty="No data for these filters." />
         </x-panel>
 
         <x-panel title="Estimated 1RM" subtitle="{{ $filter->exerciseTemplateHevyId ? 'Best e1RM per session' : 'Select a single exercise to see e1RM progression' }}">
-            <x-line-chart :series="$e1rmSeries" label="e1RM (kg)" color="#16a34a"
+            <x-line-chart :series="$e1rmSeries" :label="__('app.series.e1rm')" color="#16a34a"
                           empty="Pick one exercise in the filter to chart its estimated 1RM (Epley/Brzycki) over time." />
         </x-panel>
     </div>

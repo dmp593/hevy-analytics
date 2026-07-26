@@ -19,21 +19,21 @@
         <div class="grid lg:grid-cols-2 gap-6 mb-6">
             <x-panel title="Weight & lean mass">
                 <x-multi-line-chart :sets="[
-                    ['series' => $weightSeries, 'label' => 'Weight (kg)', 'color' => '#0ea5e9'],
-                    ['series' => $leanSeries, 'label' => 'Lean mass (kg)', 'color' => '#16a34a'],
-                ]" empty="Log a bodyweight measurement to see this chart." /></x-panel>
+                    ['series' => $weightSeries, 'label' => __('app.series.weight'), 'color' => '#0ea5e9'],
+                    ['series' => $leanSeries, 'label' => __('app.series.lean_mass'), 'color' => '#16a34a'],
+                ]" :empty="__('app.chart.no_body_data')" /></x-panel>
             <x-panel title="Body fat %">
-                <x-line-chart :series="$fatSeries" label="Body fat %" color="#ef4444" />
+                <x-line-chart :series="$fatSeries" :label="__('app.series.body_fat')" color="#ef4444" />
             </x-panel>
             <x-panel title="Normalized FFMI" subtitle="Natural ceiling ≈ 25">
-                <x-line-chart :series="$ffmiSeries" label="FFMI" color="#8b5cf6" />
+                <x-line-chart :series="$ffmiSeries" :label="__('app.series.ffmi')" color="#8b5cf6" />
             </x-panel>
             <x-panel title="Circumferences (cm)">
                 <x-multi-line-chart :sets="[
-                    ['series' => $chestSeries, 'label' => 'Chest', 'color' => '#4f46e5'],
-                    ['series' => $waistSeries, 'label' => 'Waist', 'color' => '#f59e0b'],
-                    ['series' => $bicepSeries, 'label' => 'Bicep (R)', 'color' => '#10b981'],
-                ]" empty="Log a tape measurement to see this chart." />
+                    ['series' => $chestSeries, 'label' => __('app.series.chest'), 'color' => '#4f46e5'],
+                    ['series' => $waistSeries, 'label' => __('app.series.waist'), 'color' => '#f59e0b'],
+                    ['series' => $bicepSeries, 'label' => __('app.series.bicep'), 'color' => '#10b981'],
+                ]" :empty="__('app.chart.no_tape_data')" />
             </x-panel>
         </div>
 

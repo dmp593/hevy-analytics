@@ -56,17 +56,16 @@ class AiQuota
     public function denialReason(): ?string
     {
         if (self::globalCeilingReached()) {
-            return 'AI analysis is temporarily unavailable while we top up capacity. Please try again later.';
+            return __('app.ai.temporarily_unavailable');
         }
 
         if ($this->remaining() <= 0) {
-            return sprintf(
-                'You have used all %d AI analyses for this month. Your allowance resets on %s.',
-                $this->monthlyLimit(),
+            return __('app.ai.quota_spent', [
+                'limit' => $this->monthlyLimit(),
                 // startOfMonth BEFORE addMonth: Carbon overflows 31 Jan + 1 month
                 // to 3 March, which would report the reset a month late.
-                Carbon::now()->startOfMonth()->addMonth()->format('j M'),
-            );
+                'date' => Carbon::now()->startOfMonth()->addMonth()->isoFormat('D MMM'),
+            ]);
         }
 
         return null;

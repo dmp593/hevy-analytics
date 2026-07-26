@@ -96,19 +96,31 @@
             </div>
 
             <div class="mt-4">
-                <x-input-label for="timezone" :value="__('Timezone')" />
+                <x-input-label for="locale" :value="__('app.profile.language')" />
+                <select id="locale" name="locale" class="mt-1 block w-full md:w-1/2 rounded-md border-gray-300 text-sm">
+                    <option value="">{{ __('app.profile.follow_browser') }}</option>
+                    @foreach(\App\Support\Locales::supported() as $code => $meta)
+                        <option value="{{ $code }}" @selected(old('locale', $user->locale) === $code)>{{ $meta['native'] }}</option>
+                    @endforeach
+                </select>
+                <p class="mt-1 text-xs text-gray-500">{{ __('app.profile.language_help') }}</p>
+                <x-input-error class="mt-2" :messages="$errors->get('locale')" />
+            </div>
+
+            <div class="mt-4">
+                <x-input-label for="timezone" :value="__('app.profile.timezone')" />
                 <select id="timezone" name="timezone" class="mt-1 block w-full md:w-1/2 rounded-md border-gray-300 text-sm">
                     @foreach(timezone_identifiers_list() as $tz)
                         <option value="{{ $tz }}" @selected(old('timezone', $user->resolvedTimezone()) === $tz)>{{ str_replace('_', ' ', $tz) }}</option>
                     @endforeach
                 </select>
-                <p class="mt-1 text-xs text-gray-500">Decides which day and week each session counts toward. Get this wrong and an evening workout can land in the previous week, skewing your sets-per-week figures.</p>
+                <p class="mt-1 text-xs text-gray-500">{{ __('app.profile.timezone_help') }}</p>
                 <x-input-error class="mt-2" :messages="$errors->get('timezone')" />
             </div>
         </div>
 
         <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+            <x-primary-button>{{ __('app.common.save') }}</x-primary-button>
 
             @if (session('status') === 'profile-updated')
                 <p
@@ -117,7 +129,7 @@
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
                     class="text-sm text-gray-600"
-                >{{ __('Saved.') }}</p>
+                >{{ __('app.common.saved') }}</p>
             @endif
         </div>
     </form>

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { signIn } from './helpers.js';
 
 /** Every authenticated page, loaded for real, with the console watched. */
 const PAGES = [
@@ -12,11 +13,7 @@ test('every page loads without a JS error', async ({ page }) => {
     page.on('pageerror', (e) => errors.push(`${page.url()}: ${e.message}`));
     page.on('console', (m) => m.type() === 'error' && errors.push(`${page.url()}: ${m.text()}`));
 
-    await page.goto('/login');
-    await page.fill('input[name=email]', 'demo@example.test');
-    await page.fill('input[name=password]', 'password');
-    await page.click('button[type=submit]');
-    await page.waitForURL('**/dashboard');
+    await signIn(page);
 
     for (const path of PAGES) {
         const response = await page.goto(path, { waitUntil: 'networkidle' });
@@ -27,11 +24,7 @@ test('every page loads without a JS error', async ({ page }) => {
 });
 
 test('the page body never scrolls sideways', async ({ page }) => {
-    await page.goto('/login');
-    await page.fill('input[name=email]', 'demo@example.test');
-    await page.fill('input[name=password]', 'password');
-    await page.click('button[type=submit]');
-    await page.waitForURL('**/dashboard');
+    await signIn(page);
 
     // Tooltips on edge cards used to push the document wider than the viewport.
     for (const path of ['/dashboard', '/body', '/performance']) {

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\User;
+use App\Support\Locales;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -35,6 +36,8 @@ class ProfileUpdateRequest extends FormRequest
             // Validated against the real zone list: this value ends up in
             // date arithmetic, so an arbitrary string must not reach it.
             'timezone' => ['nullable', 'string', Rule::in(timezone_identifiers_list())],
+            // Only languages the app actually ships translations for.
+            'locale' => ['nullable', 'string', Rule::in(Locales::codes())],
         ];
     }
 }

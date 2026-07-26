@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'hevy_api_key', 'sex', 'age', 'height_cm', 'activity_level', 'timezone', 'body_fat_source', 'hevy_last_synced_at'])]
+#[Fillable(['name', 'email', 'password', 'hevy_api_key', 'sex', 'age', 'height_cm', 'activity_level', 'timezone', 'locale', 'body_fat_source', 'hevy_last_synced_at'])]
 #[Hidden(['password', 'remember_token', 'hevy_api_key'])]
 /**
  * Implementing MustVerifyEmail is what makes the `verified` middleware do

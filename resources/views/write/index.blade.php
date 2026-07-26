@@ -29,13 +29,13 @@
                                     default => 'bg-gray-100 text-gray-600',
                                 };
                             @endphp
-                            <span class="text-xs px-2 py-0.5 rounded-full {{ $tone }}">{{ $stale ? 'stalled' : $op->status }}</span>
-                            <button @click="open = !open" class="text-xs text-gray-500">details</button>
+                            <span class="text-xs px-2 py-0.5 rounded-full {{ $tone }}">{{ $stale ? __('app.write.stalled') : $op->status }}</span>
+                            <button @click="open = !open" class="text-xs text-gray-500">{{ __('app.write.details') }}</button>
                             @if($canPush)
                                 <form method="POST" action="{{ route('write.confirm', $op) }}">
                                     @csrf
                                     <button class="text-xs rounded-md bg-indigo-600 text-white px-3 py-1 hover:bg-indigo-700">
-                                        {{ $stale ? 'Retry' : 'Confirm &amp; push' }}
+                                        {{ $stale ? __('app.write.retry') : __('app.write.confirm') }}
                                     </button>
                                 </form>
                             @endif

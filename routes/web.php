@@ -4,6 +4,7 @@ use App\Http\Controllers\AiController;
 use App\Http\Controllers\BodyCompositionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GoalController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MuscleController;
 use App\Http\Controllers\NutritionController;
 use App\Http\Controllers\PerformanceController;
@@ -15,6 +16,9 @@ use App\Http\Controllers\StrengthLevelController;
 use App\Http\Controllers\SyncController;
 use App\Http\Controllers\WriteBackController;
 use Illuminate\Support\Facades\Route;
+
+// Available to guests: the login page is the first thing anyone sees.
+Route::post('/locale/{locale}', [LocaleController::class, 'update'])->name('locale.update');
 
 Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');

@@ -1,7 +1,5 @@
 import { expect, test } from '@playwright/test';
-
-const EMAIL = 'demo@example.test';
-const PASSWORD = 'password';
+import { signIn } from './helpers.js';
 
 /** Pages that must render at least one chart against the demo account. */
 const CHART_PAGES = [
@@ -11,14 +9,6 @@ const CHART_PAGES = [
     { path: '/nutrition', charts: 1 },
     { path: '/performance', charts: 1 },
 ];
-
-async function signIn(page) {
-    await page.goto('/login');
-    await page.fill('input[name=email]', EMAIL);
-    await page.fill('input[name=password]', PASSWORD);
-    await page.click('button[type=submit]');
-    await page.waitForURL('**/dashboard');
-}
 
 /**
  * Read the canvases directly: a chart that failed to initialise still leaves a
