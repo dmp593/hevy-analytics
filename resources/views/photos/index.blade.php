@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header"><h2 class="font-semibold text-xl text-gray-800">Progress photos</h2></x-slot>
+    <x-slot name="header"><h2 class="font-semibold text-xl text-ink">Progress photos</h2></x-slot>
 
     <div class="py-8 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8"
          x-data="{
@@ -19,33 +19,33 @@
             <x-panel title="Add a photo" subtitle="The mirror is the most honest metric" class="lg:col-span-1 h-fit">
                 <form method="POST" action="{{ route('photos.store') }}" enctype="multipart/form-data" class="space-y-3">
                     @csrf
-                    <label class="text-xs text-gray-600 block">Date
-                        <input type="date" name="date" value="{{ now()->toDateString() }}" class="mt-1 w-full rounded-md border-gray-300 text-sm" required>
+                    <label class="text-xs text-body block">Date
+                        <input type="date" name="date" value="{{ now()->toDateString() }}" class="mt-1 w-full rounded-md border-line text-sm" required>
                     </label>
-                    <label class="text-xs text-gray-600 block">Angle
-                        <select name="angle" class="mt-1 w-full rounded-md border-gray-300 text-sm">
+                    <label class="text-xs text-body block">Angle
+                        <select name="angle" class="mt-1 w-full rounded-md border-line text-sm">
                             <option value="front">Front</option>
                             <option value="side">Side</option>
                             <option value="back">Back</option>
                         </select>
                     </label>
-                    <label class="text-xs text-gray-600 block">Photo
+                    <label class="text-xs text-body block">Photo
                         <input type="file" name="photo" accept="image/*" class="mt-1 w-full text-sm" required>
                     </label>
-                    <label class="text-xs text-gray-600 block">Weight (kg, optional)
-                        <input type="number" step="0.1" name="weight_kg" class="mt-1 w-full rounded-md border-gray-300 text-sm">
+                    <label class="text-xs text-body block">Weight (kg, optional)
+                        <input type="number" step="0.1" name="weight_kg" class="mt-1 w-full rounded-md border-line text-sm">
                     </label>
                     <x-input-error :messages="$errors->all()" class="mt-1" />
-                    <button class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">Upload</button>
+                    <button class="w-full rounded-md bg-brand px-4 py-2 text-sm font-semibold text-on-fill hover:bg-brand-hover">Upload</button>
                 </form>
-                <p class="mt-3 text-xs text-gray-400">Photos are private to your account and streamed only to you. Same pose, lighting and time of day makes comparisons meaningful.</p>
+                <p class="mt-3 text-xs text-faint">Photos are private to your account and streamed only to you. Same pose, lighting and time of day makes comparisons meaningful.</p>
             </x-panel>
 
             <div class="lg:col-span-2 space-y-4">
                 <div class="flex items-center justify-between">
                     <label class="inline-flex items-center gap-2 text-sm">
-                        <input type="checkbox" x-model="compare" class="rounded-sm border-gray-300">
-                        Compare mode <span class="text-xs text-gray-400">(pick two photos)</span>
+                        <input type="checkbox" x-model="compare" class="rounded-sm border-line">
+                        Compare mode <span class="text-xs text-faint">(pick two photos)</span>
                     </label>
                 </div>
 
@@ -70,14 +70,14 @@
                             @foreach($group as $p)
                                 <div class="relative group cursor-pointer"
                                      @click="pick({{ $p->id }})"
-                                     :class="(a === {{ $p->id }} || b === {{ $p->id }}) ? 'ring-2 ring-indigo-500 rounded-lg' : ''">
+                                     :class="(a === {{ $p->id }} || b === {{ $p->id }}) ? 'ring-2 ring-brand rounded-lg' : ''">
                                     <img src="{{ route('photos.file', $p) }}" loading="lazy" class="w-full h-40 object-cover rounded-lg border" alt="">
                                     <span class="absolute top-1 left-1 text-[10px] bg-black/60 text-white px-1.5 py-0.5 rounded-sm">{{ ucfirst($p->angle) }}</span>
                                     <form method="POST" action="{{ route('photos.destroy', $p) }}" @click.stop
                                           onsubmit="return confirm('Delete this photo?')"
                                           class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition">
                                         @csrf @method('DELETE')
-                                        <button class="text-[10px] bg-red-600 text-white px-1.5 py-0.5 rounded-sm">✕</button>
+                                        <button class="text-[10px] bg-bad text-on-fill px-1.5 py-0.5 rounded-sm">✕</button>
                                     </form>
                                     @if($p->weight_kg)<span class="absolute bottom-1 left-1 text-[10px] bg-black/60 text-white px-1.5 py-0.5 rounded-sm">{{ $p->weight_kg }}kg</span>@endif
                                 </div>
@@ -85,7 +85,7 @@
                         </div>
                     </x-panel>
                 @empty
-                    <x-panel><p class="text-sm text-gray-500">No photos yet. Upload your first progress photo to start a visual timeline.</p></x-panel>
+                    <x-panel><p class="text-sm text-muted">No photos yet. Upload your first progress photo to start a visual timeline.</p></x-panel>
                 @endforelse
             </div>
         </div>

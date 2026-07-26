@@ -31,6 +31,7 @@ return [
         'write_operations' => 'Operações de escrita',
         'log_out' => 'Terminar sessão',
         'toggle' => 'Alternar navegação',
+        'primary' => 'Principal',
         'language' => 'Idioma',
     ],
 
@@ -64,6 +65,15 @@ return [
         'weekly_sets' => 'Séries semanais por músculo',
         'weekly_sets_sub' => 'vs referências de hipertrofia',
         'muscle_balance' => 'Equilíbrio muscular',
+        'whats_next' => 'O que se segue',
+        'at_a_glance' => 'Num relance',
+        'trends' => 'Tendências',
+        'detail' => 'Detalhe',
+        'more_alerts' => 'mais :count',
+        'nutrition_targets' => 'Metas nutricionais',
+        'nutrition_targets_sub' => 'Diárias, com base no seu objetivo',
+        'no_training_yet' => 'Ainda sem treinos registados',
+        'no_training_yet_body' => 'Sincronize a sua conta Hevy e as séries semanais por músculo aparecem aqui.',
         'muscle_balance_sub' => 'Rácio de séries, 3 meses',
     ],
 
@@ -211,6 +221,33 @@ return [
         'per_week' => '/sem.',
     ],
 
+    'theme' => [
+        'system' => 'Acompanhar o sistema',
+        'light' => 'Claro',
+        'dark' => 'Escuro',
+        'switch_dark' => 'Mudar para modo escuro',
+        'switch_light' => 'Mudar para modo claro',
+    ],
+
+    'sections' => [
+        'today' => 'Hoje',
+        'today_question' => 'O que devo fazer esta semana?',
+        'training' => 'Treino',
+        'training_question' => 'Estou a ficar mais forte?',
+        'body' => 'Corpo',
+        'body_question' => 'O meu corpo está a mudar como quero?',
+        'outlook' => 'Perspetiva',
+        'outlook_question' => 'Onde é que isto vai dar?',
+    ],
+
+    'tips' => [
+        'weight' => 'O seu peso corporal e a que ritmo muda por semana. Faixa ideal de ganho limpo: +0,25% a +0,5% do peso corporal por semana.',
+        'body_fat' => 'Percentagem do seu peso que é gordura. Navy = uma estimativa independente com fita métrica, usada como verificação cruzada.',
+        'lean_mass' => 'Tudo o que não é gordura (sobretudo músculo). FFMI = musculatura ajustada à altura; ~25 é perto do limite natural nos homens.',
+        'hard_sets' => 'Total de séries efetivas (sem aquecimentos) nas últimas 4 semanas — o principal motor do crescimento muscular.',
+        'landmarks' => 'Séries efetivas por músculo em cada semana. MEV = mínimo para crescer, MAV = zona de melhor retorno. Fique entre os dois. "Abaixo da manutenção" significa séries a menos para crescer.',
+    ],
+
     'common' => [
         'save' => 'Guardar',
         'saved' => 'Guardado.',
@@ -220,6 +257,7 @@ return [
         'to' => 'Até',
         'period' => 'Período',
         'learn_more' => 'Saber mais →',
+        'skip_to_content' => 'Saltar para o conteúdo',
         'more_info' => 'Mais informação',
     ],
 

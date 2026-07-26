@@ -1,24 +1,24 @@
 <x-app-layout>
-    <x-slot name="header"><h2 class="font-semibold text-xl text-gray-800">Guide — what every metric means</h2></x-slot>
+    <x-slot name="header"><h2 class="font-semibold text-xl text-ink">Guide — what every metric means</h2></x-slot>
 
     <div class="py-8 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
         <x-panel>
-            <p class="text-sm text-gray-600">
+            <p class="text-sm text-body">
                 No jargon. This page explains every number the app shows, why it matters for
                 <strong>building muscle while staying lean</strong>, and what "good" looks like.
                 Everything is based on published strength &amp; nutrition science (sources at the bottom).
             </p>
             <nav class="mt-4 flex flex-wrap gap-2 text-xs">
                 @foreach(['volume'=>'Weekly sets & volume','strength'=>'Strength & 1RM','levels'=>'Strength levels','body'=>'Body composition','accuracy'=>'Measurement accuracy','leanbulk'=>'Lean-bulk signals','nutrition'=>'Calories & macros','projections'=>'Projections','balance'=>'Muscle balance'] as $id=>$label)
-                    <a href="#{{ $id }}" class="rounded-full bg-gray-100 px-3 py-1 hover:bg-gray-200">{{ $label }}</a>
+                    <a href="#{{ $id }}" class="rounded-full bg-surface-sunk px-3 py-1 hover:bg-surface-sunk">{{ $label }}</a>
                 @endforeach
             </nav>
         </x-panel>
 
         {{-- VOLUME --}}
         <x-panel id="volume" title="Weekly sets & volume landmarks (MV · MEV · MAV · MRV)">
-            <div class="prose prose-sm max-w-none text-gray-700">
+            <div class="prose prose-sm max-w-none text-body">
                 <p>The single biggest driver of muscle growth is <strong>how many hard sets you do per muscle each week</strong>
                    (a "hard set" = a real working set taken close to failure; warm-ups don't count). Researchers describe four
                    weekly-set landmarks per muscle:</p>
@@ -30,16 +30,16 @@
                 </ul>
                 <p>So the ideal zone is <strong>MEV → MAV</strong>. The app labels each muscle:</p>
                 <div class="not-prose grid sm:grid-cols-2 gap-2 my-3">
-                    <div class="rounded-lg border p-3"><span class="inline-block h-2 w-2 rounded-full bg-red-400"></span> <strong>Below maintenance</strong> — too few sets; the muscle is likely stalling or shrinking. Add sets.</div>
-                    <div class="rounded-lg border p-3"><span class="inline-block h-2 w-2 rounded-full bg-amber-400"></span> <strong>Maintenance</strong> — holding, not really growing. Fine on a cut; add sets on a bulk.</div>
-                    <div class="rounded-lg border p-3"><span class="inline-block h-2 w-2 rounded-full bg-green-500"></span> <strong>Optimal</strong> — in the MEV–MAV growth zone. Keep going.</div>
-                    <div class="rounded-lg border p-3"><span class="inline-block h-2 w-2 rounded-full bg-emerald-400"></span> <strong>Growth (high)</strong> — near your recovery ceiling; great if you're recovering well.</div>
-                    <div class="rounded-lg border p-3"><span class="inline-block h-2 w-2 rounded-full bg-purple-500"></span> <strong>Junk</strong> — above MRV; trim sets, you're just adding fatigue.</div>
+                    <div class="rounded-lg border p-3"><span class="inline-block h-2 w-2 rounded-full bg-bad"></span> <strong>Below maintenance</strong> — too few sets; the muscle is likely stalling or shrinking. Add sets.</div>
+                    <div class="rounded-lg border p-3"><span class="inline-block h-2 w-2 rounded-full bg-warn"></span> <strong>Maintenance</strong> — holding, not really growing. Fine on a cut; add sets on a bulk.</div>
+                    <div class="rounded-lg border p-3"><span class="inline-block h-2 w-2 rounded-full bg-good"></span> <strong>Optimal</strong> — in the MEV–MAV growth zone. Keep going.</div>
+                    <div class="rounded-lg border p-3"><span class="inline-block h-2 w-2 rounded-full bg-grow"></span> <strong>Growth (high)</strong> — near your recovery ceiling; great if you're recovering well.</div>
+                    <div class="rounded-lg border p-3"><span class="inline-block h-2 w-2 rounded-full bg-accent"></span> <strong>Junk</strong> — above MRV; trim sets, you're just adding fatigue.</div>
                 </div>
 
-                <div class="not-prose rounded-lg bg-indigo-50 border border-indigo-200 p-4 my-3">
-                    <p class="text-sm font-semibold text-indigo-900">Reading your example: "Chest 7.9/wk · below maintenance (MEV 10 / MAV 16)"</p>
-                    <p class="text-sm text-indigo-800 mt-1">
+                <div class="not-prose rounded-lg bg-brand-soft border border-brand p-4 my-3">
+                    <p class="text-sm font-semibold text-brand-ink">Reading your example: "Chest 7.9/wk · below maintenance (MEV 10 / MAV 16)"</p>
+                    <p class="text-sm text-brand-ink mt-1">
                         You're averaging <strong>7.9 hard chest sets per week</strong>. Chest needs at least <strong>~8 to maintain</strong>
                         and <strong>~10 (MEV) to actually grow</strong>, with the best returns up to <strong>~16 (MAV)</strong>.
                         At 7.9 you're <em>under</em> the growth line — <strong>yes, your chest probably isn't developing as fast as it could.</strong>
@@ -47,7 +47,7 @@
                         Your lats and upper back (3–5/wk) are even further below — prioritise back volume too.
                     </p>
                 </div>
-                <p class="text-xs text-gray-500">Landmarks per muscle follow Renaissance Periodization (Dr. Mike Israetel et&nbsp;al.). They're starting guidelines — individual recovery varies. Secondary muscles count as a half-set by default.</p>
+                <p class="text-xs text-muted">Landmarks per muscle follow Renaissance Periodization (Dr. Mike Israetel et&nbsp;al.). They're starting guidelines — individual recovery varies. Secondary muscles count as a half-set by default.</p>
 
                 <h4>Tonnage (a.k.a. volume-load)</h4>
                 <p><strong>Tonnage = weight × reps, summed across all your sets.</strong> It's total "work" done and a quick proxy for
@@ -57,7 +57,7 @@
 
         {{-- STRENGTH --}}
         <x-panel id="strength" title="Strength & estimated 1RM">
-            <div class="prose prose-sm max-w-none text-gray-700">
+            <div class="prose prose-sm max-w-none text-body">
                 <h4>Estimated 1RM (e1RM)</h4>
                 <p>Your <strong>1-rep max</strong> is the most you could lift once. Testing it is risky, so we <em>estimate</em> it from
                    normal sets using two well-known formulas (<strong>Epley</strong> and <strong>Brzycki</strong>) and average them.
@@ -78,7 +78,7 @@
 
         {{-- LEVELS --}}
         <x-panel id="levels" title="Strength levels (Beginner → Elite)">
-            <div class="prose prose-sm max-w-none text-gray-700">
+            <div class="prose prose-sm max-w-none text-body">
                 <p>For each barbell lift we place you on a <strong>0–100% bar</strong> that compares you to other lifters of the
                    <strong>same sex, bodyweight and age</strong>. The fill % is literally your percentile — <em>"stronger than X% of lifters."</em></p>
                 <p>The separator lines mark the boundaries between levels, mapped to well-known percentiles:</p>
@@ -91,20 +91,20 @@
                 </ul>
                 <p>So "stronger than 86%" sits in the <strong>Advanced</strong> band, closing in on Elite. We estimate your 1RM (Epley/Brzycki)
                    from your best set, divide by bodyweight, and <strong>age-adjust</strong> so you're compared to peers your age (strength peaks ~25–35 and declines later).</p>
-                <p class="text-xs text-gray-500"><strong>Where the data comes from (layered):</strong> we try the free <strong>FitnessVolt API</strong> (CC BY 4.0) first — it serves two separate populations: <strong>verified competition</strong> percentiles from <strong>OpenPowerlifting</strong> (2.5M+ judged lifts) and <strong>self-reported gym</strong> percentiles (Symmetric Strength), age-adjusted. If it's unreachable we fall back to a locally-built <strong>OpenPowerlifting</strong> table, then to an offline ratio model.</p>
-                <div class="not-prose rounded-lg bg-indigo-50 border border-indigo-200 p-3 my-2 text-sm text-indigo-800">
+                <p class="text-xs text-muted"><strong>Where the data comes from (layered):</strong> we try the free <strong>FitnessVolt API</strong> (CC BY 4.0) first — it serves two separate populations: <strong>verified competition</strong> percentiles from <strong>OpenPowerlifting</strong> (2.5M+ judged lifts) and <strong>self-reported gym</strong> percentiles (Symmetric Strength), age-adjusted. If it's unreachable we fall back to a locally-built <strong>OpenPowerlifting</strong> table, then to an offline ratio model.</p>
+                <div class="not-prose rounded-lg bg-brand-soft border border-brand p-3 my-2 text-sm text-brand-ink">
                     <strong>Why two different percentages?</strong> The same lift ranks differently depending on who you're compared to.
                     Against everyday <strong>gym</strong> lifters you rank high; against <strong>competition</strong> lifters (a much stronger crowd) you rank lower.
                     Example: a 100&nbsp;kg bench at 68&nbsp;kg is ~<strong>83rd percentile (gym)</strong> but ~<strong>46th (verified competition)</strong>.
                     We show the <strong>gym</strong> number as the headline (it matches apps like Hevy) and display the verified number beside it.
                     Neither is "wrong" — they're different reference populations.
                 </div>
-                <p class="text-xs text-gray-500">Big-3 (squat/bench/deadlift) have verified competition data; accessory lifts use ratio estimates. Only weight×reps barbell lifts are covered; others fall back to the offline model. Powered by FitnessVolt (CC BY 4.0); data from OpenPowerlifting (CC0) &amp; Symmetric Strength.</p>
+                <p class="text-xs text-muted">Big-3 (squat/bench/deadlift) have verified competition data; accessory lifts use ratio estimates. Only weight×reps barbell lifts are covered; others fall back to the offline model. Powered by FitnessVolt (CC BY 4.0); data from OpenPowerlifting (CC0) &amp; Symmetric Strength.</p>
             </div>
         </x-panel>
 
         {{-- BODY --}}
-        <x-panel id="body" title="Body composition">            <div class="prose prose-sm max-w-none text-gray-700">
+        <x-panel id="body" title="Body composition">            <div class="prose prose-sm max-w-none text-body">
                 <ul>
                     <li><strong>Body fat %:</strong> share of your weight that is fat. Lower = leaner. During a lean bulk you want this to creep up only slowly.</li>
                     <li><strong>Lean mass:</strong> everything that isn't fat (muscle, bone, water, organs). Growing lean mass while fat stays flat is the whole goal.</li>
@@ -118,7 +118,7 @@
 
         {{-- ACCURACY --}}
         <x-panel id="accuracy" title="Measurement accuracy — why we don't trust one number">
-            <div class="prose prose-sm max-w-none text-gray-700">
+            <div class="prose prose-sm max-w-none text-body">
                 <p>Smart scales (Xiaomi, etc.) estimate body fat with <strong>BIA — Bioelectrical Impedance Analysis</strong>: a tiny
                    current through your feet. It's convenient but <strong>noisy and not very accurate for absolute values</strong>:</p>
                 <ul>
@@ -133,7 +133,7 @@
                     <li><strong>Triangulation:</strong> we show weight, waist, chest, arm and strength trends together — muscle gain looks like chest/arms + strength rising while waist stays flat.</li>
                     <li><strong>Choose your source</strong> (Profile → Body-fat source): <strong>Scale (BIA)</strong>, <strong>Navy tape</strong> (neck/waist/height — steadier), or <strong>Manual</strong> (type your own estimate).</li>
                 </ul>
-                <p class="not-prose rounded-lg bg-indigo-50 border border-indigo-200 p-3 text-sm text-indigo-800">
+                <p class="not-prose rounded-lg bg-brand-soft border border-brand p-3 text-sm text-brand-ink">
                     <strong>Bottom line:</strong> the mirror and progress photos are legitimately the most reliable everyday gauge. Use the
                     <a href="{{ route('photos') }}" class="underline">Photos</a> page for that, and treat body-fat % as a rough trend, not gospel.
                 </p>
@@ -143,19 +143,19 @@
         </x-panel>
 
         {{-- LEAN BULK --}}
-        <x-panel id="leanbulk" title="Lean-bulk signals">            <div class="prose prose-sm max-w-none text-gray-700">
+        <x-panel id="leanbulk" title="Lean-bulk signals">            <div class="prose prose-sm max-w-none text-body">
                 <ul>
                     <li><strong>Weight rate (%BW/week):</strong> how fast your bodyweight is changing, as a percent of your bodyweight, per week. For a lean bulk the sweet spot is <strong>+0.25% to +0.5%/week</strong> (e.g., ~0.2–0.35&nbsp;kg/wk at 70&nbsp;kg). Faster = more fat; slower/negative = you're not feeding growth.</li>
                     <li><strong>P-ratio (partitioning):</strong> of the weight you gained, what fraction was <em>lean</em> mass vs fat. A p-ratio of 0.7 means 70% of the gain was muscle — excellent. A low p-ratio while bulking is a warning to slow the surplus down.</li>
                     <li><strong>Waist vs muscle trend:</strong> if your waist is growing faster than your chest/arms, that's a proxy for fat gain outpacing muscle gain — the app flags it.</li>
                 </ul>
-                <p class="text-xs text-gray-500">These need a few body-weight/measurement entries over time to become reliable. Log weight regularly in Hevy (or on the Nutrition page).</p>
+                <p class="text-xs text-muted">These need a few body-weight/measurement entries over time to become reliable. Log weight regularly in Hevy (or on the Nutrition page).</p>
             </div>
         </x-panel>
 
         {{-- NUTRITION --}}
         <x-panel id="nutrition" title="Calories & macros">
-            <div class="prose prose-sm max-w-none text-gray-700">
+            <div class="prose prose-sm max-w-none text-body">
                 <ul>
                     <li><strong>BMR (Basal Metabolic Rate):</strong> calories your body burns at complete rest just to stay alive. We use the Mifflin-St&nbsp;Jeor formula, or Katch-McArdle when your body-fat is known (more accurate for lean people).</li>
                     <li><strong>TDEE / Maintenance:</strong> total calories you burn in a day (BMR × your activity level + training). Eat this to stay the same weight.</li>
@@ -169,7 +169,7 @@
 
         {{-- PROJECTIONS --}}
         <x-panel id="projections" title="Projections">
-            <div class="prose prose-sm max-w-none text-gray-700">
+            <div class="prose prose-sm max-w-none text-body">
                 <p>We fit a straight <strong>trend line</strong> through your recent data and extend it out 1 month / quarter / semester / year.
                    These are <strong>"if you keep going like this" estimates, not promises.</strong></p>
                 <ul>
@@ -181,7 +181,7 @@
 
         {{-- BALANCE --}}
         <x-panel id="balance" title="Muscle balance">
-            <div class="prose prose-sm max-w-none text-gray-700">
+            <div class="prose prose-sm max-w-none text-body">
                 <p>Compares training volume between opposing/related areas so you develop evenly and reduce injury risk:</p>
                 <ul>
                     <li><strong>Push vs Pull</strong> (chest/shoulders/triceps vs back/biceps)</li>
@@ -193,7 +193,7 @@
         </x-panel>
 
         <x-panel title="Sources">
-            <ul class="text-xs text-gray-500 list-disc list-inside space-y-1">
+            <ul class="text-xs text-muted list-disc list-inside space-y-1">
                 <li>Schoenfeld et al. — dose-response of weekly sets and hypertrophy.</li>
                 <li>Renaissance Periodization (Israetel et al.) — MV/MEV/MAV/MRV volume landmarks.</li>
                 <li>Epley (1985) &amp; Brzycki (1998) — 1RM estimation formulas.</li>
@@ -201,7 +201,7 @@
                 <li>Helms, Aragon, Morton et al. — protein intake &amp; lean-gain rate guidelines.</li>
                 <li>Kouri et al. — FFMI and the natural muscular ceiling.</li>
             </ul>
-            <p class="mt-3 text-xs text-gray-400">Educational only — not medical advice.</p>
+            <p class="mt-3 text-xs text-faint">Educational only — not medical advice.</p>
         </x-panel>
     </div>
 </x-app-layout>

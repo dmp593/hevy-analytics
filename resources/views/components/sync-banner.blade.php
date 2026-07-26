@@ -8,8 +8,8 @@
 @if ($message && in_array($state, ['queued', 'stalled', 'running', 'failed'], true))
     @php
         $tone = match ($state) {
-            'failed', 'stalled' => 'border-red-200 bg-red-50 text-red-800',
-            default => 'border-sky-200 bg-sky-50 text-sky-800',
+            'failed', 'stalled' => 'border-bad/30 bg-bad-soft text-bad',
+            default => 'border-info/30 bg-info-soft text-info',
         };
     @endphp
     <div class="mb-4 flex items-start gap-3 rounded-md border px-4 py-3 text-sm {{ $tone }}" role="status">

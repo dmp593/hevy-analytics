@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800">{{ $routine->title }}</h2>
-            <a href="{{ route('routines.edit', $routine->hevy_id) }}" class="text-sm text-indigo-600">Edit / stage progression →</a>
+            <h2 class="font-semibold text-xl text-ink">{{ $routine->title }}</h2>
+            <a href="{{ route('routines.edit', $routine->hevy_id) }}" class="text-sm text-brand-ink">Edit / stage progression →</a>
         </div>
     </x-slot>
 
@@ -36,12 +36,12 @@
         <x-panel title="Muscle coverage" subtitle="Prescribed working sets per session vs weekly landmarks">
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
                 @foreach($muscleCoverage as $m)
-                    <div class="rounded-lg border border-gray-100 p-3">
+                    <div class="rounded-lg border border-subtle p-3">
                         <div class="flex justify-between text-sm">
                             <span class="capitalize font-medium">{{ str_replace('_',' ',$m['muscle']) }}</span>
                             <span>{{ $m['sets_per_session'] }} sets</span>
                         </div>
-                        <div class="text-[10px] text-gray-400">weekly MEV {{ $m['landmarks']['mev'] }} · MAV {{ $m['landmarks']['mav'] }}</div>
+                        <div class="text-[10px] text-faint">weekly MEV {{ $m['landmarks']['mev'] }} · MAV {{ $m['landmarks']['mav'] }}</div>
                     </div>
                 @endforeach
             </div>

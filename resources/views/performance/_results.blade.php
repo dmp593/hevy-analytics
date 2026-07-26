@@ -35,7 +35,7 @@
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
                 <thead>
-                    <tr class="text-left text-xs uppercase text-gray-500 border-b">
+                    <tr class="text-left text-xs uppercase text-muted border-b">
                         <th class="py-2 pr-4">Exercise</th>
                         <th class="py-2 pr-4">Muscle</th>
                         <th class="py-2 pr-4">Best e1RM</th>
@@ -46,16 +46,16 @@
                 </thead>
                 <tbody>
                     @forelse(array_slice($prs, 0, 25) as $p)
-                        <tr class="border-b border-gray-50">
+                        <tr class="border-b border-subtle">
                             <td class="py-2 pr-4 font-medium">{{ $p['exercise'] }}</td>
-                            <td class="py-2 pr-4 capitalize text-gray-500">{{ str_replace('_',' ', $p['muscle'] ?? '—') }}</td>
+                            <td class="py-2 pr-4 capitalize text-muted">{{ str_replace('_',' ', $p['muscle'] ?? '—') }}</td>
                             <td class="py-2 pr-4">{{ $p['best_e1rm'] ? round($p['best_e1rm'],1).' kg' : '—' }}</td>
                             <td class="py-2 pr-4">{{ $p['best_weight'] ? round($p['best_weight'],1).' kg' : '—' }}</td>
                             <td class="py-2 pr-4">{{ $p['best_reps'] ?: '—' }}</td>
                             <td class="py-2 pr-4">{{ $p['best_volume_set'] ? number_format($p['best_volume_set']).' kg' : '—' }}</td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="py-3 text-gray-500">No exercises match these filters.</td></tr>
+                        <tr><td colspan="6" class="py-3 text-muted">No exercises match these filters.</td></tr>
                     @endforelse
                 </tbody>
             </table>

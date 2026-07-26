@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800">Strength levels</h2>
+            <h2 class="font-semibold text-xl text-ink">Strength levels</h2>
             <x-info title="Strength level" text="Strength level measures your strength in this exercise compared to people at the same age, weight and sex group as you. 0% = beginner, 100% = elite. Based on Strength Level community standards (millions of lifts)." />
         </div>
     </x-slot>
@@ -11,20 +11,20 @@
 
         @if(! $bodyweight)
             <x-panel>
-                <p class="text-sm text-gray-600">Log a body weight in Hevy and set your <a href="{{ route('profile.edit') }}" class="text-indigo-600 underline">age &amp; sex</a> — strength levels compare you to lifters of the same age, bodyweight and sex.</p>
+                <p class="text-sm text-body">Log a body weight in Hevy and set your <a href="{{ route('profile.edit') }}" class="text-brand-ink underline">age &amp; sex</a> — strength levels compare you to lifters of the same age, bodyweight and sex.</p>
             </x-panel>
         @elseif(empty($levels))
             <x-panel>
-                <p class="text-sm text-gray-600">No standard-mapped lifts found yet. Strength standards cover barbell movements like Bench, Squat, Deadlift, Overhead Press, Barbell Row and Barbell Curl. Log some and re-sync.</p>
+                <p class="text-sm text-body">No standard-mapped lifts found yet. Strength standards cover barbell movements like Bench, Squat, Deadlift, Overhead Press, Barbell Row and Barbell Curl. Log some and re-sync.</p>
             </x-panel>
         @else
             <x-panel class="mb-6">
-                <p class="text-sm text-gray-600">
+                <p class="text-sm text-body">
                     Compared against {{ $sex }} lifters
                     @if($age) aged {{ $age }} @endif
                     at {{ $bodyweight }}kg bodyweight.
                     @if($ageFactor && $ageFactor != 1)
-                        <span class="text-gray-400">Standards age-adjusted ×{{ $ageFactor }}.</span>
+                        <span class="text-faint">Standards age-adjusted ×{{ $ageFactor }}.</span>
                     @endif
                 </p>
             </x-panel>
@@ -37,7 +37,7 @@
                 @endforeach
             </div>
 
-            <p class="mt-6 text-xs text-gray-400">
+            <p class="mt-6 text-xs text-faint">
                 Levels use a layered data source: <strong>FitnessVolt</strong> (free, CC BY 4.0 — serving verified
                 <a href="https://www.openpowerlifting.org/" target="_blank" rel="noopener" class="underline">OpenPowerlifting</a>
                 competition percentiles + self-reported gym percentiles), falling back to a locally-built OpenPowerlifting

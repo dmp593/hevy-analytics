@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800">Nutrition</h2>
+            <h2 class="font-semibold text-xl text-ink">Nutrition</h2>
             <form method="POST" action="{{ route('nutrition.recompute') }}">
                 @csrf
-                <button class="text-xs rounded-md bg-gray-800 text-white px-3 py-1.5 hover:bg-gray-700">Recompute targets</button>
+                <button class="text-xs rounded-md bg-ink text-canvas px-3 py-1.5 hover:opacity-90">Recompute targets</button>
             </form>
         </div>
     </x-slot>
@@ -14,7 +14,7 @@
 
         @if(! $target)
             <x-panel>
-                <p class="text-sm text-gray-600">Add your <a href="{{ route('profile.edit') }}" class="text-indigo-600 underline">height, age & sex</a>, set a <a href="{{ route('goals') }}" class="text-indigo-600 underline">goal</a>, and log a body weight in Hevy — then targets will appear here.</p>
+                <p class="text-sm text-body">Add your <a href="{{ route('profile.edit') }}" class="text-brand-ink underline">height, age & sex</a>, set a <a href="{{ route('goals') }}" class="text-brand-ink underline">goal</a>, and log a body weight in Hevy — then targets will appear here.</p>
             </x-panel>
         @else
             @php $basis = $target->basis ?? []; @endphp
@@ -41,29 +41,29 @@
                 <x-panel title="Log today's intake" subtitle="Feeds adaptive TDEE & adherence">
                     <form method="POST" action="{{ route('nutrition.intake') }}" class="grid grid-cols-2 gap-3">
                         @csrf
-                        <label class="text-xs text-gray-600 col-span-2">Date
-                            <input type="date" name="date" value="{{ now()->toDateString() }}" class="mt-1 w-full rounded-md border-gray-300 text-sm" required>
+                        <label class="text-xs text-body col-span-2">Date
+                            <input type="date" name="date" value="{{ now()->toDateString() }}" class="mt-1 w-full rounded-md border-line text-sm" required>
                         </label>
-                        <label class="text-xs text-gray-600">Calories
-                            <input type="number" step="1" name="calories" class="mt-1 w-full rounded-md border-gray-300 text-sm" placeholder="{{ (int)$target->target_calories }}">
+                        <label class="text-xs text-body">Calories
+                            <input type="number" step="1" name="calories" class="mt-1 w-full rounded-md border-line text-sm" placeholder="{{ (int)$target->target_calories }}">
                         </label>
-                        <label class="text-xs text-gray-600">Weight (kg)
-                            <input type="number" step="0.1" name="weight_kg" class="mt-1 w-full rounded-md border-gray-300 text-sm">
+                        <label class="text-xs text-body">Weight (kg)
+                            <input type="number" step="0.1" name="weight_kg" class="mt-1 w-full rounded-md border-line text-sm">
                         </label>
-                        <label class="text-xs text-gray-600">Body fat (%, optional)
-                            <input type="number" step="0.1" name="fat_percent" class="mt-1 w-full rounded-md border-gray-300 text-sm" placeholder="manual estimate">
+                        <label class="text-xs text-body">Body fat (%, optional)
+                            <input type="number" step="0.1" name="fat_percent" class="mt-1 w-full rounded-md border-line text-sm" placeholder="manual estimate">
                         </label>
-                        <label class="text-xs text-gray-600">Protein (g)
-                            <input type="number" step="1" name="protein_g" class="mt-1 w-full rounded-md border-gray-300 text-sm" placeholder="{{ (int)$target->protein_g }}">
+                        <label class="text-xs text-body">Protein (g)
+                            <input type="number" step="1" name="protein_g" class="mt-1 w-full rounded-md border-line text-sm" placeholder="{{ (int)$target->protein_g }}">
                         </label>
-                        <label class="text-xs text-gray-600">Fat (g)
-                            <input type="number" step="1" name="fat_g" class="mt-1 w-full rounded-md border-gray-300 text-sm" placeholder="{{ (int)$target->fat_g }}">
+                        <label class="text-xs text-body">Fat (g)
+                            <input type="number" step="1" name="fat_g" class="mt-1 w-full rounded-md border-line text-sm" placeholder="{{ (int)$target->fat_g }}">
                         </label>
-                        <label class="text-xs text-gray-600">Carbs (g)
-                            <input type="number" step="1" name="carb_g" class="mt-1 w-full rounded-md border-gray-300 text-sm" placeholder="{{ (int)$target->carb_g }}">
+                        <label class="text-xs text-body">Carbs (g)
+                            <input type="number" step="1" name="carb_g" class="mt-1 w-full rounded-md border-line text-sm" placeholder="{{ (int)$target->carb_g }}">
                         </label>
                         <div class="col-span-2">
-                            <button class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">Log intake</button>
+                            <button class="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-on-fill hover:bg-brand-hover">Log intake</button>
                         </div>
                     </form>
                 </x-panel>
@@ -72,21 +72,21 @@
             <x-panel title="Recent intake vs target">
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
-                        <thead><tr class="text-left text-xs uppercase text-gray-500 border-b">
+                        <thead><tr class="text-left text-xs uppercase text-muted border-b">
                             <th class="py-2 pr-4">Date</th><th class="py-2 pr-4">Calories</th><th class="py-2 pr-4">Target</th>
                             <th class="py-2 pr-4">Protein</th><th class="py-2 pr-4">Weight</th>
                         </tr></thead>
                         <tbody>
                         @forelse($adherence as $row)
-                            <tr class="border-b border-gray-50">
+                            <tr class="border-b border-subtle">
                                 <td class="py-2 pr-4">{{ $row['date'] }}</td>
                                 <td class="py-2 pr-4">{{ $row['calories'] ? number_format($row['calories']) : '—' }}</td>
-                                <td class="py-2 pr-4 text-gray-500">{{ $row['target_calories'] ? number_format($row['target_calories']) : '—' }}</td>
+                                <td class="py-2 pr-4 text-muted">{{ $row['target_calories'] ? number_format($row['target_calories']) : '—' }}</td>
                                 <td class="py-2 pr-4">{{ $row['protein_g'] ? $row['protein_g'].'g' : '—' }}</td>
                                 <td class="py-2 pr-4">{{ collect($recentLogs)->firstWhere('date', \Illuminate\Support\Carbon::parse($row['date']))?->weight_kg ?? '—' }}</td>
                             </tr>
                         @empty
-                            <tr><td colspan="5" class="py-3 text-gray-500">No intake logged yet.</td></tr>
+                            <tr><td colspan="5" class="py-3 text-muted">No intake logged yet.</td></tr>
                         @endforelse
                         </tbody>
                     </table>

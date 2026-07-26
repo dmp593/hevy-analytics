@@ -11,6 +11,25 @@ class Chart
     /** Used when a multi() set does not name a colour. */
     public const DEFAULT_COLOR = '#4f46e5';
 
+    /**
+     * The shared, ordered chart palette.
+     *
+     * Views ask for a slot rather than naming a hex value, so every chart in the
+     * app uses the same colours in the same order and the palette can change in
+     * one place. Read from the CSS custom properties at render time is not
+     * possible here (this runs server-side), so the values mirror the --series-*
+     * tokens in app.css; the chart wrapper re-reads the live values in the
+     * browser so dark mode still shifts them.
+     */
+    private const SERIES = [
+        '#6366f1', '#38bdf8', '#22c55e', '#f59e0b', '#ef4444', '#d946ef',
+    ];
+
+    public static function series(int $index): string
+    {
+        return self::SERIES[$index % count(self::SERIES)];
+    }
+
     /** Extract the x-axis labels from a series. */
     public static function labels(array $series): array
     {

@@ -31,6 +31,7 @@ return [
         'write_operations' => 'Write Operations',
         'log_out' => 'Log Out',
         'toggle' => 'Toggle navigation',
+        'primary' => 'Primary',
         'language' => 'Language',
     ],
 
@@ -64,6 +65,15 @@ return [
         'weekly_sets' => 'Weekly sets per muscle',
         'weekly_sets_sub' => 'vs hypertrophy landmarks',
         'muscle_balance' => 'Muscle balance',
+        'whats_next' => "What's next",
+        'at_a_glance' => 'At a glance',
+        'trends' => 'Trends',
+        'detail' => 'Detail',
+        'more_alerts' => ':count more',
+        'nutrition_targets' => 'Nutrition targets',
+        'nutrition_targets_sub' => 'Daily, based on your goal',
+        'no_training_yet' => 'No training logged yet',
+        'no_training_yet_body' => 'Sync your Hevy account and your weekly sets per muscle will appear here.',
         'muscle_balance_sub' => 'Set ratios, 3 months',
     ],
 
@@ -211,6 +221,33 @@ return [
         'per_week' => '/wk',
     ],
 
+    'theme' => [
+        'system' => 'Match my system',
+        'light' => 'Light',
+        'dark' => 'Dark',
+        'switch_dark' => 'Switch to dark mode',
+        'switch_light' => 'Switch to light mode',
+    ],
+
+    'sections' => [
+        'today' => 'Today',
+        'today_question' => 'What should I do this week?',
+        'training' => 'Training',
+        'training_question' => 'Am I getting stronger?',
+        'body' => 'Body',
+        'body_question' => 'Is my body changing the way I want?',
+        'outlook' => 'Outlook',
+        'outlook_question' => 'Where does this end up?',
+    ],
+
+    'tips' => [
+        'weight' => "Your bodyweight and how fast it's changing per week. Lean-bulk sweet spot: +0.25% to +0.5% of bodyweight per week.",
+        'body_fat' => 'Percent of your weight that is fat. Navy = an independent tape-measure estimate used as a cross-check.',
+        'lean_mass' => "Everything that isn't fat (mostly muscle). FFMI = muscularity adjusted for height; ~25 is near the natural ceiling for men.",
+        'hard_sets' => 'Total working sets (warm-ups excluded) in the last 4 weeks — the main driver of muscle growth.',
+        'landmarks' => "Hard working sets per muscle each week. MEV = minimum to grow, MAV = best-return zone. Aim between them. 'Below maintenance' means too few sets to grow.",
+    ],
+
     'common' => [
         'save' => 'Save',
         'saved' => 'Saved.',
@@ -220,6 +257,7 @@ return [
         'to' => 'To',
         'period' => 'Period',
         'learn_more' => 'Learn more →',
+        'skip_to_content' => 'Skip to content',
         'more_info' => 'More info',
     ],
 

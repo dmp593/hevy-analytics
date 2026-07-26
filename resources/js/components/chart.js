@@ -27,6 +27,23 @@ import { Chart } from 'chart.js';
 // its chart are both collectable, and so nothing here is ever made reactive.
 const instances = new WeakMap();
 
+/**
+ * Chart.js draws grid lines, ticks and legend text itself, so it has to be told
+ * the theme colours — otherwise a dark page gets a chart with near-black axes on
+ * a near-black card. Read live from the CSS custom properties so there is one
+ * source of truth, and re-read on every draw so a theme switch takes effect.
+ */
+function themeColours() {
+    const style = getComputedStyle(document.documentElement);
+    const read = (name, fallback) => style.getPropertyValue(name).trim() || fallback;
+
+    return {
+        grid: read('--chart-grid', 'rgba(0,0,0,.08)'),
+        axis: read('--chart-axis', '#64748b'),
+        series: [1, 2, 3, 4, 5, 6].map((n) => read(`--series-${n}`, '#6366f1')),
+    };
+}
+
 function destroyFor(canvas) {
     const existing = instances.get(canvas) ?? Chart.getChart(canvas);
     if (existing) {
@@ -55,6 +72,7 @@ function sweepDetached() {
 export default function chart() {
     return {
         onMerged: null,
+        themeObserver: null,
         lastConfig: null,
 
         mount() {
@@ -84,9 +102,23 @@ export default function chart() {
             };
 
             document.addEventListener('ajax:merged', this.onMerged);
+
+            // A theme switch changes the colours the chart was drawn with, and
+            // Chart.js has no way to know that happened.
+            this.themeObserver = new MutationObserver(() => {
+                this.lastConfig = null;
+                this.draw();
+            });
+            this.themeObserver.observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ['class'],
+            });
         },
 
         destroy() {
+            this.themeObserver?.disconnect();
+            this.themeObserver = null;
+
             if (this.onMerged) {
                 document.removeEventListener('ajax:merged', this.onMerged);
                 this.onMerged = null;
@@ -126,6 +158,23 @@ export default function chart() {
             this.lastConfig = raw;
 
             const options = config.options ?? {};
+            const theme = themeColours();
+
+            // Server-rendered series colours are a fallback; the live token wins
+            // so the palette shifts with the theme.
+            (config.data?.datasets ?? []).forEach((dataset, i) => {
+                const colour = theme.series[i % theme.series.length];
+                if (colour) {
+                    dataset.borderColor = colour;
+                    if (dataset.fill) {
+                        dataset.backgroundColor = colour.startsWith('oklch')
+                            ? colour.replace(')', ' / 12%)')
+                            : dataset.backgroundColor;
+                    } else if (config.type !== 'line') {
+                        dataset.backgroundColor = theme.series.slice(0, (dataset.data ?? []).length);
+                    }
+                }
+            });
 
             instances.set(
                 canvas,
@@ -135,11 +184,21 @@ export default function chart() {
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        color: theme.axis,
+                        scales: config.type === 'line' || config.type === 'bar'
+                            ? {
+                                x: { grid: { color: theme.grid }, ticks: { color: theme.axis } },
+                                y: { grid: { color: theme.grid }, ticks: { color: theme.axis } },
+                            }
+                            : undefined,
                         ...options,
                         // Merged after the spread so a caller-supplied `plugins`
                         // key cannot silently drop the legend setting.
                         plugins: {
-                            legend: { display: config.legend !== false },
+                            legend: {
+                                display: config.legend !== false,
+                                labels: { color: theme.axis, usePointStyle: true, boxWidth: 8 },
+                            },
                             ...(options.plugins ?? {}),
                         },
                     },
