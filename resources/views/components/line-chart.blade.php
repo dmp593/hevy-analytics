@@ -15,5 +15,5 @@
         :legend="false"
     />
 @else
-    <p class="text-sm text-gray-500">{{ $empty }}</p>
+    <x-empty-chart :height="$height">{{ $empty }}</x-empty-chart>
 @endif

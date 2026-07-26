@@ -56,12 +56,10 @@
                 </x-panel>
 
                 <x-panel title="Body composition" subtitle="Weight vs lean mass, last 12 months">
-                    <x-chart
-                        :labels="\App\Support\Chart::labels($weightSeries)"
-                        :datasets="[
-                            \App\Support\Chart::line($weightSeries, 'Weight (kg)', '#0ea5e9', false),
-                            \App\Support\Chart::line($leanSeries, 'Lean mass (kg)', '#16a34a', false),
-                        ]" />
+                    <x-multi-line-chart :sets="[
+                        ['series' => $weightSeries, 'label' => 'Weight (kg)', 'color' => '#0ea5e9'],
+                        ['series' => $leanSeries, 'label' => 'Lean mass (kg)', 'color' => '#16a34a'],
+                    ]" empty="Log a bodyweight measurement to see this chart." />
                 </x-panel>
             </div>
 
