@@ -15,18 +15,28 @@
                             <span class="text-xs text-gray-400 ml-2">{{ $op->endpoint }}</span>
                         </div>
                         <div class="flex items-center gap-3">
-                            @php $tone = match($op->status) {
-                                'success' => 'bg-green-100 text-green-700',
-                                'failed' => 'bg-red-100 text-red-700',
-                                'pending' => 'bg-amber-100 text-amber-700',
-                                default => 'bg-gray-100 text-gray-600',
-                            }; @endphp
-                            <span class="text-xs px-2 py-0.5 rounded-full {{ $tone }}">{{ $op->status }}</span>
+                            @php
+                                // Ask the service the same question it asks itself, rather than
+                                // duplicating its status list here — that drift is what left a
+                                // stalled operation with no way to retry it.
+                                $stale = \App\Services\Hevy\HevyWriter::isStale($op);
+                                $canPush = \App\Services\Hevy\HevyWriter::isExecutable($op);
+                                $tone = match(true) {
+                                    $op->status === 'success' => 'bg-green-100 text-green-700',
+                                    $op->status === 'failed' => 'bg-red-100 text-red-700',
+                                    $op->status === 'pending' => 'bg-amber-100 text-amber-700',
+                                    $stale => 'bg-red-100 text-red-700',
+                                    default => 'bg-gray-100 text-gray-600',
+                                };
+                            @endphp
+                            <span class="text-xs px-2 py-0.5 rounded-full {{ $tone }}">{{ $stale ? 'stalled' : $op->status }}</span>
                             <button @click="open = !open" class="text-xs text-gray-500">details</button>
-                            @if($op->status === 'pending' || $op->status === 'failed')
+                            @if($canPush)
                                 <form method="POST" action="{{ route('write.confirm', $op) }}">
                                     @csrf
-                                    <button class="text-xs rounded-md bg-indigo-600 text-white px-3 py-1 hover:bg-indigo-700">Confirm &amp; push</button>
+                                    <button class="text-xs rounded-md bg-indigo-600 text-white px-3 py-1 hover:bg-indigo-700">
+                                        {{ $stale ? 'Retry' : 'Confirm &amp; push' }}
+                                    </button>
                                 </form>
                             @endif
                         </div>

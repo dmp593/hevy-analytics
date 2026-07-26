@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
 class HevyWriter
 {
     /** A 'running' claim older than this is assumed abandoned and may be retaken. */
-    private const STALE_CLAIM_MINUTES = 10;
+    public const STALE_CLAIM_MINUTES = 10;
 
     public function __construct(private readonly User $user) {}
 
@@ -29,13 +29,23 @@ class HevyWriter
     /**
      * An operation is executable when it has never run, or when a previous
      * attempt claimed it and then died without releasing it.
+     *
+     * Static so the view can ask the same question the service does — gating the
+     * Confirm button on a hand-copied status list is how the two drifted apart
+     * and left the reclaim path with no way to reach it.
      */
-    public function isExecutable(WriteOperation $op): bool
+    public static function isExecutable(WriteOperation $op): bool
     {
         if (in_array($op->status, self::EXECUTABLE, true)) {
             return true;
         }
 
+        return self::isStale($op);
+    }
+
+    /** A claim abandoned by a process that died mid-write. */
+    public static function isStale(WriteOperation $op): bool
+    {
         return $op->status === 'running'
             && $op->updated_at !== null
             && $op->updated_at->lt(now()->subMinutes(self::STALE_CLAIM_MINUTES));
@@ -73,7 +83,7 @@ class HevyWriter
      */
     public function execute(WriteOperation $op): WriteOperation
     {
-        if (! $this->isExecutable($op)) {
+        if (! self::isExecutable($op)) {
             return $op;
         }
 
@@ -91,7 +101,6 @@ class HevyWriter
 
         $op->refresh();
 
-        $client = $this->client();
         $payload = $op->payload ?? [];
         $targetId = (string) ($payload['_target_id'] ?? '');
         unset($payload['_target_id']);
@@ -99,6 +108,11 @@ class HevyWriter
         $key = $op->idempotency_key;
 
         try {
+            // Built inside the try: a missing or undecryptable API key throws
+            // here, and outside the try that would escape past the claim and
+            // strand the row.
+            $client = $this->client();
+
             $response = match ($op->operation) {
                 'workout.create' => $client->createWorkout($payload, $key),
                 'workout.update' => $client->updateWorkout($targetId, $payload, $key),

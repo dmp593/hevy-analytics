@@ -142,6 +142,32 @@ class AbuseControlsTest extends TestCase
         $this->assertSame('failed', (new SyncStatus($user))->current()['state']);
     }
 
+    public function test_a_stalled_write_offers_a_retry_button(): void
+    {
+        $user = User::factory()->create();
+        $user->forceFill(['hevy_api_key' => 'k'])->save();
+
+        $op = $user->writeOperations()->create([
+            'operation' => 'workout.create',
+            'method' => 'POST',
+            'endpoint' => '/v1/workouts',
+            'payload' => ['title' => 'Test'],
+            'status' => 'running',
+            'idempotency_key' => (string) Str::uuid(),
+        ]);
+
+        // Freshly claimed: nothing to offer, the write may still be in flight.
+        $this->actingAs($user)->get('/write-operations')->assertDontSee('Retry');
+
+        // Abandoned: the service would reclaim this, so the page has to say so —
+        // the reclaim path previously had no UI entry point at all.
+        $op->forceFill(['updated_at' => now()->subMinutes(30)])->saveQuietly();
+
+        $this->actingAs($user)->get('/write-operations')
+            ->assertSee('Retry')
+            ->assertSee('stalled');
+    }
+
     public function test_a_write_stuck_mid_call_is_recoverable(): void
     {
         $timeout = true;
