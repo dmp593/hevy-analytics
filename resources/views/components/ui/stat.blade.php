@@ -9,17 +9,22 @@
 ])
 
 @php
+    $hasValue = $value !== null && $value !== '' && $value !== '—';
+
     // Tone colours the VALUE, never the whole tile: a wall of coloured boxes
     // stops meaning anything.
-    $valueTone = match ($tone) {
+    //
+    // A missing value is always neutral, whatever tone the caller passed. A
+    // caller writing `$x > 0.5 ? 'warn' : 'good'` produces 'good' when $x is
+    // null, so an athlete who had never logged a waist measurement was shown a
+    // reassuring green dash. Judging nothing is not the same as judging it fine.
+    $valueTone = ! $hasValue ? 'text-muted' : match ($tone) {
         'good' => 'text-good',
         'warn' => 'text-warn',
         'bad' => 'text-bad',
         'accent' => 'text-brand-ink',
         default => 'text-ink',
     };
-
-    $hasValue = $value !== null && $value !== '' && $value !== '—';
 @endphp
 
 <div {{ $attributes->merge(['class' => 'rounded-xl border border-line bg-surface px-4 py-3 shadow-xs']) }}>

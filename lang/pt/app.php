@@ -110,6 +110,7 @@ return [
     ],
 
     'ai' => [
+        'refresh' => 'Procurar nova análise',
         'generate' => 'Gerar análise',
         'regenerate' => 'Gerar de novo',
         'unavailable' => 'A análise por IA ainda não está disponível na sua conta.',
@@ -129,6 +130,35 @@ return [
         'quarter' => 'Trimestre',
         'semester' => 'Semestre',
         'year' => 'Ano',
+    ],
+
+    'projections' => [
+        'weight' => 'Peso corporal (kg)',
+        'lean_mass' => 'Massa magra (kg)',
+        'fat_percent' => 'Massa gorda (%)',
+        'ffmi' => 'FFMI normalizado',
+        'chest' => 'Peito (cm)',
+        'waist' => 'Cintura (cm)',
+        'bicep' => 'Bíceps direito (cm)',
+        'top_lift' => '1RM est. em :exercise (kg)',
+        'method' => 'Uma reta ajustada aos teus últimos 12 meses, prolongada para a frente. São estimativas, não promessas — o R² diz quão bem a reta se ajusta aos teus dados, e um valor baixo significa que a projeção é um palpite disfarçado de número.',
+        'not_enough' => 'Ainda não há dados suficientes para ajustar uma tendência.',
+        'quality_strong' => 'ajuste forte',
+        'quality_moderate' => 'ajuste moderado',
+        'quality_weak' => 'ajuste fraco',
+        'dampened' => 'atenuado',
+        'dampened_tip' => 'Horizontes mais longos são reduzidos, porque um progresso em linha reta durante um ano seria invulgar. A redução depende apenas de quão longe vai a estimativa — não é um modelo do teu teto pessoal.',
+        'week_abbr' => 'sem.',
+    ],
+
+    'levels' => [
+        'assumed_sex' => 'Estes percentis assumem que és homem',
+        'assumed_sex_body' => 'As referências de força diferem bastante entre homens e mulheres, e o teu perfil não diz qual usar — por isso esta página recorreu às referências masculinas. Se estiver errado, todos os percentis abaixo estão errados. Define o teu sexo em :profile para corrigir.',
+        'compared_against' => 'Comparado com atletas :sex a :bodyweight kg de peso corporal.',
+        'sex_male' => 'do sexo masculino',
+        'sex_female' => 'do sexo feminino',
+        'aged' => 'A idade :age é tida em conta onde a fonte de dados o permite.',
+        'add_age' => 'Adiciona a tua idade no Perfil para uma comparação ajustada à idade.',
     ],
 
     'performance' => [

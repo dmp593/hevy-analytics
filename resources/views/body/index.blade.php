@@ -81,8 +81,15 @@
                 <x-ui.stat :label="__('app.body.ffmi')" :value="$status['ffmi_normalized'] ?? '—'"
                            :sub="$status['ffmi'] ? __('app.body.ffmi_raw', ['value' => $status['ffmi']]) : null"
                            :tip="__('app.tips.ffmi')" />
+                {{-- No measurement means no verdict. `?? 0` read as "0 is not
+                     over 0.5, so this is fine" and painted an athlete who had
+                     never logged a waist a reassuring green. --}}
                 <x-ui.stat :label="__('app.body.waist_height')" :value="$status['waist_to_height'] ?? '—'"
-                           :tone="($status['waist_to_height'] ?? 0) > 0.5 ? 'warn' : 'good'"
+                           :tone="match (true) {
+                               ($status['waist_to_height'] ?? null) === null => null,
+                               $status['waist_to_height'] > 0.5 => 'warn',
+                               default => 'good',
+                           }"
                            :tip="__('app.tips.waist_height')" />
                 <x-ui.stat :label="__('app.body.p_ratio')" :value="$partitioning['p_ratio'] ?? '—'"
                            :sub="$partitioning['p_ratio'] !== null

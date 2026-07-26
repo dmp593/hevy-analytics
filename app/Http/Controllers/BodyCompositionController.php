@@ -6,7 +6,6 @@ use App\Science\Stats\LinearRegression;
 use App\Services\Analytics\BodyCompAnalytics;
 use App\Services\Analytics\BodyVerdict;
 use App\Services\Analytics\FilterCriteria;
-use App\Services\Analytics\GoalAlerts;
 use App\Services\Analytics\StrengthAnalytics;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -40,8 +39,10 @@ class BodyCompositionController extends Controller
             }
         }
 
+        $rate = $bc->weightRateKgPerWeek();
+
         $triangulation = [
-            'weight' => $bc->weightRateKgPerWeek(),
+            'weight' => $rate,
             'waist' => $bc->trendPerMonth('waist'),
             'chest' => $bc->trendPerMonth('chest_cm'),
             'bicep' => $bc->trendPerMonth('right_bicep_cm'),
@@ -51,7 +52,7 @@ class BodyCompositionController extends Controller
         return view('body.index', [
             'from' => $from,
             'status' => $bc->status(),
-            'rate' => $bc->weightRateKgPerWeek(),
+            'rate' => $rate,
             'partitioning' => $bc->partitioning(),
             'triangulation' => $triangulation,
             // Read the corroborating signals together and say, in words, what
@@ -66,7 +67,6 @@ class BodyCompositionController extends Controller
             'waistSeries' => $bc->series('waist', $from),
             'bicepSeries' => $bc->series('right_bicep_cm', $from),
             'symmetry' => $bc->symmetry(),
-            'alerts' => (new GoalAlerts($user))->all(),
         ]);
     }
 }

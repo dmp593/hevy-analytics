@@ -110,6 +110,7 @@ return [
     ],
 
     'ai' => [
+        'refresh' => 'Check for new analysis',
         'generate' => 'Generate analysis',
         'regenerate' => 'Regenerate',
         'unavailable' => "AI analysis isn't available on your account yet.",
@@ -129,6 +130,35 @@ return [
         'quarter' => 'Quarter',
         'semester' => 'Half-year',
         'year' => 'Year',
+    ],
+
+    'projections' => [
+        'weight' => 'Bodyweight (kg)',
+        'lean_mass' => 'Lean mass (kg)',
+        'fat_percent' => 'Body fat (%)',
+        'ffmi' => 'Normalised FFMI',
+        'chest' => 'Chest (cm)',
+        'waist' => 'Waist (cm)',
+        'bicep' => 'Right bicep (cm)',
+        'top_lift' => ':exercise e1RM (kg)',
+        'method' => 'A straight line fitted through your last 12 months, extended forward. These are estimates, not promises — the R² badge says how well the line actually fits your data, and a low one means the projection is a guess dressed as a number.',
+        'not_enough' => 'Not enough data to fit a trend yet.',
+        'quality_strong' => 'strong fit',
+        'quality_moderate' => 'moderate fit',
+        'quality_weak' => 'weak fit',
+        'dampened' => 'damped',
+        'dampened_tip' => 'Longer horizons are scaled down, because progress that continued in a straight line for a year would be unusual. The reduction depends only on how far ahead the estimate reaches — it is not a model of your personal ceiling.',
+        'week_abbr' => 'wk',
+    ],
+
+    'levels' => [
+        'assumed_sex' => 'These percentiles assume you are male',
+        'assumed_sex_body' => 'Strength standards differ substantially between men and women, and your profile does not say which to use — so this page fell back to male standards. If that is wrong, every percentile below is wrong. Set your sex in :profile to fix it.',
+        'compared_against' => 'Compared against :sex lifters at :bodyweight kg bodyweight.',
+        'sex_male' => 'male',
+        'sex_female' => 'female',
+        'aged' => 'Age :age is taken into account where the data source supports it.',
+        'add_age' => 'Add your age in Profile for an age-adjusted comparison.',
     ],
 
     'performance' => [

@@ -1,10 +1,16 @@
 <x-ui.page :title="__('app.pages.ai')" :subtitle="__('app.pages.ai_sub')" width="4xl">
     <x-slot:actions>
+        {{-- No force flag.
+
+             This button used to submit force=1, which bypasses the content-hash
+             cache and bills a fresh provider call on every press — against a
+             30-a-month allowance, even when nothing about the athlete's data had
+             changed. It also made the "your data has not changed" path
+             unreachable, so that copy had never once been shown. --}}
         <form method="POST" action="{{ route('ai.generate') }}">
             @csrf
-            <input type="hidden" name="force" value="1">
             <x-ui.button type="submit" size="sm">
-                {{ $analysis ? __('app.ai.regenerate') : __('app.ai.generate') }}
+                {{ $analysis ? __('app.ai.refresh') : __('app.ai.generate') }}
             </x-ui.button>
         </form>
     </x-slot:actions>

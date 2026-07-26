@@ -1,35 +1,59 @@
 <x-ui.page :title="__('app.pages.levels')" :subtitle="__('app.pages.levels_sub')" width="4xl">
     <x-slot:actions>
-        <x-info title="Strength level" text="Strength level measures your strength in this exercise compared to people at the same age, weight and sex group as you. 0% = beginner, 100% = elite. Based on Strength Level community standards (millions of lifts)." />
+        <x-info :title="__('app.pages.levels')" :text="__('app.tips.strength_level')" />
     </x-slot:actions>
 
     <x-flash />
 
+    {{-- Above the branches on purpose. When sex is unset the analytics layer
+         must pick something and picks male, and the page then stated that
+         comparison as fact. An athlete needs to see this before any percentile,
+         including on the empty state where they are about to log their first
+         lift. --}}
+    @if ($assumedSex)
+        <x-ui.insight tone="warn" :title="__('app.levels.assumed_sex')" class="mb-6">
+            <p>{!! __('app.levels.assumed_sex_body', [
+                'profile' => '<a href="'.route('profile.edit').'" class="underline font-medium">'.__('app.nav.profile').'</a>',
+            ]) !!}</p>
+        </x-ui.insight>
+    @endif
+
     @if(! $bodyweight)
-        <x-panel>
+        <x-ui.card>
             <p class="text-sm text-body">Log a body weight in Hevy and set your <a href="{{ route('profile.edit') }}" class="text-brand-ink underline">age &amp; sex</a> — strength levels compare you to lifters of the same age, bodyweight and sex.</p>
-        </x-panel>
+        </x-ui.card>
     @elseif(empty($levels))
-        <x-panel>
+        <x-ui.card>
             <p class="text-sm text-body">No standard-mapped lifts found yet. Strength standards cover barbell movements like Bench, Squat, Deadlift, Overhead Press, Barbell Row and Barbell Curl. Log some and re-sync.</p>
-        </x-panel>
+        </x-ui.card>
     @else
-        <x-panel class="mb-6">
+        {{-- Say what the comparison assumed, not just what it concluded.
+
+             When sex is unset the analytics layer has to pick something to
+             compute with and picks male; the page then printed "compared against
+             male lifters" as a statement of fact. For a woman who had not filled
+             in her profile, every percentile on the page was wrong and nothing
+             said so. The age factor is likewise only applied on the offline
+             fallback rows, so it is stated per row rather than page-wide. --}}
+        <x-ui.card class="mb-6">
             <p class="text-sm text-body">
-                Compared against {{ $sex }} lifters
-                @if($age) aged {{ $age }} @endif
-                at {{ $bodyweight }}kg bodyweight.
-                @if($ageFactor && $ageFactor != 1)
-                    <span class="text-faint">Standards age-adjusted ×{{ $ageFactor }}.</span>
+                {{ __('app.levels.compared_against', [
+                    'sex' => __('app.levels.sex_'.($sex ?? 'male')),
+                    'bodyweight' => $bodyweight,
+                ]) }}
+                @if ($age)
+                    {{ __('app.levels.aged', ['age' => $age]) }}
+                @else
+                    <a href="{{ route('profile.edit') }}" class="underline">{{ __('app.levels.add_age') }}</a>
                 @endif
             </p>
-        </x-panel>
+        </x-ui.card>
 
         <div class="space-y-4">
-            @foreach($levels as $l)
-                <x-panel>
+            @foreach ($levels as $l)
+                <x-ui.card>
                     <x-strength-bar :eval="$l" :exercise="$l['exercise']" />
-                </x-panel>
+                </x-ui.card>
             @endforeach
         </div>
 

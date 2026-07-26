@@ -7,7 +7,7 @@
 
         <form method="POST" action="{{ route('goals.store') }}">
             @csrf
-            <x-panel title="Choose a goal" subtitle="Adjusts your diet targets and training landmarks" class="mb-6">
+            <x-panel title="Choose a goal" subtitle="Sets your calorie and macro targets, and the rate this app measures you against" class="mb-6">
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
                     @foreach($types as $key => $t)
                         <label class="cursor-pointer rounded-lg border p-4 transition"
@@ -24,18 +24,22 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <label class="text-xs text-body">Calorie adj. %
                         <input type="number" step="0.5" name="calorie_adjustment_pct" class="mt-1 w-full rounded-md border-line text-sm"
+                               value="{{ old('calorie_adjustment_pct', $active?->calorie_adjustment_pct) }}"
                                :placeholder="presets[type]?.calorie_adjustment_pct">
                     </label>
                     <label class="text-xs text-body">Protein g/kg
                         <input type="number" step="0.1" name="protein_g_per_kg" class="mt-1 w-full rounded-md border-line text-sm"
+                               value="{{ old('protein_g_per_kg', $active?->protein_g_per_kg) }}"
                                :placeholder="presets[type]?.protein_g_per_kg">
                     </label>
                     <label class="text-xs text-body">Fat g/kg
                         <input type="number" step="0.1" name="fat_g_per_kg" class="mt-1 w-full rounded-md border-line text-sm"
+                               value="{{ old('fat_g_per_kg', $active?->fat_g_per_kg) }}"
                                :placeholder="presets[type]?.fat_g_per_kg">
                     </label>
                     <label class="text-xs text-body">Rate %BW/wk
                         <input type="number" step="0.05" name="target_rate_pct_bw_per_week" class="mt-1 w-full rounded-md border-line text-sm"
+                               value="{{ old('target_rate_pct_bw_per_week', $active?->target_rate_pct_bw_per_week) }}"
                                :placeholder="presets[type]?.target_rate_pct_bw_per_week">
                     </label>
                 </div>
