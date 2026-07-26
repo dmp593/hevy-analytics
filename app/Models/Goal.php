@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use App\Science\Goals\GoalProfile;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Goal extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'type', 'is_active', 'calorie_adjustment_pct', 'protein_g_per_kg',
         'fat_g_per_kg', 'target_rate_pct_bw_per_week', 'training', 'started_at',

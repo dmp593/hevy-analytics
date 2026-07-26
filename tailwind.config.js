@@ -13,7 +13,12 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                // System stack rather than a webfont from a third-party CDN.
+                // A remote font is the same failure mode as the Chart.js CDN
+                // was: when the request does not land, the page silently
+                // degrades. It is also a third-party request on every page
+                // load, which is a disclosure we would rather not owe EU users.
+                sans: defaultTheme.fontFamily.sans,
             },
         },
     },
