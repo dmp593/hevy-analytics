@@ -1,0 +1,104 @@
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+#[Fillable(['name', 'email', 'password', 'hevy_api_key', 'sex', 'age', 'height_cm', 'activity_level', 'body_fat_source', 'hevy_last_synced_at'])]
+#[Hidden(['password', 'remember_token', 'hevy_api_key'])]
+class User extends Authenticatable
+{
+    /** @use HasFactory<UserFactory> */
+    use HasFactory, Notifiable;
+
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'hevy_api_key' => 'encrypted',
+            'height_cm' => 'float',
+            'activity_level' => 'float',
+            'age' => 'integer',
+            'hevy_last_synced_at' => 'datetime',
+        ];
+    }
+
+    public function hasHevyKey(): bool
+    {
+        return filled($this->hevy_api_key);
+    }
+
+    public function exerciseTemplates(): HasMany
+    {
+        return $this->hasMany(ExerciseTemplate::class);
+    }
+
+    public function workouts(): HasMany
+    {
+        return $this->hasMany(Workout::class);
+    }
+
+    public function routines(): HasMany
+    {
+        return $this->hasMany(Routine::class);
+    }
+
+    public function routineFolders(): HasMany
+    {
+        return $this->hasMany(RoutineFolder::class);
+    }
+
+    public function bodyMeasurements(): HasMany
+    {
+        return $this->hasMany(BodyMeasurement::class);
+    }
+
+    public function goals(): HasMany
+    {
+        return $this->hasMany(Goal::class);
+    }
+
+    public function activeGoal(): ?Goal
+    {
+        return $this->goals()->where('is_active', true)->latest('id')->first()
+            ?? $this->goals()->latest('id')->first();
+    }
+
+    public function nutritionTargets(): HasMany
+    {
+        return $this->hasMany(NutritionTarget::class);
+    }
+
+    public function intakeLogs(): HasMany
+    {
+        return $this->hasMany(IntakeLog::class);
+    }
+
+    public function progressPhotos(): HasMany
+    {
+        return $this->hasMany(ProgressPhoto::class);
+    }
+
+    public function syncLogs(): HasMany
+    {
+        return $this->hasMany(SyncLog::class);
+    }
+
+    public function writeOperations(): HasMany
+    {
+        return $this->hasMany(WriteOperation::class);
+    }
+
+    public function aiAnalyses(): HasMany
+    {
+        return $this->hasMany(AiAnalysis::class);
+    }
+}
