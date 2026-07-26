@@ -123,6 +123,54 @@ return [
         'edit_progression' => 'Edit / stage progression →',
     ],
 
+    'periods' => [
+        'week' => 'Week',
+        'month' => 'Month',
+        'quarter' => 'Quarter',
+        'semester' => 'Half-year',
+        'year' => 'Year',
+    ],
+
+    'performance' => [
+        'e1rm_sub' => 'Best estimated 1RM per session',
+        'tonnage' => 'Tonnage',
+        'pick_exercise' => 'Pick one exercise in the filter to chart it',
+        'pick_exercise_empty' => 'Choose a single exercise below to chart its estimated 1RM over time.',
+        'working_sets' => 'Working sets',
+        'total_reps' => 'Total reps',
+        'wilks' => 'Top e1RM Wilks',
+        'exercises' => 'Exercises',
+        'exercise' => 'Exercise',
+        'best_e1rm' => 'Best e1RM',
+        'top_weight' => 'Top weight',
+        'best_set' => 'Best single set',
+        'no_exercises' => 'No exercises match these filters.',
+        'verdict' => [
+            'all_rising_headline' => '{1}Your lift is going up|[2,*]All :count of your tracked lifts are going up',
+            'all_rising_body' => 'Every lift with enough history to judge is trending upward. :exercise is moving fastest at :rate a year at the current rate.',
+            'mixed_headline' => ':rising of :total tracked lifts are going up',
+            'mixed_body' => ':exercise is your best mover at :rate a year. :stalled have gone flat — a stalled lift usually wants either more sets or a lighter week, not more effort.',
+            'stalled_headline' => '{1}Your tracked lift has gone flat|[2,*]All :count tracked lifts have gone flat',
+            'stalled_body' => 'No lift with enough history is trending up. That is what a plateau looks like: it is usually recovery or volume, not effort. Check the muscle page for whether the sets are actually there.',
+            'falling_headline' => '{1}One lift is going backwards|[2,*]:count lifts are going backwards',
+            'falling_body' => ':exercise is declining at :rate a year. A falling estimated 1RM while you are still training it usually means accumulated fatigue or a change in how the sets are being run.',
+            'movers' => 'Lift by lift',
+            'movers_sub' => 'Estimated 1RM trend, steepest change first',
+            'per_year' => ':value/year',
+            'noisy' => 'noisy',
+            'noisy_tip' => 'Session-to-session estimates vary a lot for this lift, so treat the direction as a hint rather than a measurement.',
+            'not_enough' => 'not enough sessions',
+            'excluded' => '{1}:count lift does not have enough history to judge yet.|[2,*]:count lifts do not have enough history to judge yet.',
+            'trend' => 'Trend',
+            'records' => 'Personal records',
+            'records_sub' => 'Best estimated 1RM, top weight and best single set',
+            'volume' => 'Training volume',
+            'volume_sub' => 'How much work you are doing — not the same question as whether you are getting stronger',
+            'filters' => 'Date range, routine & grouping',
+            'partial_period' => 'The most recent point covers a period still in progress, so it will look lower than it finishes.',
+        ],
+    ],
+
     'muscle' => [
         'verdict' => [
             'under_headline' => '{1}One muscle is below the volume that grows it|[2,*]:count of your :total muscles are below the volume that grows them',
@@ -368,6 +416,7 @@ return [
     ],
 
     'tips' => [
+        'strength_level' => 'Your strength in this lift compared to people of the same age, bodyweight and sex. 0% is beginner, 100% is elite.',
         'ffmi' => 'Muscularity adjusted for height, standardised to 1.80m. Around 19 is average, 22 is fit, and 25 is close to the natural ceiling.',
         'waist_height' => 'Your waist divided by your height. Under 0.5 is the target. Rising during a bulk means the gain is going around your middle.',
         'p_ratio' => 'Of the weight you have gained, the share that was lean mass rather than fat, taken from a trend across many readings. Scale body fat is noisy, so treat it as a direction rather than a measurement.',

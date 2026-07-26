@@ -66,16 +66,20 @@ test.describe('charts', () => {
         await page.goto('/performance', { waitUntil: 'networkidle' });
         await page.waitForTimeout(800);
 
+        // The secondary filters sit in a collapsed disclosure so the page opens
+        // with its answer rather than with a form. Open it before driving them.
+        await page.locator('details:has(#perf-filters) > summary').click();
+
         const periods = await page.$$eval(
-            'form[x-target] select[name=period] option',
+            '#perf-filters select[name=period] option',
             (options) => options.map((o) => o.value),
         );
 
         // The original bug: the second filter apply left the canvas permanently
         // blank, and every apply stranded another Chart on the same canvas.
         for (let i = 1; i <= 5; i++) {
-            await page.selectOption('form[x-target] select[name=period]', periods[i % periods.length]);
-            await page.click('form[x-target] button');
+            await page.selectOption('#perf-filters select[name=period]', periods[i % periods.length]);
+            await page.click('#perf-filters button[type=submit]');
             await page.waitForTimeout(900);
 
             const result = await inspectCharts(page);

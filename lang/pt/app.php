@@ -123,6 +123,54 @@ return [
         'edit_progression' => 'Editar / preparar progressão →',
     ],
 
+    'periods' => [
+        'week' => 'Semana',
+        'month' => 'Mês',
+        'quarter' => 'Trimestre',
+        'semester' => 'Semestre',
+        'year' => 'Ano',
+    ],
+
+    'performance' => [
+        'e1rm_sub' => 'Melhor 1RM estimado por sessão',
+        'tonnage' => 'Tonelagem',
+        'pick_exercise' => 'Escolhe um exercício no filtro para o ver no gráfico',
+        'pick_exercise_empty' => 'Escolhe um único exercício abaixo para ver o 1RM estimado ao longo do tempo.',
+        'working_sets' => 'Séries efetivas',
+        'total_reps' => 'Repetições totais',
+        'wilks' => 'Melhor Wilks (e1RM)',
+        'exercises' => 'Exercícios',
+        'exercise' => 'Exercício',
+        'best_e1rm' => 'Melhor 1RM est.',
+        'top_weight' => 'Carga máxima',
+        'best_set' => 'Melhor série',
+        'no_exercises' => 'Nenhum exercício corresponde a estes filtros.',
+        'verdict' => [
+            'all_rising_headline' => '{1}O teu levantamento está a subir|[2,*]Todos os teus :count levantamentos acompanhados estão a subir',
+            'all_rising_body' => 'Todos os levantamentos com histórico suficiente estão em tendência de subida. :exercise é o mais rápido, a :rate por ano ao ritmo atual.',
+            'mixed_headline' => ':rising de :total levantamentos acompanhados estão a subir',
+            'mixed_body' => ':exercise é o teu melhor, a :rate por ano. :stalled estagnaram — um levantamento estagnado costuma pedir mais séries ou uma semana mais leve, não mais esforço.',
+            'stalled_headline' => '{1}O teu levantamento acompanhado estagnou|[2,*]Todos os :count levantamentos acompanhados estagnaram',
+            'stalled_body' => 'Nenhum levantamento com histórico suficiente está a subir. É assim que se parece um plateau: costuma ser recuperação ou volume, não esforço. Vê na página de músculo se as séries estão mesmo lá.',
+            'falling_headline' => '{1}Um levantamento está a andar para trás|[2,*]:count levantamentos estão a andar para trás',
+            'falling_body' => ':exercise está a descer :rate por ano. Um 1RM estimado a cair enquanto continuas a treinar costuma indicar fadiga acumulada ou uma mudança na forma como fazes as séries.',
+            'movers' => 'Levantamento a levantamento',
+            'movers_sub' => 'Tendência do 1RM estimado, maior variação primeiro',
+            'per_year' => ':value/ano',
+            'noisy' => 'ruidoso',
+            'noisy_tip' => 'As estimativas variam muito entre sessões neste levantamento, por isso trata a direção como pista e não como medição.',
+            'not_enough' => 'sessões insuficientes',
+            'excluded' => '{1}:count levantamento ainda não tem histórico suficiente para avaliar.|[2,*]:count levantamentos ainda não têm histórico suficiente para avaliar.',
+            'trend' => 'Tendência',
+            'records' => 'Recordes pessoais',
+            'records_sub' => 'Melhor 1RM estimado, carga máxima e melhor série',
+            'volume' => 'Volume de treino',
+            'volume_sub' => 'Quanto trabalho estás a fazer — não é a mesma pergunta que se estás a ficar mais forte',
+            'filters' => 'Intervalo de datas, rotina e agrupamento',
+            'partial_period' => 'O ponto mais recente cobre um período ainda a decorrer, por isso parece mais baixo do que vai acabar.',
+        ],
+    ],
+
     'muscle' => [
         'verdict' => [
             'under_headline' => '{1}Um músculo está abaixo do volume que o faz crescer|[2,*]:count dos teus :total músculos estão abaixo do volume que os faz crescer',
@@ -362,6 +410,7 @@ return [
     ],
 
     'tips' => [
+        'strength_level' => 'A tua força neste levantamento comparada com pessoas da mesma idade, peso e sexo. 0% é iniciante, 100% é elite.',
         'ffmi' => 'Musculatura ajustada à altura, padronizada para 1,80 m. Cerca de 19 é a média, 22 é em forma, e 25 está perto do teto natural.',
         'waist_height' => 'A tua cintura a dividir pela altura. O alvo é abaixo de 0,5. Se sobe durante um bulk, o ganho está a ir para a barriga.',
         'p_ratio' => 'Do peso que ganhaste, a parte que foi massa magra e não gordura, a partir de uma tendência sobre muitas leituras. A massa gorda da balança é ruidosa, por isso trata isto como uma direção e não como uma medição.',
