@@ -94,6 +94,17 @@
                 </select>
                 <p class="mt-1 text-xs text-gray-500">Drives lean-mass, FFMI and partitioning. BIA scales are noisy day-to-day; the Navy tape method or a manual estimate are often steadier for tracking trends.</p>
             </div>
+
+            <div class="mt-4">
+                <x-input-label for="timezone" :value="__('Timezone')" />
+                <select id="timezone" name="timezone" class="mt-1 block w-full md:w-1/2 rounded-md border-gray-300 text-sm">
+                    @foreach(timezone_identifiers_list() as $tz)
+                        <option value="{{ $tz }}" @selected(old('timezone', $user->resolvedTimezone()) === $tz)>{{ str_replace('_', ' ', $tz) }}</option>
+                    @endforeach
+                </select>
+                <p class="mt-1 text-xs text-gray-500">Decides which day and week each session counts toward. Get this wrong and an evening workout can land in the previous week, skewing your sets-per-week figures.</p>
+                <x-input-error class="mt-2" :messages="$errors->get('timezone')" />
+            </div>
         </div>
 
         <div class="flex items-center gap-4">

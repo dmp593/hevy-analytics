@@ -32,6 +32,9 @@ class ProfileUpdateRequest extends FormRequest
             'height_cm' => ['nullable', 'numeric', 'between:100,250'],
             'activity_level' => ['nullable', 'numeric', 'between:1.2,1.9'],
             'body_fat_source' => ['nullable', 'in:scale,navy,manual'],
+            // Validated against the real zone list: this value ends up in
+            // date arithmetic, so an arbitrary string must not reach it.
+            'timezone' => ['nullable', 'string', Rule::in(timezone_identifiers_list())],
         ];
     }
 }

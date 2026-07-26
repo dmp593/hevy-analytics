@@ -27,7 +27,7 @@ class MuscleController extends Controller
     private function payload(Request $request): array
     {
         $user = $request->user();
-        $filter = FilterCriteria::fromRequest($request);
+        $filter = FilterCriteria::fromRequest($request, $request->user()->resolvedTimezone());
         $volume = new VolumeAnalytics($user, $filter);
 
         return [

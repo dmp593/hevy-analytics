@@ -33,16 +33,31 @@ class PeriodService
         };
     }
 
-    /** Bucket key for grouping a date into the given period. */
-    public static function bucketKey(Carbon $date, string $period): string
+    /**
+     * Bucket key for grouping a date into the given period.
+     *
+     * Timestamps arrive in UTC; which day or week they belong to is a question
+     * about the athlete's local calendar, so shift into their zone first. A
+     * 21:00 session in Auckland is the previous day in UTC and would otherwise
+     * be counted against the wrong week.
+     */
+    public static function bucketKey(Carbon $date, string $period, string $timezone = 'UTC'): string
     {
+        $local = $date->copy()->setTimezone($timezone);
+
         return match ($period) {
-            'week' => $date->copy()->startOfWeek()->toDateString(),
-            'quarter' => $date->year.'-Q'.$date->quarter,
-            'semester' => $date->year.'-S'.($date->month <= 6 ? 1 : 2),
-            'year' => (string) $date->year,
-            default => $date->format('Y-m'),
+            'week' => $local->copy()->startOfWeek()->toDateString(),
+            'quarter' => $local->year.'-Q'.$local->quarter,
+            'semester' => $local->year.'-S'.($local->month <= 6 ? 1 : 2),
+            'year' => (string) $local->year,
+            default => $local->format('Y-m'),
         };
+    }
+
+    /** The athlete's local calendar day for a UTC timestamp. */
+    public static function localDate(Carbon $date, string $timezone = 'UTC'): string
+    {
+        return $date->copy()->setTimezone($timezone)->toDateString();
     }
 
     /**

@@ -29,7 +29,7 @@ class RoutineAnalytics
             if (! $r->start_time) {
                 continue;
             }
-            $key = Carbon::parse($r->start_time)->toDateString();
+            $key = PeriodService::localDate(Carbon::parse($r->start_time), $this->user->resolvedTimezone());
             $sessions[$key] ??= ['date' => $key, 'tonnage' => 0.0, 'sets' => 0, 'reps' => 0, 'rpe_sum' => 0.0, 'rpe_n' => 0];
             $sessions[$key]['tonnage'] += (float) ($r->weight_kg ?? 0) * (float) ($r->reps ?? 0);
             $sessions[$key]['sets']++;

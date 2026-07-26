@@ -46,7 +46,7 @@ class VolumeAnalytics
             if (! $r->start_time) {
                 continue;
             }
-            $key = PeriodService::bucketKey(Carbon::parse($r->start_time), $this->filter->period);
+            $key = PeriodService::bucketKey(Carbon::parse($r->start_time), $this->filter->period, $this->user->resolvedTimezone());
             $buckets[$key] = ($buckets[$key] ?? 0) + (float) ($r->weight_kg ?? 0) * (float) ($r->reps ?? 0);
         }
         ksort($buckets);

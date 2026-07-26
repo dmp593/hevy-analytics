@@ -13,7 +13,7 @@ class PerformanceController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $filter = FilterCriteria::fromRequest($request);
+        $filter = FilterCriteria::fromRequest($request, $request->user()->resolvedTimezone());
 
         return view('performance.index', array_merge(
             $this->payload($request),
@@ -34,7 +34,7 @@ class PerformanceController extends Controller
     private function payload(Request $request): array
     {
         $user = $request->user();
-        $filter = FilterCriteria::fromRequest($request);
+        $filter = FilterCriteria::fromRequest($request, $request->user()->resolvedTimezone());
         $volume = new VolumeAnalytics($user, $filter);
         $strength = new StrengthAnalytics($user, $filter);
 

@@ -144,6 +144,47 @@ class AnalyticsCorrectnessTest extends TestCase
         $this->assertGreaterThan(3.0, $chest['per_week']);
     }
 
+    public function test_sessions_are_bucketed_in_the_athletes_timezone(): void
+    {
+        $auckland = $this->makeAthlete(['timezone' => 'Pacific/Auckland']);
+        $this->seedExerciseTemplates($auckland, ['bench' => ['Bench Press', 'chest', []]]);
+
+        // 09:00 Monday in Auckland is 21:00 the previous SUNDAY in UTC — so in
+        // UTC this session falls in the week before the one the athlete trained.
+        $mondayMorningLocal = Carbon::parse('2026-03-09 09:00', 'Pacific/Auckland');
+        $this->seedWorkout($auckland, $mondayMorningLocal->copy()->utc(), ['bench']);
+
+        $filter = new FilterCriteria(
+            from: Carbon::parse('2026-03-01'),
+            to: Carbon::parse('2026-03-31'),
+            period: 'week',
+        );
+
+        $series = (new VolumeAnalytics($auckland, $filter))->tonnageSeries();
+
+        $this->assertCount(1, $series);
+        // Monday 9 March, the week the athlete actually trained — not 2 March.
+        $this->assertSame('2026-03-09', $series[0]['label']);
+    }
+
+    public function test_the_same_session_buckets_differently_for_a_utc_athlete(): void
+    {
+        $utc = $this->makeAthlete(['timezone' => 'UTC']);
+        $this->seedExerciseTemplates($utc, ['bench' => ['Bench Press', 'chest', []]]);
+
+        $sameInstant = Carbon::parse('2026-03-09 09:00', 'Pacific/Auckland')->utc();
+        $this->seedWorkout($utc, $sameInstant, ['bench']);
+
+        $series = (new VolumeAnalytics($utc, new FilterCriteria(
+            from: Carbon::parse('2026-03-01'),
+            to: Carbon::parse('2026-03-31'),
+            period: 'week',
+        )))->tonnageSeries();
+
+        // Same instant, different athlete: in UTC it really is the prior week.
+        $this->assertSame('2026-03-02', $series[0]['label']);
+    }
+
     public function test_muscle_balance_is_measured_in_sets_not_tonnage(): void
     {
         $user = $this->makeAthlete();

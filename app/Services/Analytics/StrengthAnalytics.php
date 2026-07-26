@@ -39,7 +39,7 @@ class StrengthAnalytics
             if ($e === null || ! OneRepMax::isReliableSet((float) $r->reps, $r->rpe !== null ? (float) $r->rpe : null)) {
                 continue;
             }
-            $day = Carbon::parse($r->start_time)->toDateString();
+            $day = PeriodService::localDate(Carbon::parse($r->start_time), $this->user->resolvedTimezone());
             $perSession[$day] = max($perSession[$day] ?? 0, $e);
         }
         ksort($perSession);

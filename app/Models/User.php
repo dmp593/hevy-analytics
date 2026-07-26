@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'hevy_api_key', 'sex', 'age', 'height_cm', 'activity_level', 'body_fat_source', 'hevy_last_synced_at'])]
+#[Fillable(['name', 'email', 'password', 'hevy_api_key', 'sex', 'age', 'height_cm', 'activity_level', 'timezone', 'body_fat_source', 'hevy_last_synced_at'])]
 #[Hidden(['password', 'remember_token', 'hevy_api_key'])]
 /**
  * Implementing MustVerifyEmail is what makes the `verified` middleware do
@@ -40,6 +40,23 @@ class User extends Authenticatable implements MustVerifyEmail
     public function hasHevyKey(): bool
     {
         return filled($this->hevy_api_key);
+    }
+
+    /**
+     * The zone this athlete's days and weeks are measured in.
+     *
+     * Deliberately NOT named timezone(): Eloquent treats a method whose name
+     * matches an attribute as a relationship accessor, which sends
+     * $this->timezone straight back into this method.
+     *
+     * Always returns something usable — a stale or hand-edited value must not be
+     * able to throw from inside an analytics calculation.
+     */
+    public function resolvedTimezone(): string
+    {
+        $tz = $this->getAttribute('timezone') ?: 'UTC';
+
+        return in_array($tz, timezone_identifiers_list(), true) ? $tz : 'UTC';
     }
 
     public function exerciseTemplates(): HasMany
