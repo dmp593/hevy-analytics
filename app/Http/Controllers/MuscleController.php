@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Science\Volume\MuscleLandmarks;
 use App\Services\Analytics\FilterCriteria;
 use App\Services\Analytics\MuscleBalance;
+use App\Services\Analytics\MuscleVerdict;
 use App\Services\Analytics\VolumeAnalytics;
 use Illuminate\Http\Request;
 
@@ -30,12 +31,19 @@ class MuscleController extends Controller
         $filter = FilterCriteria::fromRequest($request, $request->user()->resolvedTimezone());
         $volume = new VolumeAnalytics($user, $filter);
 
+        $weeklySets = $volume->weeklySetsPerMuscle();
+        $balance = (new MuscleBalance($user, $filter))->ratios();
+
         return [
             'filter' => $filter,
-            'weeklySetsPerMuscle' => $volume->weeklySetsPerMuscle(),
+            'weeklySetsPerMuscle' => $weeklySets,
             'volumePerMuscle' => $volume->volumePerMuscle(),
-            'balance' => (new MuscleBalance($user, $filter))->ratios(),
+            'balance' => $balance,
             'landmarks' => MuscleLandmarks::LANDMARKS,
+            // Does the MEV subtraction the athlete would otherwise do by hand,
+            // so the page opens with "chest needs 5 more sets" rather than with
+            // ten bars and a legend.
+            'verdict' => (new MuscleVerdict($weeklySets, $balance))->verdict(),
         ];
     }
 }

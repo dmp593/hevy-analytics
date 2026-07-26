@@ -123,6 +123,91 @@ return [
         'edit_progression' => 'Edit / stage progression →',
     ],
 
+    'muscle' => [
+        'verdict' => [
+            'under_headline' => '{1}One muscle is below the volume that grows it|[2,*]:count of your :total muscles are below the volume that grows them',
+            'under_body' => 'Below MEV — the minimum weekly sets shown to build muscle — means training that muscle is holding it, not growing it. Biggest gaps first: :fixes',
+            'fix' => ':muscle needs :sets more sets a week',
+            'and_more' => '{1}One other muscle is also short.|[2,*]:count other muscles are also short.',
+            'over_headline' => 'Some muscles are past your recovery ceiling',
+            'over_body' => 'You are training :muscles above MRV. Past that point the extra sets add fatigue without adding growth — trimming them usually improves the sessions that remain.',
+            'all_good_headline' => 'Every muscle is in its growth zone',
+            'all_good_body' => 'All muscles sit between MEV and MRV for the selected window. Hold this volume while it keeps producing progress, and add sets only when it stops.',
+            'imbalance' => ':heavy work is running at :ratiox your :light work. Gaps this wide are a common source of stalls and posture problems.',
+            'add_sets' => '+:count sets/wk',
+            'per_week_now' => ':current now, :target needed',
+            'gaps_title' => 'Where to add sets',
+            'full_breakdown' => 'All muscles, with landmarks',
+            'distribution' => 'Where your tonnage goes',
+            'distribution_sub' => 'Share of total weight lifted, per muscle',
+            'balance' => 'Push / pull balance',
+            'filters' => 'Date range & routine',
+        ],
+    ],
+
+    'body' => [
+        'fat_mass' => 'Fat mass',
+        'weight_lean' => 'Weight & lean mass',
+        'tape' => 'Tape measurements',
+        'tape_sub' => 'Chest, waist and arm — the signals body-fat scales cannot fake',
+        'detail' => 'Reference numbers & full history',
+        'ffmi' => 'FFMI (normalised)',
+        'ffmi_raw' => 'raw :value',
+        'ffmi_chart' => 'Normalised FFMI',
+        'ffmi_chart_sub' => 'Natural ceiling is roughly 25',
+        'fat_chart' => 'Body fat %',
+        'waist_height' => 'Waist / height',
+        'p_ratio' => 'P-ratio (lean share)',
+        'source' => 'Body-fat source',
+        'source_scale' => 'Scale (BIA)',
+        'source_navy' => 'Navy tape',
+        'source_manual' => 'Manual',
+        'sufficient_data' => ':count readings',
+        'low_confidence' => 'low confidence · :count readings',
+        'bia_noisy' => 'BIA scale body fat swings several points on hydration alone. Switching to the Navy tape method or a manual estimate in :profile gives a steadier trend.',
+        'symmetry' => 'Left / right symmetry',
+        'symmetry_sub' => 'A gap over 5% is worth addressing',
+        'no_symmetry' => 'No paired circumference measurements logged yet.',
+        'verdict' => [
+            'title' => 'What your measurements agree on',
+            'month_abbr' => 'mo',
+            'your_top_lift' => 'your top lift',
+            'strength_up' => 'getting stronger',
+            'strength_down' => 'losing strength',
+            'waist_flat' => 'your waist is flat (:value)',
+            'waist_falling' => 'your waist is coming down (:value)',
+            'waist_unmeasured' => 'you have not logged a waist measurement',
+
+            'gaining_muscle' => 'You are gaining muscle',
+            'gaining_muscle_body' => ':signals are rising while :waist. Independent measurements agreeing like this is a far better read than any single body-fat number.',
+
+            'gaining_both' => 'Gaining muscle, and some fat with it',
+            'gaining_both_body' => ':signals are rising, but so is your waist (:waist). You are building — just not cleanly. Trimming 150-250 kcal usually keeps the muscle and slows the rest.',
+
+            'gaining_fat' => 'The surplus is not buying muscle',
+            'gaining_fat_body' => 'Your waist is growing (:waist) while nothing else is. Either the extra calories are outpacing what your training can use, or training volume is too low to spend them.',
+
+            'losing_fat_keeping_muscle' => 'Losing fat, keeping muscle',
+            'losing_fat_keeping_muscle_body' => 'Your waist is down :waist while :signals held or improved. This is exactly what a cut is supposed to look like.',
+
+            'losing_muscle_risk' => 'You may be losing more than fat',
+            'losing_muscle_risk_body' => 'Bodyweight is falling and your strength on :exercise is falling with it. Strength usually holds through a well-run cut, so this is worth acting on: raise protein, keep the heavy sets, and slow the deficit.',
+
+            'mixed' => 'Your measurements disagree',
+            'mixed_body' => 'Moving in the right direction: :up. Not yet: :flat. When signals split like this, the honest answer is that it is too early to call — keep measuring the same way and look again in two to three weeks.',
+
+            'holding' => 'You are holding steady',
+            'holding_body' => 'Nothing is moving beyond measurement noise. That is the right outcome if you are maintaining, and a sign to change something if you are not.',
+
+            'unclear' => 'Not enough agreement yet',
+            'unclear_body' => 'There is not enough measurement history to triangulate. Log your waist, chest and arm with a tape every couple of weeks — two or three readings and this becomes meaningful.',
+
+            'confidence_high' => 'high confidence - :count independent measurements',
+            'confidence_moderate' => 'moderate confidence - :count independent measurements',
+            'confidence_low' => 'low confidence - only :count measurement so far',
+        ],
+    ],
+
     'write' => [
         'confirm' => 'Confirm & push',
         'retry' => 'Retry',
@@ -283,6 +368,9 @@ return [
     ],
 
     'tips' => [
+        'ffmi' => 'Muscularity adjusted for height, standardised to 1.80m. Around 19 is average, 22 is fit, and 25 is close to the natural ceiling.',
+        'waist_height' => 'Your waist divided by your height. Under 0.5 is the target. Rising during a bulk means the gain is going around your middle.',
+        'p_ratio' => 'Of the weight you have gained, the share that was lean mass rather than fat, taken from a trend across many readings. Scale body fat is noisy, so treat it as a direction rather than a measurement.',
         'weight' => "Your bodyweight and how fast it's changing per week. Lean-bulk sweet spot: +0.25% to +0.5% of bodyweight per week.",
         'body_fat' => 'Percent of your weight that is fat. Navy = an independent tape-measure estimate used as a cross-check.',
         'lean_mass' => "Everything that isn't fat (mostly muscle). FFMI = muscularity adjusted for height; ~25 is near the natural ceiling for men.",
@@ -291,6 +379,7 @@ return [
     ],
 
     'common' => [
+        'and' => 'and',
         'save' => 'Save',
         'saved' => 'Saved.',
         'apply' => 'Apply',

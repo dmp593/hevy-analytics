@@ -123,6 +123,91 @@ return [
         'edit_progression' => 'Editar / preparar progressão →',
     ],
 
+    'muscle' => [
+        'verdict' => [
+            'under_headline' => '{1}Um músculo está abaixo do volume que o faz crescer|[2,*]:count dos teus :total músculos estão abaixo do volume que os faz crescer',
+            'under_body' => 'Abaixo do MEV — as séries semanais mínimas que comprovadamente constroem músculo — treinar esse músculo mantém-no, não o faz crescer. Maiores lacunas primeiro: :fixes',
+            'fix' => ':muscle precisa de mais :sets séries por semana',
+            'and_more' => '{1}Há mais um músculo em falta.|[2,*]Há mais :count músculos em falta.',
+            'over_headline' => 'Alguns músculos passaram o teu teto de recuperação',
+            'over_body' => 'Estás a treinar :muscles acima do MRV. A partir daí as séries extra só acrescentam fadiga, não crescimento — cortá-las costuma melhorar as sessões que ficam.',
+            'all_good_headline' => 'Todos os músculos estão na zona de crescimento',
+            'all_good_body' => 'Todos os músculos estão entre o MEV e o MRV no período selecionado. Mantém este volume enquanto continuar a dar progresso, e só acrescenta séries quando parar.',
+            'imbalance' => ':heavy está a :ratiox o trabalho de :light. Diferenças assim grandes são causa frequente de estagnações e problemas de postura.',
+            'add_sets' => '+:count séries/sem.',
+            'per_week_now' => ':current agora, :target necessárias',
+            'gaps_title' => 'Onde acrescentar séries',
+            'full_breakdown' => 'Todos os músculos, com as referências',
+            'distribution' => 'Para onde vai a tua tonelagem',
+            'distribution_sub' => 'Percentagem do peso total levantado, por músculo',
+            'balance' => 'Equilíbrio empurrar / puxar',
+            'filters' => 'Intervalo de datas e rotina',
+        ],
+    ],
+
+    'body' => [
+        'fat_mass' => 'Massa gorda (kg)',
+        'weight_lean' => 'Peso e massa magra',
+        'tape' => 'Medições com fita',
+        'tape_sub' => 'Peito, cintura e braço — os sinais que uma balança não consegue falsear',
+        'detail' => 'Números de referência e histórico completo',
+        'ffmi' => 'FFMI (normalizado)',
+        'ffmi_raw' => 'bruto :value',
+        'ffmi_chart' => 'FFMI normalizado',
+        'ffmi_chart_sub' => 'O teto natural anda por volta de 25',
+        'fat_chart' => 'Massa gorda %',
+        'waist_height' => 'Cintura / altura',
+        'p_ratio' => 'Rácio-P (parte magra)',
+        'source' => 'Fonte da massa gorda',
+        'source_scale' => 'Balança (BIA)',
+        'source_navy' => 'Fita (método Navy)',
+        'source_manual' => 'Manual',
+        'sufficient_data' => ':count leituras',
+        'low_confidence' => 'confiança baixa · :count leituras',
+        'bia_noisy' => 'A massa gorda de uma balança BIA varia vários pontos só com a hidratação. Mudar para o método da fita (Navy) ou uma estimativa manual em :profile dá uma tendência mais estável.',
+        'symmetry' => 'Simetria esquerda / direita',
+        'symmetry_sub' => 'Uma diferença acima de 5% merece atenção',
+        'no_symmetry' => 'Ainda não há medições de circunferência emparelhadas.',
+        'verdict' => [
+            'title' => 'Aquilo em que as tuas medições concordam',
+            'month_abbr' => 'mês',
+            'your_top_lift' => 'o teu melhor levantamento',
+            'strength_up' => 'a ficar mais forte',
+            'strength_down' => 'a perder força',
+            'waist_flat' => 'a tua cintura está estável (:value)',
+            'waist_falling' => 'a tua cintura está a descer (:value)',
+            'waist_unmeasured' => 'ainda não registaste a cintura',
+
+            'gaining_muscle' => 'Estás a ganhar músculo',
+            'gaining_muscle_body' => ':signals a subir enquanto :waist. Medições independentes a concordarem assim valem muito mais do que qualquer valor isolado de massa gorda.',
+
+            'gaining_both' => 'A ganhar músculo, e alguma gordura com ele',
+            'gaining_both_body' => ':signals a subir, mas a cintura também (:waist). Estás a construir — só que não de forma limpa. Cortar 150-250 kcal costuma manter o músculo e travar o resto.',
+
+            'gaining_fat' => 'O excedente não está a virar músculo',
+            'gaining_fat_body' => 'A cintura está a crescer (:waist) e mais nada está. Ou as calorias extra ultrapassam o que o treino consegue usar, ou o volume de treino é baixo demais para as gastar.',
+
+            'losing_fat_keeping_muscle' => 'A perder gordura, a manter músculo',
+            'losing_fat_keeping_muscle_body' => 'A cintura desceu :waist enquanto :signals se mantiveram ou melhoraram. É exatamente assim que um corte deve correr.',
+
+            'losing_muscle_risk' => 'Podes estar a perder mais do que gordura',
+            'losing_muscle_risk_body' => 'O peso está a descer e a tua força em :exercise está a descer com ele. Num corte bem feito a força costuma aguentar-se, por isso vale a pena agir: sobe a proteína, mantém as séries pesadas e abranda o défice.',
+
+            'mixed' => 'As tuas medições não concordam',
+            'mixed_body' => 'No sentido certo: :up. Ainda não: :flat. Quando os sinais se dividem assim, a resposta honesta é que ainda é cedo — continua a medir da mesma forma e volta a ver daqui a duas ou três semanas.',
+
+            'holding' => 'Estás a manter-te',
+            'holding_body' => 'Nada se move além do ruído da medição. É o resultado certo se estás em manutenção, e um sinal para mudar algo se não estás.',
+
+            'unclear' => 'Ainda sem concordância suficiente',
+            'unclear_body' => 'Não há histórico de medições suficiente para triangular. Regista cintura, peito e braço com uma fita a cada duas semanas — com duas ou três leituras isto passa a ter significado.',
+
+            'confidence_high' => 'confiança alta — :count medições independentes',
+            'confidence_moderate' => 'confiança moderada — :count medições independentes',
+            'confidence_low' => 'confiança baixa — só :count medição até agora',
+        ],
+    ],
+
     'write' => [
         'confirm' => 'Confirmar e enviar',
         'retry' => 'Repetir',
@@ -277,6 +362,9 @@ return [
     ],
 
     'tips' => [
+        'ffmi' => 'Musculatura ajustada à altura, padronizada para 1,80 m. Cerca de 19 é a média, 22 é em forma, e 25 está perto do teto natural.',
+        'waist_height' => 'A tua cintura a dividir pela altura. O alvo é abaixo de 0,5. Se sobe durante um bulk, o ganho está a ir para a barriga.',
+        'p_ratio' => 'Do peso que ganhaste, a parte que foi massa magra e não gordura, a partir de uma tendência sobre muitas leituras. A massa gorda da balança é ruidosa, por isso trata isto como uma direção e não como uma medição.',
         'weight' => 'O seu peso corporal e a que ritmo muda por semana. Faixa ideal de ganho limpo: +0,25% a +0,5% do peso corporal por semana.',
         'body_fat' => 'Percentagem do seu peso que é gordura. Navy = uma estimativa independente com fita métrica, usada como verificação cruzada.',
         'lean_mass' => 'Tudo o que não é gordura (sobretudo músculo). FFMI = musculatura ajustada à altura; ~25 é perto do limite natural nos homens.',
@@ -285,6 +373,7 @@ return [
     ],
 
     'common' => [
+        'and' => 'e',
         'save' => 'Guardar',
         'saved' => 'Guardado.',
         'apply' => 'Aplicar',
