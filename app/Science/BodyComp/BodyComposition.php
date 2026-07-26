@@ -77,13 +77,73 @@ class BodyComposition
     }
 
     /**
+     * US Navy circumference method (women).
+     * bodyFat% = 495 / (1.29579 − 0.35004·log10(waist+hip−neck) + 0.22100·log10(height)) − 450
+     *
+     * Unlike the men's equation this needs a hip measurement; without one the
+     * estimate cannot be made and we return null rather than silently falling
+     * back to the men's formula (which under-reads a typical woman by roughly
+     * 12 percentage points).
+     */
+    public static function navyBodyFatWomen(float $neckCm, float $waistCm, float $hipCm, float $heightCm): ?float
+    {
+        if ($neckCm <= 0 || $waistCm <= 0 || $hipCm <= 0 || $heightCm <= 0) {
+            return null;
+        }
+
+        $diff = $waistCm + $hipCm - $neckCm;
+        if ($diff <= 0) {
+            return null;
+        }
+
+        $denom = 1.29579 - 0.35004 * log10($diff) + 0.22100 * log10($heightCm);
+
+        if ($denom == 0) {
+            return null;
+        }
+
+        return round(495 / $denom - 450, 1);
+    }
+
+    /**
+     * Navy body fat for the given sex, dispatching to the correct equation.
+     * Women require a hip measurement; when it is missing this returns null so
+     * callers can ask for the measurement instead of showing a wrong number.
+     */
+    public static function navyBodyFat(
+        string $sex,
+        ?float $neckCm,
+        ?float $abdomenCm,
+        ?float $heightCm,
+        ?float $hipCm = null,
+    ): ?float {
+        if ($neckCm === null || $abdomenCm === null || $heightCm === null) {
+            return null;
+        }
+
+        if (self::isFemale($sex)) {
+            return $hipCm === null
+                ? null
+                : self::navyBodyFatWomen($neckCm, $abdomenCm, $hipCm, $heightCm);
+        }
+
+        return self::navyBodyFatMen($neckCm, $abdomenCm, $heightCm);
+    }
+
+    /** Whether a stored sex value denotes female. */
+    public static function isFemale(?string $sex): bool
+    {
+        return in_array(strtolower((string) $sex), ['female', 'f', 'woman'], true);
+    }
+
+    /**
      * Boer LBM formula (used when no fat% is available).
      * men: LBM = 0.407·W + 0.267·H − 19.2
      * women: LBM = 0.252·W + 0.473·H − 48.3
      */
     public static function boerLbm(float $weightKg, float $heightCm, string $sex = 'male'): float
     {
-        $isFemale = in_array(strtolower($sex), ['female', 'f', 'woman'], true);
+        $isFemale = self::isFemale($sex);
         $w = $weightKg;
         $h = $heightCm;
 

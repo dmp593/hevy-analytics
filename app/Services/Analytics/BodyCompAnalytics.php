@@ -44,7 +44,13 @@ class BodyCompAnalytics
             return null;
         }
 
-        return BodyComposition::navyBodyFatMen((float) $m->neck_cm, (float) $abdomen, (float) $height);
+        return BodyComposition::navyBodyFat(
+            $this->user->sex ?? 'male',
+            (float) $m->neck_cm,
+            (float) $abdomen,
+            (float) $height,
+            $m->hips !== null ? (float) $m->hips : null,
+        );
     }
 
     private function manualFatFor(Carbon $date): ?float
@@ -157,9 +163,13 @@ class BodyCompAnalytics
         $waist = $this->latestValue('waist');
         $hips = $this->latestValue('hips');
 
-        $navyBf = ($neck && $abdomen && $height)
-            ? BodyComposition::navyBodyFatMen($neck, $abdomen, $height)
-            : null;
+        $navyBf = BodyComposition::navyBodyFat(
+            $this->user->sex ?? 'male',
+            $neck,
+            $abdomen,
+            $height !== null ? (float) $height : null,
+            $hips,
+        );
 
         // Effective body-fat per chosen source.
         $fat = match ($this->bodyFatSource()) {
@@ -228,7 +238,10 @@ class BodyCompAnalytics
         $y = [];
         $base = Carbon::parse($series[0]['label']);
         foreach ($series as $p) {
-            $x[] = Carbon::parse($p['label'])->diffInDays($base);
+            // Days elapsed SINCE the first point. Carbon 3's diffInDays is
+            // signed, so the receiver must be the earlier date or every slope
+            // comes out negated.
+            $x[] = $base->diffInDays(Carbon::parse($p['label']));
             $y[] = $p['value'];
         }
         $reg = LinearRegression::fit($x, $y);
@@ -256,7 +269,8 @@ class BodyCompAnalytics
         $x = [];
         $y = [];
         foreach ($series as $p) {
-            $x[] = (float) Carbon::parse($p['label'])->diffInDays($base);
+            // See weightRateKgPerWeek(): the earlier date must be the receiver.
+            $x[] = (float) $base->diffInDays(Carbon::parse($p['label']));
             $y[] = (float) $p['value'];
         }
         $reg = LinearRegression::fit($x, $y);

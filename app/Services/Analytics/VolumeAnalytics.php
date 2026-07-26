@@ -110,16 +110,42 @@ class VolumeAnalytics
         return array_map(fn ($k, $v) => ['muscle' => $k, 'tonnage' => round($v, 1)], array_keys($totals), $totals);
     }
 
+    /**
+     * Number of whole weeks the analysis window covers, used as the divisor for
+     * "per week" figures.
+     *
+     * Prefer the requested filter window over the observed data span: a user who
+     * trained on days 1 and 3 of a 28-day window has still only trained for one
+     * week's worth of sessions across four weeks, and dividing by the observed
+     * 3-day span would overstate their weekly volume ~9x. Falls back to the data
+     * span when the filter is open-ended.
+     */
     public function weeksInRange(?Collection $rows = null): int
     {
-        $rows ??= $this->rows();
-        $dates = $rows->pluck('start_time')->filter();
-        if ($dates->isEmpty()) {
+        [$from, $to] = $this->windowBounds($rows);
+
+        if ($from === null || $to === null) {
             return 1;
         }
-        $min = Carbon::parse($dates->min());
-        $max = Carbon::parse($dates->max());
 
-        return max(1, (int) ceil($min->diffInDays($max) / 7) + 1);
+        return max(1, (int) round($from->diffInDays($to) / 7));
+    }
+
+    /** @return array{0: ?Carbon, 1: ?Carbon} */
+    private function windowBounds(?Collection $rows): array
+    {
+        if ($this->filter->from && $this->filter->to) {
+            return [$this->filter->from->copy(), $this->filter->to->copy()];
+        }
+
+        $dates = ($rows ?? $this->rows())->pluck('start_time')->filter();
+        if ($dates->isEmpty()) {
+            return [null, null];
+        }
+
+        return [
+            $this->filter->from?->copy() ?? Carbon::parse($dates->min()),
+            $this->filter->to?->copy() ?? Carbon::parse($dates->max()),
+        ];
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Services\Analytics;
 
-use App\Enums\SetType;
 use App\Models\Routine;
 use App\Models\User;
 use App\Science\Volume\MuscleLandmarks;

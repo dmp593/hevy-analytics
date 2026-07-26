@@ -45,6 +45,33 @@ class PeriodService
         };
     }
 
+    /**
+     * Inverse of bucketKey(): turn a bucket label back into the date the bucket
+     * starts on. Quarter ("2026-Q3"), semester ("2026-S2") and year ("2026")
+     * labels are not parseable by Carbon, so anything that treats bucket labels
+     * as dates must come through here.
+     */
+    public static function bucketDate(string $key): ?Carbon
+    {
+        if (preg_match('/^(\d{4})-Q([1-4])$/', $key, $m)) {
+            return Carbon::create((int) $m[1], ((int) $m[2] - 1) * 3 + 1, 1)->startOfDay();
+        }
+
+        if (preg_match('/^(\d{4})-S([12])$/', $key, $m)) {
+            return Carbon::create((int) $m[1], $m[2] === '1' ? 1 : 7, 1)->startOfDay();
+        }
+
+        if (preg_match('/^\d{4}$/', $key)) {
+            return Carbon::create((int) $key, 1, 1)->startOfDay();
+        }
+
+        try {
+            return Carbon::parse($key)->startOfDay();
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
     /** All standard projection horizons. */
     public static function projectionHorizons(): array
     {

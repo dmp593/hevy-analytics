@@ -54,11 +54,32 @@ class OneRepMax
             $effectiveReps = $reps + $rir;
         }
 
+        // Both formulas diverge badly past their validated range — Brzycki's
+        // denominator approaches zero at 37 reps, so a 36-rep set would report an
+        // e1RM ~19x the load. Clamp to the reliable range: a high-rep set simply
+        // predicts the top of what this method can honestly say.
+        $effectiveReps = min($effectiveReps, (float) self::MAX_RELIABLE_REPS);
+
         if ($effectiveReps <= 1) {
             return round($weight, 2);
         }
 
         return round((self::epley($weight, $effectiveReps) + self::brzycki($weight, $effectiveReps)) / 2, 2);
+    }
+
+    /**
+     * Whether an estimate built from this set is trustworthy enough to headline
+     * as a personal record. RPE-derived reps-in-reserve are an inference, not a
+     * measurement, so a set well short of failure does not qualify however few
+     * reps were performed.
+     */
+    public static function isReliableSet(float $reps, ?float $rpe = null): bool
+    {
+        if (! self::isReliable($reps)) {
+            return false;
+        }
+
+        return $rpe === null || $rpe >= 7.0;
     }
 
     /** Whether an estimate from this rep count is considered reliable. */
