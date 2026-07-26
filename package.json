@@ -19,6 +19,7 @@
     },
     "dependencies": {
         "@alpinejs/morph": "^3.15.12",
-        "@imacrayon/alpine-ajax": "^0.12.7"
+        "@imacrayon/alpine-ajax": "^0.12.7",
+        "chart.js": "^4.5.1"
     }
 }
