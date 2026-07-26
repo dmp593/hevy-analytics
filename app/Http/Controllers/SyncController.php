@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\SyncHevyJob;
+use App\Services\Hevy\SyncStatus;
 use Illuminate\Http\Request;
 
 class SyncController extends Controller
@@ -23,11 +24,23 @@ class SyncController extends Controller
             return back()->with('error', 'Add your Hevy API key in Profile first.');
         }
 
-        // Deduplication lives on the job (ShouldBeUnique), not here: the sync_log
-        // row is written inside the job, so at this point there is nothing yet to
-        // detect and rapid clicks all looked like the first one.
-        SyncHevyJob::dispatch($user->id, $request->boolean('force'));
+        $status = new SyncStatus($user);
+        if ($status->isPending()) {
+            return back()->with('status', $status->current()['message']);
+        }
 
-        return back()->with('status', 'Sync started. Your data will appear here shortly — refresh in a moment.');
+        // Record the queued state up front so the UI has something to show while
+        // the job waits, and so a queue that nobody is consuming is visible
+        // instead of silently swallowing the request.
+        $log = $user->syncLogs()->create([
+            'type' => 'incremental',
+            'status' => 'queued',
+        ]);
+
+        // Deduplication also lives on the job itself (ShouldBeUnique), which is
+        // what actually holds under concurrent requests.
+        SyncHevyJob::dispatch($user->id, $request->boolean('force'), $log->id);
+
+        return back()->with('status', 'Sync queued — refresh in a moment to see your new data.');
     }
 }

@@ -63,7 +63,9 @@ class AiQuota
             return sprintf(
                 'You have used all %d AI analyses for this month. Your allowance resets on %s.',
                 $this->monthlyLimit(),
-                Carbon::now()->addMonth()->startOfMonth()->format('j M'),
+                // startOfMonth BEFORE addMonth: Carbon overflows 31 Jan + 1 month
+                // to 3 March, which would report the reset a month late.
+                Carbon::now()->startOfMonth()->addMonth()->format('j M'),
             );
         }
 

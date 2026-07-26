@@ -21,16 +21,22 @@ class DeepSeekService
      * Return a cached analysis if the metrics haven't changed, otherwise
      * generate a fresh one.
      */
+    /** A previously generated analysis for the same metrics, if one exists. */
+    public function cached(User $user, string $scope, array $metrics): ?AiAnalysis
+    {
+        return $user->aiAnalyses()
+            ->where('scope', $scope)
+            ->where('data_hash', hash('sha256', json_encode($metrics)))
+            ->latest('id')
+            ->first();
+    }
+
     public function analyze(User $user, string $scope, array $metrics, string $systemPrompt, bool $force = false): ?AiAnalysis
     {
         $hash = hash('sha256', json_encode($metrics));
 
         if (! $force) {
-            $existing = $user->aiAnalyses()
-                ->where('scope', $scope)
-                ->where('data_hash', $hash)
-                ->latest('id')
-                ->first();
+            $existing = $this->cached($user, $scope, $metrics);
             if ($existing) {
                 return $existing;
             }

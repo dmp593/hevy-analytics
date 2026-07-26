@@ -6,6 +6,7 @@ use App\Jobs\SyncHevyJob;
 use App\Models\User;
 use App\Services\AI\AiQuota;
 use App\Services\Hevy\HevyWriter;
+use App\Services\Hevy\SyncStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
@@ -101,6 +102,44 @@ class AbuseControlsTest extends TestCase
         }
 
         Queue::assertPushed(SyncHevyJob::class, 1);
+        $this->assertSame(1, $user->syncLogs()->count());
+    }
+
+    public function test_a_queue_nobody_is_consuming_is_visible_to_the_user(): void
+    {
+        Queue::fake();
+
+        $user = User::factory()->create();
+        $user->forceFill(['hevy_api_key' => 'k'])->save();
+
+        $this->actingAs($user)->post('/sync');
+
+        // Straight away it just reads as queued.
+        $this->assertSame('queued', (new SyncStatus($user))->current()['state']);
+
+        // Still unclaimed several minutes later means there is no worker, and
+        // saying "queued" forever would be the silent failure that moving sync
+        // onto the queue introduced.
+        $user->syncLogs()->update(['created_at' => now()->subMinutes(10)]);
+
+        $status = (new SyncStatus($user->fresh()))->current();
+        $this->assertSame('stalled', $status['state']);
+        $this->assertStringContainsString('queue:work', $status['message']);
+
+        $this->actingAs($user)->get('/dashboard')->assertSee('queue:work');
+    }
+
+    public function test_a_sync_job_that_dies_does_not_leave_the_ui_saying_queued(): void
+    {
+        $user = User::factory()->create();
+        $user->forceFill(['hevy_api_key' => 'k'])->save();
+
+        $log = $user->syncLogs()->create(['type' => 'incremental', 'status' => 'queued']);
+
+        (new SyncHevyJob($user->id, false, $log->id))->failed(new \RuntimeException('worker died'));
+
+        $this->assertSame('failed', $log->fresh()->status);
+        $this->assertSame('failed', (new SyncStatus($user))->current()['state']);
     }
 
     public function test_a_write_stuck_mid_call_is_recoverable(): void

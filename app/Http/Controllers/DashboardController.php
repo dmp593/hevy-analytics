@@ -8,6 +8,7 @@ use App\Services\Analytics\GoalAlerts;
 use App\Services\Analytics\MuscleBalance;
 use App\Services\Analytics\NutritionService;
 use App\Services\Analytics\VolumeAnalytics;
+use App\Services\Hevy\SyncStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -44,6 +45,7 @@ class DashboardController extends Controller
             'balance' => (new MuscleBalance($user, new FilterCriteria(from: Carbon::now()->subMonths(3))))->ratios(),
             'workoutCount' => $user->workouts()->count(),
             'lastSync' => $user->hevy_last_synced_at,
+            'syncStatus' => (new SyncStatus($user))->current(),
             'nutrition' => (new NutritionService($user))->computeTargets(),
         ]);
     }

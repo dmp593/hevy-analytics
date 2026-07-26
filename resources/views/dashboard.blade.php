@@ -13,6 +13,7 @@
 
     <div class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <x-flash />
+        <x-sync-banner :status="$syncStatus ?? null" />
 
         @if($needsSetup ?? false)
             <x-panel title="Welcome to Hevy Analytics">

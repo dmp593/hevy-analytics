@@ -23,6 +23,32 @@ class HevyWriter
         return new HevyClient($this->user->hevy_api_key);
     }
 
+    /** Statuses an operation can be executed from. */
+    private const EXECUTABLE = ['pending', 'confirmed', 'failed'];
+
+    /**
+     * An operation is executable when it has never run, or when a previous
+     * attempt claimed it and then died without releasing it.
+     */
+    public function isExecutable(WriteOperation $op): bool
+    {
+        if (in_array($op->status, self::EXECUTABLE, true)) {
+            return true;
+        }
+
+        return $op->status === 'running'
+            && $op->updated_at !== null
+            && $op->updated_at->lt(now()->subMinutes(self::STALE_CLAIM_MINUTES));
+    }
+
+    /** The same predicate as isExecutable(), expressed for the claim query. */
+    private function executableWhere($query): void
+    {
+        $query->whereIn('status', self::EXECUTABLE)
+            ->orWhere(fn ($stale) => $stale->where('status', 'running')
+                ->where('updated_at', '<', now()->subMinutes(self::STALE_CLAIM_MINUTES)));
+    }
+
     /** Stage an operation for confirmation. */
     public function stage(string $operation, string $method, string $endpoint, array $payload): WriteOperation
     {
@@ -47,20 +73,16 @@ class HevyWriter
      */
     public function execute(WriteOperation $op): WriteOperation
     {
-        if (! in_array($op->status, ['pending', 'confirmed', 'failed'], true)) {
+        if (! $this->isExecutable($op)) {
             return $op;
         }
 
-        // Claim it, or reclaim a stale claim. A crash or timeout mid-call used to
-        // leave the row in 'running' forever with no way back, because 'running'
-        // is not an executable status.
+        // Claim it, or reclaim a claim abandoned by a crashed process. The same
+        // predicate has to appear here as in isExecutable() above, or a stale row
+        // is rejected before it can ever be reclaimed.
         $claimed = WriteOperation::query()
             ->whereKey($op->getKey())
-            ->where(function ($q) {
-                $q->whereIn('status', ['pending', 'confirmed', 'failed'])
-                    ->orWhere(fn ($stale) => $stale->where('status', 'running')
-                        ->where('updated_at', '<', now()->subMinutes(self::STALE_CLAIM_MINUTES)));
-            })
+            ->where(fn ($q) => $this->executableWhere($q))
             ->update(['status' => 'running', 'updated_at' => now()]);
 
         if ($claimed === 0) {

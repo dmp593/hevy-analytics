@@ -25,7 +25,7 @@ class HevySync
      *
      * @return array<string,int> counts
      */
-    public function run(bool $force = false): array
+    public function run(bool $force = false, ?SyncLog $log = null): array
     {
         $incremental = ! $force && $this->user->hevy_last_synced_at !== null;
 
@@ -34,12 +34,22 @@ class HevySync
         // and new watermark and is never picked up by a later incremental run.
         $startedAt = now();
 
-        $log = SyncLog::create([
-            'user_id' => $this->user->id,
-            'type' => $incremental ? 'incremental' : 'full',
-            'status' => 'running',
-            'started_at' => now(),
-        ]);
+        // The controller writes a 'queued' row at dispatch so the UI can show
+        // that something is pending; take it over rather than opening a second.
+        if ($log !== null) {
+            $log->update([
+                'type' => $incremental ? 'incremental' : 'full',
+                'status' => 'running',
+                'started_at' => now(),
+            ]);
+        } else {
+            $log = SyncLog::create([
+                'user_id' => $this->user->id,
+                'type' => $incremental ? 'incremental' : 'full',
+                'status' => 'running',
+                'started_at' => now(),
+            ]);
+        }
 
         $counts = ['templates' => 0, 'routine_folders' => 0, 'routines' => 0, 'workouts' => 0, 'body_measurements' => 0];
 

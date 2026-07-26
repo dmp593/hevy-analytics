@@ -106,9 +106,24 @@ class SetQuery
         });
     }
 
+    /**
+     * Keyed on the full filter, at full timestamp precision.
+     *
+     * FilterCriteria::toArray() is for display and renders dates as Y-m-d, which
+     * would make "today up to 09:00" and "today up to 23:59" the same key and
+     * hand one window the other's rows.
+     */
     private function cacheKey(): string
     {
-        return $this->user->id.':'.md5(serialize($this->filter->toArray()));
+        return $this->user->id.':'.md5(serialize([
+            $this->filter->from?->toIso8601String(),
+            $this->filter->to?->toIso8601String(),
+            $this->filter->routineHevyId,
+            $this->filter->exerciseTemplateHevyId,
+            $this->filter->muscle,
+            $this->filter->equipment,
+            $this->filter->includeWarmups,
+        ]));
     }
 
     /**

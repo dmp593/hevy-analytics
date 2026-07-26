@@ -12,17 +12,31 @@ npm install
 cp .env.example .env && php artisan key:generate
 touch database/database.sqlite
 php artisan migrate
-npm run dev            # vite dev server (hot reload)
-php artisan serve      # http://127.0.0.1:8000
+composer dev           # server + queue worker + logs + vite, all at once
 ```
 
-Then, in the app: register → **Profile** (add your Hevy API key + height/age/sex)
-→ click **Sync Hevy**. Or from the CLI: `php artisan hevy:sync {email}`.
+**Run `composer dev`, not `php artisan serve` on its own.** Syncing is a queued
+job, so without a worker the app will say "Sync queued" and then nothing will
+ever happen. If you do run the pieces separately you need at least:
+
+```bash
+php artisan serve
+php artisan queue:work   # required, or syncs never run
+npm run dev
+```
+
+The dashboard warns you when a sync has been sitting in the queue unclaimed, so
+this failure is visible rather than silent.
+
+Then, in the app: register → verify your email (in local dev the link is written
+to `storage/logs/laravel.log`) → **Profile** (add your Hevy API key +
+height/age/sex) → click **Sync Hevy**. Or from the CLI:
+`php artisan hevy:sync {email}`.
 
 Run the checks before committing:
 
 ```bash
-php artisan test        # 77 tests
+php artisan test        # 115 tests
 ./vendor/bin/pint       # code style (PSR-12 via Laravel Pint)
 npm run build           # production assets
 ```
@@ -36,7 +50,7 @@ npm run build           # production assets
 | Auth | Laravel Breeze (Blade), multi-user |
 | Frontend | Blade + Alpine.js + [Alpine AJAX](https://alpine-ajax.js.org) |
 | Styling | Tailwind CSS **only** (v3) |
-| Charts | Chart.js (via CDN, wrapped in one Alpine component) |
+| Charts | Chart.js, bundled via Vite (never a CDN — see `resources/js/components/chart.js`) |
 | AI | DeepSeek (OpenAI-compatible), optional |
 
 There is **no SPA / frontend framework**. Pages are server-rendered Blade;
@@ -99,7 +113,9 @@ a query in Science, it's in the wrong place.
   `x-balance-ratios`, `x-strength-bar`.
 - **Charts:** build datasets in PHP with `App\Support\Chart` and pass simple
   `['label'=>..,'value'=>..]` series to `<x-line-chart>`. Don't hand-write
-  Chart.js config in views.
+  Chart.js config in views. For two or more series on one axis use
+  `<x-multi-line-chart>`, never several `Chart::line()` datasets against one
+  series' labels — that plots the later series against the wrong dates.
 - **Filtering:** a `<form x-target="results-id" method="get" action="…/data">`
   submits via Alpine AJAX; the controller returns a `_results.blade.php` partial
   whose root element has the matching `id`. No custom JS needed.
@@ -110,15 +126,23 @@ a query in Science, it's in the wrong place.
 ## Testing
 
 - `tests/Unit/ScienceTest.php` — pure formula correctness (fast, no DB).
-- `tests/Feature/*` — pages render (200), sync upserts, write-back, strength
-  resolver fallback order, etc. External HTTP is always mocked (`Http::fake`).
+- `tests/Feature/AnalyticsCorrectnessTest.php` — the analytics layer against
+  REAL seeded data (use the `SeedsTrainingData` trait). Every metric bug found so
+  far hid behind tests that only ever ran on an empty database, so new analytics
+  work belongs here.
+- `tests/Feature/AbuseControlsTest.php` — the guards on things that cost money or
+  touch the user's real Hevy account: AI quota, sync queueing, write idempotency.
+- `tests/Feature/*` — pages render (200), strength resolver fallback order, auth.
+  External HTTP is always mocked (`Http::fake`).
 - When adding a feature: put the math in `Science/` with a unit test, the
   orchestration in a `Service/` (feature test), and keep the controller thin.
 
 ## External services (all optional / graceful)
 
 - **Hevy API** — per-user API key (Profile). Stored encrypted.
-- **DeepSeek** — set `DEEPSEEK_API_KEY` in `.env` to enable the AI page.
+- **DeepSeek** — set `DEEPSEEK_API_KEY` in `.env` to enable the AI page. Usage is
+  capped per user and app-wide (`config/services.php` → `ai`), counted in
+  `ai_usage_events` by requests ATTEMPTED, not analyses stored.
 - **Strength levels** — layered: FitnessVolt API (free, CC BY 4.0) →
   OpenPowerlifting (`php artisan strength:build-opl-standards`) → offline model.
   Everything degrades gracefully if a source is down.

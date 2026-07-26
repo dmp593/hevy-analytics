@@ -19,8 +19,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('workout_sets', function (Blueprint $table) {
-            $table->index('workout_exercise_id', 'workout_sets_exercise_idx');
-            // Warm-ups are excluded from nearly every query.
+            // Composite only: a leading-column lookup on workout_exercise_id uses
+            // this index too, so a separate single-column one would be dead weight
+            // on every write. Warm-ups are excluded from nearly every query.
             $table->index(['workout_exercise_id', 'type'], 'workout_sets_exercise_type_idx');
         });
 
@@ -45,7 +46,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('workout_sets', function (Blueprint $table) {
-            $table->dropIndex('workout_sets_exercise_idx');
             $table->dropIndex('workout_sets_exercise_type_idx');
         });
 
