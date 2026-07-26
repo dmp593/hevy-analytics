@@ -18,8 +18,12 @@
                             <td class="py-2 pr-4 font-medium">{{ $o['routine'] }}</td>
                             <td class="py-2 pr-4">{{ $o['sessions'] }}</td>
                             <td class="py-2 pr-4">{{ number_format($o['avg_tonnage']) }} kg</td>
-                            <td class="py-2 pr-4 {{ ($o['progression_pct'] ?? 0) >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                            <td class="py-2 pr-4 {{ ($o['progression_pct'] ?? 0) >= 0 ? 'text-green-700' : 'text-red-700' }}">
                                 {{ $o['progression_pct'] !== null ? ($o['progression_pct'] > 0 ? '+' : '').$o['progression_pct'].'%' : '—' }}
+                                {{-- A trend can be real but scattered. Saying so beats implying precision we do not have. --}}
+                                @if($o['progression_pct'] !== null && ! ($o['progression_reliable'] ?? true))
+                                    <span class="ml-1 text-[10px] font-normal text-gray-500" title="Session-to-session tonnage varies a lot here, so treat the direction as a hint rather than a measurement.">noisy</span>
+                                @endif
                             </td>
                             <td class="py-2 pr-4 text-gray-500">{{ $o['last_performed'] }}</td>
                             <td class="py-2 pr-4"><a href="{{ route('routines.show', $o['routine_id']) }}" class="text-indigo-600">Analyse →</a></td>

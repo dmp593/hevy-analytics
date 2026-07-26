@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\BodyMeasurement;
 use App\Models\ExerciseTemplate;
+use App\Models\Routine;
+use App\Models\RoutineExercise;
 use App\Models\User;
 use App\Models\Workout;
 use App\Models\WorkoutExercise;
@@ -75,10 +77,46 @@ class DemoSeeder
         ]);
 
         $templates = $this->seedTemplates($user);
+        $this->seedRoutines($user, $templates);
         $this->seedTraining($user, $templates, $weeks);
         $this->seedBody($user, $weeks);
 
         return $user->refresh();
+    }
+
+    /**
+     * The routines the logged sessions were performed from.
+     *
+     * Workouts already carry a routine_hevy_id, so without the matching Routine
+     * rows the Routines page is empty and the routine analytics have nothing to
+     * summarise — which is precisely the page you would want to look at.
+     */
+    private function seedRoutines(User $user, array $templates): void
+    {
+        foreach (self::PROGRAMME as $day => $exercises) {
+            $routine = Routine::create([
+                'user_id' => $user->id,
+                'hevy_id' => 'demo-r-'.$day,
+                'title' => ucfirst($day).' day',
+                'hevy_created_at' => now(),
+                'hevy_updated_at' => now(),
+            ]);
+
+            foreach ($exercises as $index => [$title, $_p, $_s, $load]) {
+                RoutineExercise::create([
+                    'routine_id' => $routine->id,
+                    'index' => $index,
+                    'title' => $title,
+                    'exercise_template_hevy_id' => $templates[$title],
+                    'rest_seconds' => 150,
+                    'sets' => array_fill(0, 3, [
+                        'type' => 'normal',
+                        'weight_kg' => $load,
+                        'reps' => 8,
+                    ]),
+                ]);
+            }
+        }
     }
 
     private function reset(User $user): void
@@ -87,6 +125,7 @@ class DemoSeeder
         WorkoutExercise::whereHas('workout', fn ($q) => $q->where('user_id', $user->id))->delete();
         $user->workouts()->delete();
         $user->bodyMeasurements()->delete();
+        $user->routines()->delete();
         $user->exerciseTemplates()->delete();
         $user->goals()->delete();
     }

@@ -69,6 +69,11 @@ class HevySyncCommand extends Command
                 ->get();
         }
 
-        return User::query()->whereNotNull('hevy_api_key')->get();
+        // Unverified accounts must not be able to arm recurring outbound work
+        // against a third-party API on an address they may not even own.
+        return User::query()
+            ->whereNotNull('hevy_api_key')
+            ->whereNotNull('email_verified_at')
+            ->get();
     }
 }

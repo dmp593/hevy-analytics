@@ -2,8 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\ProgressPhotoController;
 use App\Models\User;
+use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -49,10 +52,66 @@ class SecurityTest extends TestCase
         $a = User::factory()->create();
         $b = User::factory()->create();
 
-        // Attempt to smuggle another user's id through mass assignment.
-        $goal = $a->goals()->create(['type' => 'cut', 'user_id' => $b->id]);
+        // Attempting to smuggle another user's id through mass assignment now
+        // throws rather than being silently dropped. Both are safe, but a loud
+        // failure means an attempt like this shows up in the logs instead of
+        // looking like a successful write.
+        $this->expectException(MassAssignmentException::class);
+
+        $a->goals()->create(['type' => 'cut', 'user_id' => $b->id]);
+    }
+
+    public function test_a_goal_created_through_the_relationship_belongs_to_its_owner(): void
+    {
+        $a = User::factory()->create();
+
+        $goal = $a->goals()->create(['type' => 'cut']);
 
         $this->assertSame($a->id, $goal->fresh()->user_id);
+    }
+
+    public function test_deleting_an_account_removes_progress_photo_files(): void
+    {
+        Storage::fake('local');
+
+        $user = User::factory()->create();
+        $path = 'progress-photos/'.$user->id.'/front.jpg';
+        Storage::disk('local')->put($path, 'not-really-a-jpeg');
+
+        $user->progressPhotos()->create([
+            'date' => now()->toDateString(), 'angle' => 'front', 'path' => $path,
+        ]);
+
+        $this->actingAs($user)
+            ->delete('/profile', ['password' => 'password'])
+            ->assertRedirect('/');
+
+        // Body photographs are special-category data under GDPR; a cascade that
+        // drops the row and keeps the image is still holding the data.
+        Storage::disk('local')->assertMissing($path);
+    }
+
+    public function test_progress_photos_are_capped_per_account(): void
+    {
+        Storage::fake('local');
+
+        $user = User::factory()->create();
+        $reflection = new \ReflectionClassConstant(ProgressPhotoController::class, 'MAX_PHOTOS_PER_USER');
+        $limit = $reflection->getValue();
+
+        for ($i = 0; $i < $limit; $i++) {
+            $user->progressPhotos()->create([
+                'date' => now()->toDateString(), 'angle' => 'front', 'path' => "p/{$i}.jpg",
+            ]);
+        }
+
+        $this->actingAs($user)->post('/photos', [
+            'date' => now()->toDateString(),
+            'angle' => 'front',
+            'photo' => UploadedFile::fake()->image('one-too-many.jpg'),
+        ])->assertSessionHas('error');
+
+        $this->assertSame($limit, $user->progressPhotos()->count());
     }
 
     public function test_responses_carry_security_headers(): void

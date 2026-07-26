@@ -16,6 +16,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             SecurityHeaders::class,
         ]);
+
+        // Behind a load balancer every request appears to come from the proxy,
+        // so throttle:6,1 on sync and throttle:10,1 on AI would be shared by the
+        // whole internet rather than applied per client. Configured via
+        // TRUSTED_PROXIES so it is a deployment decision, not a code change.
+        $proxies = env('TRUSTED_PROXIES');
+        if (filled($proxies)) {
+            $middleware->trustProxies(
+                at: $proxies === '*' ? '*' : array_map('trim', explode(',', $proxies)),
+            );
+        }
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
