@@ -117,12 +117,40 @@ so a partially translated language cannot ship unnoticed.
 | Service | What it adds | Without it |
 |---|---|---|
 | Hevy API | All training data | Nothing to analyse |
-| DeepSeek, or any OpenAI-compatible endpoint | Written analysis of your metrics | Every metric still works; the AI page is disabled |
+| An AI provider | Written analysis of your metrics | Every metric still works; the AI page says so |
 | FitnessVolt / OpenPowerlifting | Strength percentiles against real lifters | Falls back to a built-in model |
 
-AI usage is capped per user and app-wide (`config/services.php` → `ai`), counted
-by requests attempted rather than analyses stored, so failed calls cannot be used
-to run up a bill.
+### AI providers
+
+There are two ways to have an AI provider, and they are independent.
+
+**Your own key**, set in **Profile & settings**. OpenAI, Anthropic, DeepSeek, or
+anything speaking the OpenAI chat-completions schema — Groq, Together,
+OpenRouter, vLLM. Keys are encrypted at rest, sent only to the provider you
+picked, and never written to logs or included in your data export. Analyses on
+your own key are not rationed, because you are paying for them.
+
+**The operator's key**, set in `.env` as `AI_API_KEY`. This is the
+"included with your account" path. It is capped per user and app-wide
+(`AI_MONTHLY_LIMIT_PER_USER`, `AI_MONTHLY_LIMIT_GLOBAL`), counted by requests
+attempted rather than analyses stored, so failed calls cannot be used to run up
+a bill. Leave the key empty to ship without an included allowance.
+
+A user's own key always takes priority.
+
+> **A custom endpoint is a security decision.** The server makes an
+> authenticated request to whatever address is configured, so `App\Services\AI\UrlGuard`
+> requires https and a publicly routable address, and refuses redirects. Private
+> networks, loopback and the cloud metadata endpoint are all blocked, and the
+> check is repeated on every call rather than only when the URL was saved.
+> `AI_ALLOW_LOCAL_PROVIDERS=true` permits loopback for a single-user install; it
+> must stay off anywhere other people have accounts.
+
+### Your data
+
+**Profile & settings → Your data** exports everything the app holds as one JSON
+file: workouts, measurements, goals, intake logs and generated analyses. API keys
+are deliberately excluded. Deleting your account removes all of it.
 
 ---
 

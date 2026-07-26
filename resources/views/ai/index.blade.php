@@ -17,18 +17,28 @@
 
     <x-flash />
 
-    @unless($configured)
-        <div class="mb-4 rounded-md bg-warn-soft border border-warn/30 px-4 py-3 text-sm text-warn">
-            {{ __('app.ai.unavailable') }}
-        </div>
+    @unless ($configured)
+        {{-- No provider at all: the operator shipped without an included key and
+             this athlete has not added one. Point at the fix rather than just
+             reporting the absence. --}}
+        <x-ui.insight tone="warn" :title="__('app.ai.unavailable')" class="mb-6">
+            <p>{!! __('app.ai.add_key', [
+                'settings' => '<a href="'.route('profile.edit').'" class="underline font-medium">'.__('app.nav.profile').'</a>',
+            ]) !!}</p>
+        </x-ui.insight>
+    @elseif ($usesOwnKey)
+        {{-- Showing an allowance to someone spending their own key would invent
+             a limit that does not apply to them. --}}
+        <p class="mb-4 text-xs text-muted">{{ __('app.ai.no_limit_own_key') }}</p>
     @else
         <p class="mb-4 text-xs text-muted">
             {{ __('app.ai.quota', ['remaining' => $quotaRemaining, 'limit' => $quotaLimit]) }}
+            <a href="{{ route('profile.edit') }}" class="underline">{{ __('app.ai.want_unlimited') }}</a>
         </p>
     @endunless
 
-    <x-panel>
-        @if($analysis)
+    <x-ui.card>
+        @if ($analysis)
             <div class="prose prose-sm max-w-none prose-headings:font-semibold prose-h1:text-lg prose-h2:text-base">
                 {{-- AI output is untrusted (model can emit HTML); strip raw HTML to prevent XSS. --}}
                 {!! \Illuminate\Support\Str::markdown($analysis->response, [
@@ -36,13 +46,14 @@
                     'allow_unsafe_links' => false,
                 ]) !!}
             </div>
-            <p class="mt-6 text-xs text-faint">Generated {{ $analysis->created_at->diffForHumans() }} · {{ $analysis->model }}</p>
-        @else
-            <p class="text-sm text-body">
-                Generate an evidence-based review of your training volume, strength trends, body-composition trajectory
-                and lean-bulk nutrition. The model receives your computed metrics (weekly sets vs landmarks, e1RM PRs,
-                p-ratio, TDEE/macros) and returns concrete next-4-week adjustments.
+            <p class="mt-6 text-xs text-faint">
+                {{ __('app.ai.generated_meta', [
+                    'when' => $analysis->created_at->diffForHumans(),
+                    'model' => $analysis->model,
+                ]) }}
             </p>
+        @else
+            <p class="text-sm text-body">{{ __('app.ai.intro') }}</p>
         @endif
-    </x-panel>
+    </x-ui.card>
 </x-ui.page>
