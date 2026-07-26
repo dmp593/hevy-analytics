@@ -2,13 +2,17 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\SyncHevyJob;
 use App\Models\User;
 use App\Services\Hevy\HevySync;
 use Illuminate\Console\Command;
 
 class HevySyncCommand extends Command
 {
-    protected $signature = 'hevy:sync {user? : User id or email} {--force : Force a full re-sync}';
+    protected $signature = 'hevy:sync
+        {user? : User id or email}
+        {--force : Force a full re-sync}
+        {--queue : Dispatch one queued job per user instead of syncing inline}';
 
     protected $description = 'Sync Hevy data (workouts, routines, templates, body measurements) into the local database';
 
@@ -20,6 +24,19 @@ class HevySyncCommand extends Command
             $this->error('No users with a Hevy API key found.');
 
             return self::FAILURE;
+        }
+
+        // Scheduled runs dispatch rather than sync inline: walking every account
+        // sequentially in one process means one slow or failing account delays
+        // everybody behind it, and the whole run dies together.
+        if ($this->option('queue')) {
+            foreach ($users as $user) {
+                SyncHevyJob::dispatch($user->id, (bool) $this->option('force'));
+            }
+
+            $this->info("Queued {$users->count()} sync job(s).");
+
+            return self::SUCCESS;
         }
 
         foreach ($users as $user) {
@@ -43,9 +60,11 @@ class HevySyncCommand extends Command
         $arg = $this->argument('user');
 
         if ($arg) {
+            // The id/email alternation must be grouped: AND binds tighter than
+            // OR, so an ungrouped chain matched users by id regardless of
+            // whether they had an API key, handing null to HevyClient.
             return User::query()
-                ->where('id', $arg)
-                ->orWhere('email', $arg)
+                ->where(fn ($q) => $q->where('id', $arg)->orWhere('email', $arg))
                 ->whereNotNull('hevy_api_key')
                 ->get();
         }

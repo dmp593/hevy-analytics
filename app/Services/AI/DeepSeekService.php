@@ -53,6 +53,8 @@ class DeepSeekService
                     ['role' => 'user', 'content' => $userPrompt],
                 ],
                 'temperature' => 0.4,
+                // Bound the response so a single call cannot run away on cost.
+                'max_tokens' => config('services.deepseek.max_tokens', 2000),
                 'stream' => false,
             ]);
 

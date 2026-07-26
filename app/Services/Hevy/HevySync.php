@@ -29,6 +29,11 @@ class HevySync
     {
         $incremental = ! $force && $this->user->hevy_last_synced_at !== null;
 
+        // Take the watermark BEFORE fetching. Stamping it on completion means
+        // anything the user logs while the sync is running falls between the old
+        // and new watermark and is never picked up by a later incremental run.
+        $startedAt = now();
+
         $log = SyncLog::create([
             'user_id' => $this->user->id,
             'type' => $incremental ? 'incremental' : 'full',
@@ -45,7 +50,7 @@ class HevySync
             $counts['workouts'] = $incremental ? $this->syncWorkoutEvents() : $this->syncAllWorkouts();
             $counts['body_measurements'] = $this->syncBodyMeasurements();
 
-            $this->user->forceFill(['hevy_last_synced_at' => now()])->save();
+            $this->user->forceFill(['hevy_last_synced_at' => $startedAt])->save();
 
             $log->update(['status' => 'success', 'counts' => $counts, 'finished_at' => now()]);
         } catch (Throwable $e) {

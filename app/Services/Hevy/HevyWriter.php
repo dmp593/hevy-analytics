@@ -33,25 +33,46 @@ class HevyWriter
         ]);
     }
 
-    /** Execute a previously-staged (or fresh) operation. */
+    /**
+     * Execute a previously-staged (or fresh) operation.
+     *
+     * Claims the operation before calling out. Without that, two concurrent
+     * confirmations of the same staged write — a double-clicked button, a
+     * retried request — both saw status "pending" and both fired, creating
+     * duplicate records in the user's real Hevy account. The idempotency key
+     * generated at stage time is now actually sent.
+     */
     public function execute(WriteOperation $op): WriteOperation
     {
         if (! in_array($op->status, ['pending', 'confirmed', 'failed'], true)) {
             return $op;
         }
 
+        $claimed = WriteOperation::query()
+            ->whereKey($op->getKey())
+            ->whereIn('status', ['pending', 'confirmed', 'failed'])
+            ->update(['status' => 'running']);
+
+        if ($claimed === 0) {
+            return $op->refresh();
+        }
+
+        $op->refresh();
+
         $client = $this->client();
         $payload = $op->payload ?? [];
         $targetId = (string) ($payload['_target_id'] ?? '');
         unset($payload['_target_id']);
 
+        $key = $op->idempotency_key;
+
         $response = match ($op->operation) {
-            'workout.create' => $client->createWorkout($payload),
-            'workout.update' => $client->updateWorkout($targetId, $payload),
-            'routine.create' => $client->createRoutine($payload),
-            'routine.update' => $client->updateRoutine($targetId, $payload),
-            'routine_folder.create' => $client->createRoutineFolder($payload),
-            'exercise_template.create' => $client->createExerciseTemplate($payload),
+            'workout.create' => $client->createWorkout($payload, $key),
+            'workout.update' => $client->updateWorkout($targetId, $payload, $key),
+            'routine.create' => $client->createRoutine($payload, $key),
+            'routine.update' => $client->updateRoutine($targetId, $payload, $key),
+            'routine_folder.create' => $client->createRoutineFolder($payload, $key),
+            'exercise_template.create' => $client->createExerciseTemplate($payload, $key),
             default => null,
         };
 

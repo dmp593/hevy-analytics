@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\DB;
  */
 class SetQuery
 {
+    /** @var array<string, Collection<int, object>> */
+    private static array $memo = [];
+
     public function __construct(
         private readonly User $user,
         private readonly FilterCriteria $filter,
@@ -78,15 +81,42 @@ class SetQuery
         return $q->orderBy('w.start_time');
     }
 
-    /** @return Collection<int, object> */
+    /**
+     * @return Collection<int, object>
+     *
+     * Memoised for the lifetime of the request. Analytics services each build
+     * their own SetQuery from the same user and filter, so a single dashboard
+     * render was re-running this join six or seven times. The cache key is the
+     * user plus the filter, so different windows still get their own result.
+     */
     public function rows(): Collection
     {
-        return $this->builder()->get()->map(function ($row) {
+        $key = $this->cacheKey();
+
+        if (isset(self::$memo[$key])) {
+            return self::$memo[$key];
+        }
+
+        return self::$memo[$key] = $this->builder()->get()->map(function ($row) {
             $row->secondary_muscle_groups = $row->secondary_muscle_groups
                 ? (json_decode($row->secondary_muscle_groups, true) ?: [])
                 : [];
 
             return $row;
         });
+    }
+
+    private function cacheKey(): string
+    {
+        return $this->user->id.':'.md5(serialize($this->filter->toArray()));
+    }
+
+    /**
+     * Drop the in-request cache. Only needed by tests and long-running workers,
+     * where "the request" spans more than one logical read.
+     */
+    public static function flushMemo(): void
+    {
+        self::$memo = [];
     }
 }

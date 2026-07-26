@@ -42,7 +42,21 @@ return [
     'deepseek' => [
         'key' => env('DEEPSEEK_API_KEY'),
         'base_url' => env('DEEPSEEK_BASE_URL', 'https://api.deepseek.com'),
-        'model' => env('DEEPSEEK_MODEL', 'deepseek-chat'),
+        // `deepseek-chat` was retired on 24 July 2026 and now remaps to
+        // V4-Flash. Pin the model explicitly rather than relying on an alias.
+        'model' => env('DEEPSEEK_MODEL', 'deepseek-v4-flash'),
+        'max_tokens' => (int) env('DEEPSEEK_MAX_TOKENS', 2000),
+    ],
+
+    /*
+     * Hard caps on AI generation. These bound third-party spend: without them,
+     * unlimited accounts each able to force an uncached call have nothing
+     * between them and the operator's API balance but a per-minute throttle.
+     * Set the global ceiling to 0 to disable the circuit breaker.
+     */
+    'ai' => [
+        'monthly_limit_per_user' => (int) env('AI_MONTHLY_LIMIT_PER_USER', 30),
+        'monthly_limit_global' => (int) env('AI_MONTHLY_LIMIT_GLOBAL', 5000),
     ],
 
     'fitnessvolt' => [

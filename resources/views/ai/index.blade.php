@@ -17,8 +17,12 @@
 
         @unless($configured)
             <div class="mb-4 rounded-md bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
-                Set <code>DEEPSEEK_API_KEY</code> in your <code>.env</code> to enable AI analysis.
+                AI analysis isn't available on your account yet.
             </div>
+        @else
+            <p class="mb-4 text-xs text-gray-500">
+                {{ $quotaRemaining }} of {{ $quotaLimit }} analyses left this month.
+            </p>
         @endunless
 
         <x-panel>

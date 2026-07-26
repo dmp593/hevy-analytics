@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,7 +13,13 @@ use Illuminate\Notifications\Notifiable;
 
 #[Fillable(['name', 'email', 'password', 'hevy_api_key', 'sex', 'age', 'height_cm', 'activity_level', 'body_fat_source', 'hevy_last_synced_at'])]
 #[Hidden(['password', 'remember_token', 'hevy_api_key'])]
-class User extends Authenticatable
+/**
+ * Implementing MustVerifyEmail is what makes the `verified` middleware do
+ * anything: Laravel's EnsureEmailIsVerified passes straight through for a user
+ * that does not implement it, so every route in the verified group was
+ * unguarded and anyone could sign up with an address they did not own.
+ */
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
