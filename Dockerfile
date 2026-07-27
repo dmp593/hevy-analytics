@@ -43,8 +43,11 @@ RUN apt-get update \
     && echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" \
         > /etc/apt/sources.list.d/pgdg.list \
     && apt-get update \
-    && apt-get install -y --no-install-recommends postgresql-client-17 \
+    && apt-get install -y --no-install-recommends postgresql-client-17 procps \
     && rm -rf /var/lib/apt/lists/*
+# procps supplies pkill, which start.sh needs to signal the queue worker on
+# shutdown. Without it the drain silently does nothing — the failure mode is a
+# job killed mid-flight, which is exactly what the drain exists to prevent.
 
 # The base image setcaps cap_net_bind_service onto the frankenphp binary so it
 # can bind ports 80/443 as non-root. Render (like several PaaS runtimes) runs
