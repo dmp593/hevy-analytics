@@ -22,6 +22,30 @@ class AnalyticsCorrectnessTest extends TestCase
 {
     use RefreshDatabase, SeedsTrainingData;
 
+    /**
+     * A fixed clock.
+     *
+     * These fixtures place sessions relative to "now", and one used
+     * startOfWeek()->addDay() — a Tuesday. On a Monday that seeds the most
+     * recent session for TOMORROW, so it fell outside every window under test
+     * and the suite failed one day in seven, months after the code it covers was
+     * written. Pinning the date makes any such dependency fail on every run
+     * instead of hiding until the calendar lines up.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Carbon::setTestNow(Carbon::parse('2026-06-17 09:00:00'));
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+
+        parent::tearDown();
+    }
+
     public function test_weight_trend_reports_a_gain_as_a_gain(): void
     {
         $user = $this->makeAthlete();
@@ -68,7 +92,7 @@ class AnalyticsCorrectnessTest extends TestCase
         for ($week = 3; $week >= 0; $week--) {
             $this->seedWorkout(
                 $user,
-                Carbon::now()->subWeeks($week)->startOfWeek()->addDays(1)->setTime(18, 0),
+                Carbon::now()->subWeeks($week)->setTime(18, 0),
                 ['bench'],
                 setsPerExercise: 4,
             );
@@ -98,7 +122,7 @@ class AnalyticsCorrectnessTest extends TestCase
         for ($week = 3; $week >= 0; $week--) {
             $this->seedWorkout(
                 $user,
-                Carbon::now()->subWeeks($week)->startOfWeek()->addDay()->setTime(18, 0),
+                Carbon::now()->subWeeks($week)->setTime(18, 0),
                 ['bench'],
                 setsPerExercise: 4,
             );
@@ -126,7 +150,7 @@ class AnalyticsCorrectnessTest extends TestCase
         for ($week = 2; $week >= 0; $week--) {
             $this->seedWorkout(
                 $user,
-                Carbon::now()->subWeeks($week)->startOfWeek()->addDay()->setTime(18, 0),
+                Carbon::now()->subWeeks($week)->setTime(18, 0),
                 ['bench'],
                 setsPerExercise: 5,
             );
@@ -196,7 +220,7 @@ class AnalyticsCorrectnessTest extends TestCase
         // Equal SETS on push and pull every week, but pull is trained far
         // heavier — so tonnage and sets tell opposite stories.
         for ($week = 3; $week >= 0; $week--) {
-            $date = Carbon::now()->subWeeks($week)->startOfWeek()->addDay()->setTime(18, 0);
+            $date = Carbon::now()->subWeeks($week)->setTime(18, 0);
             $this->seedWorkout($user, $date, ['bench'], setsPerExercise: 6, weightKg: 60.0);
             $this->seedWorkout($user, $date->copy()->addHours(2), ['row'], setsPerExercise: 6, weightKg: 200.0);
         }

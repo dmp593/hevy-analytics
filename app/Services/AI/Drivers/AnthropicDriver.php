@@ -8,7 +8,7 @@ use App\Services\AI\ProviderCredentials;
 use App\Services\AI\ProviderException;
 use App\Services\AI\ProviderRegistry;
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Support\Facades\Http;
+use App\Services\AI\PinnedHttp;
 
 /**
  * Anthropic's Messages API, which differs from the OpenAI schema in four ways
@@ -36,7 +36,7 @@ class AnthropicDriver implements ChatDriver
     public function chat(ProviderCredentials $credentials, string $systemPrompt, string $userPrompt): ChatResult
     {
         try {
-            $response = Http::baseUrl(rtrim($credentials->baseUrl, '/'))
+            $response = PinnedHttp::to($credentials->baseUrl, $credentials->host, $credentials->ips)
                 ->withHeaders([
                     'x-api-key' => $credentials->apiKey,
                     'anthropic-version' => self::API_VERSION,

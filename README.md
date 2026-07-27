@@ -139,12 +139,24 @@ a bill. Leave the key empty to ship without an included allowance.
 A user's own key always takes priority.
 
 > **A custom endpoint is a security decision.** The server makes an
-> authenticated request to whatever address is configured, so `App\Services\AI\UrlGuard`
-> requires https and a publicly routable address, and refuses redirects. Private
-> networks, loopback and the cloud metadata endpoint are all blocked, and the
-> check is repeated on every call rather than only when the URL was saved.
+> authenticated request to whatever address is configured, so
+> `App\Services\AI\UrlGuard` requires https and a publicly routable address, and
+> refuses redirects. Private networks, loopback, cloud metadata endpoints
+> (including Alibaba's and Oracle's, which PHP's own filter flags call "public"),
+> CGNAT and the NAT64 translation prefix are all blocked.
+>
+> The hostname is converted to the exact ASCII form libcurl will use before it is
+> resolved. Without that step a host like `ⓛocalhost.attacker.com` is checked as
+> one name and connected to as another, because curl applies UTS-46 mapping and
+> PHP's resolver does not.
+>
+> The connection is then pinned to the addresses that were approved, so the name
+> is never resolved a second time — re-checking more often does not close a
+> DNS-rebinding window, it just adds another lookup that can be raced.
+>
 > `AI_ALLOW_LOCAL_PROVIDERS=true` permits loopback for a single-user install; it
-> must stay off anywhere other people have accounts.
+> must stay off anywhere other people have accounts, and it does not open the
+> private network even when on.
 
 ### Your data
 

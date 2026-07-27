@@ -14,7 +14,12 @@ class AiSettingsController extends Controller
     {
         $data = $request->validate([
             'provider' => ['required', Rule::in(ProviderRegistry::keys())],
-            'api_key' => ['nullable', 'string', 'max:400'],
+            // Printable ASCII only, and no whitespace. Every provider issues
+            // keys in that alphabet, and the restriction matters: a key
+            // containing CR or LF is rejected by Guzzle's header validator,
+            // which puts THE WHOLE KEY into its exception message and from there
+            // into the application log.
+            'api_key' => ['nullable', 'string', 'max:400', 'regex:/^[\x21-\x7e]+$/'],
             'model' => ['required', 'string', 'max:120'],
             'base_url' => ['nullable', 'string', 'max:400'],
         ]);

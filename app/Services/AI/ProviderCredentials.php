@@ -18,5 +18,14 @@ class ProviderCredentials
         public readonly string $model,
         public readonly string $baseUrl,
         public readonly bool $ownedByUser,
+        /**
+         * The host and addresses UrlGuard approved. Carried so the connection
+         * can be pinned to them: re-resolving the name at connect time is
+         * exactly the window a DNS-rebinding attack needs.
+         *
+         * @var array<int, string>
+         */
+        public readonly string $host = '',
+        public readonly array $ips = [],
     ) {}
 }

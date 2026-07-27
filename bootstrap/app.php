@@ -36,4 +36,22 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*'),
         );
+
+        // Never flash a secret back into the session.
+        //
+        // On a validation failure Laravel redirects with the old input so the
+        // form can be repopulated, and its default exclusion list covers only
+        // password fields. An AI provider key submitted alongside a base URL the
+        // SSRF guard rejects — precisely the case that fails most often — would
+        // otherwise be written to the sessions table in plaintext, next to the
+        // ai_credentials row whose entire purpose is that it is encrypted, and
+        // sit there for the session lifetime. hevy_api_key is listed for the
+        // same reason on the profile form.
+        $exceptions->dontFlash([
+            'current_password',
+            'password',
+            'password_confirmation',
+            'api_key',
+            'hevy_api_key',
+        ]);
     })->create();

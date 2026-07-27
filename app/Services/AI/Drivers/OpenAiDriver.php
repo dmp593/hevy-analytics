@@ -8,7 +8,7 @@ use App\Services\AI\ProviderCredentials;
 use App\Services\AI\ProviderException;
 use App\Services\AI\ProviderRegistry;
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Support\Facades\Http;
+use App\Services\AI\PinnedHttp;
 
 /**
  * The OpenAI chat-completions schema, which OpenAI, DeepSeek, Groq, Together,
@@ -25,7 +25,7 @@ class OpenAiDriver implements ChatDriver
     public function chat(ProviderCredentials $credentials, string $systemPrompt, string $userPrompt): ChatResult
     {
         try {
-            $response = Http::baseUrl(rtrim($credentials->baseUrl, '/'))
+            $response = PinnedHttp::to($credentials->baseUrl, $credentials->host, $credentials->ips)
                 ->withToken($credentials->apiKey)
                 ->timeout((int) config('ai.timeout', 120))
                 // Redirects are refused rather than followed. A redirect is a

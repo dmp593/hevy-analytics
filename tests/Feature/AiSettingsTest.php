@@ -175,4 +175,65 @@ class AiSettingsTest extends TestCase
         $this->put('/settings/ai', $this->form())->assertRedirect('/login');
         $this->delete('/settings/ai/'.ProviderRegistry::OPENAI)->assertRedirect('/login');
     }
+
+    /**
+     * Guzzle rejects a header value containing CR or LF by throwing an
+     * InvalidArgumentException whose message quotes the whole value — so a key
+     * with an embedded newline ends up in the application log verbatim, and the
+     * AI page 500s instead of failing cleanly.
+     */
+    public function test_a_key_containing_control_characters_is_rejected_at_the_form(): void
+    {
+        foreach (["sk-real\r\nX-Injected: 1", "sk-real\nfoo", "sk with space", "sk-real\ttab"] as $bad) {
+            $this->actingAs(User::factory()->create())
+                ->put('/settings/ai', $this->form(['api_key' => $bad]))
+                ->assertSessionHasErrors('api_key');
+        }
+    }
+
+    public function test_a_normal_provider_key_shape_is_still_accepted(): void
+    {
+        foreach (['sk-proj-AbC123_-xyz', 'sk-ant-api03-AAAA', 'gsk_abc123'] as $good) {
+            $user = User::factory()->create();
+
+            $this->actingAs($user)
+                ->put('/settings/ai', $this->form(['api_key' => $good]))
+                ->assertSessionHasNoErrors();
+
+            $this->assertSame($good, $user->aiCredentials()->first()->api_key);
+        }
+    }
+
+    /**
+     * The failure the guard exists to produce arrives with a real key sitting in
+     * the same POST body. Laravel would flash it into the session in plaintext.
+     */
+    public function test_a_rejected_submission_does_not_flash_the_key_into_the_session(): void
+    {
+        $this->actingAs(User::factory()->create())
+            ->put('/settings/ai', $this->form([
+                'provider' => \App\Services\AI\ProviderRegistry::COMPATIBLE,
+                'api_key' => 'sk-a-real-secret-key',
+                'base_url' => 'https://10.0.0.5/v1',
+            ]))
+            ->assertSessionHasErrors('base_url');
+
+        $flashed = session()->getOldInput();
+
+        $this->assertArrayNotHasKey('api_key', $flashed);
+        $this->assertStringNotContainsString('sk-a-real-secret-key', json_encode($flashed));
+    }
+
+    public function test_a_rejected_profile_submission_does_not_flash_the_hevy_key(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->patch('/profile', [
+            'name' => '',                       // forces a validation failure
+            'email' => $user->email,
+            'hevy_api_key' => 'hevy-real-secret',
+        ])->assertSessionHasErrors('name');
+
+        $this->assertStringNotContainsString('hevy-real-secret', json_encode(session()->getOldInput()));
+    }
 }
