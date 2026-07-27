@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Science\Stats\LinearRegression;
 use App\Services\Analytics\BodyCompAnalytics;
+use App\Services\Analytics\BodyVerdict;
 use App\Services\Analytics\FilterCriteria;
-use App\Services\Analytics\GoalAlerts;
 use App\Services\Analytics\StrengthAnalytics;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -39,18 +39,26 @@ class BodyCompositionController extends Controller
             }
         }
 
+        $rate = $bc->weightRateKgPerWeek();
+
+        $triangulation = [
+            'weight' => $rate,
+            'waist' => $bc->trendPerMonth('waist'),
+            'chest' => $bc->trendPerMonth('chest_cm'),
+            'bicep' => $bc->trendPerMonth('right_bicep_cm'),
+            'lift' => $liftE1rm,
+        ];
+
         return view('body.index', [
             'from' => $from,
             'status' => $bc->status(),
-            'rate' => $bc->weightRateKgPerWeek(),
+            'rate' => $rate,
             'partitioning' => $bc->partitioning(),
-            'triangulation' => [
-                'weight' => $bc->weightRateKgPerWeek(),
-                'waist' => $bc->trendPerMonth('waist'),
-                'chest' => $bc->trendPerMonth('chest_cm'),
-                'bicep' => $bc->trendPerMonth('right_bicep_cm'),
-                'lift' => $liftE1rm,
-            ],
+            'triangulation' => $triangulation,
+            // Read the corroborating signals together and say, in words, what
+            // they agree on. This leads the page: the numbers below are the
+            // evidence for it, not a puzzle for the athlete to solve.
+            'verdict' => (new BodyVerdict($triangulation))->verdict(),
             'weightSeries' => $bc->series('weight_kg', $from),
             'fatSeries' => $bc->fatPercentSeries($from),
             'leanSeries' => $bc->leanMassSeries($from),
@@ -59,7 +67,6 @@ class BodyCompositionController extends Controller
             'waistSeries' => $bc->series('waist', $from),
             'bicepSeries' => $bc->series('right_bicep_cm', $from),
             'symmetry' => $bc->symmetry(),
-            'alerts' => (new GoalAlerts($user))->all(),
         ]);
     }
 }

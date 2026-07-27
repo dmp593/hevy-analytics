@@ -19,6 +19,15 @@ class ProgressPhotoController extends Controller
         ]);
     }
 
+    /**
+     * Cap on how many progress photos one account may hold.
+     *
+     * Uploads were bounded only by a per-minute rate limit, which allowed
+     * roughly 240 MB an hour per account, forever, on storage the operator pays
+     * for. A ceiling is not a hardship — this is a few photos a week at most.
+     */
+    private const MAX_PHOTOS_PER_USER = 500;
+
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -28,6 +37,12 @@ class ProgressPhotoController extends Controller
             'weight_kg' => ['nullable', 'numeric', 'min:0', 'max:500'],
             'notes' => ['nullable', 'string', 'max:500'],
         ]);
+
+        if ($request->user()->progressPhotos()->count() >= self::MAX_PHOTOS_PER_USER) {
+            return back()->with('error', __('app.photos.limit_reached', [
+                'limit' => self::MAX_PHOTOS_PER_USER,
+            ]));
+        }
 
         $path = $request->file('photo')->store("progress-photos/{$request->user()->id}", 'local');
 

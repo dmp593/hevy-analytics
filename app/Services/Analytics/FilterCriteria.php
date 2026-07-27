@@ -21,22 +21,60 @@ class FilterCriteria
         public bool $includeWarmups = false,
         public float $secondaryMuscleWeight = 0.5,
         public string $period = 'month', // week|month|quarter|semester|year
+        /**
+         * The zone the from/to dates were expressed in.
+         *
+         * Only used to interpret request input — a date typed into the filter
+         * means a date in the athlete's day, not in UTC. Bucketing reads the
+         * timezone off the User instead, because every analytics service already
+         * holds one and threading it through seventeen construction sites is a
+         * drift waiting to happen.
+         */
+        public string $timezone = 'UTC',
     ) {}
 
-    public static function fromRequest(Request $request): self
+    public static function fromRequest(Request $request, ?string $timezone = null): self
     {
-        $parse = fn (?string $v) => $v ? Carbon::parse($v) : null;
+        // Query strings are attacker-controlled: a malformed date must not 500
+        // the page, and the numeric weight must stay in a range the maths can
+        // survive.
+        $tz = $timezone ?: 'UTC';
+
+        // A date typed into the filter means a date in the ATHLETE's day, so it
+        // is parsed in their zone and then compared against UTC timestamps.
+        $parse = function (?string $v) use ($tz): ?Carbon {
+            if (! $v) {
+                return null;
+            }
+            try {
+                return Carbon::parse($v, $tz);
+            } catch (\Throwable) {
+                return null;
+            }
+        };
+
+        $from = $parse($request->query('from'))?->startOfDay()
+            ?: Carbon::now($tz)->subMonths(6)->startOfDay();
+        $to = $parse($request->query('to'))?->endOfDay()
+            ?: Carbon::now($tz)->endOfDay();
+
+        if ($from->greaterThan($to)) {
+            [$from, $to] = [$to, $from];
+        }
+
+        $period = (string) $request->query('period', 'month');
 
         return new self(
-            from: $parse($request->query('from')) ?: Carbon::now()->subMonths(6)->startOfDay(),
-            to: $parse($request->query('to')) ?: Carbon::now()->endOfDay(),
+            from: $from,
+            to: $to,
             routineHevyId: $request->query('routine') ?: null,
             exerciseTemplateHevyId: $request->query('exercise') ?: null,
             muscle: $request->query('muscle') ?: null,
             equipment: $request->query('equipment') ?: null,
             includeWarmups: $request->boolean('include_warmups'),
-            secondaryMuscleWeight: (float) ($request->query('secondary_weight') ?? 0.5),
-            period: $request->query('period', 'month'),
+            secondaryMuscleWeight: max(0.0, min(1.0, (float) ($request->query('secondary_weight') ?? 0.5))),
+            period: in_array($period, PeriodService::PERIODS, true) ? $period : 'month',
+            timezone: $tz,
         );
     }
 

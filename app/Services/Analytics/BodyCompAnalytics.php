@@ -36,15 +36,33 @@ class BodyCompAnalytics
         };
     }
 
+    /**
+     * The two Navy equations use different measurement sites: men's takes the
+     * abdomen at the navel, women's takes the natural (narrowest) waist. Feeding
+     * the abdomen into the women's equation overstates body fat by several
+     * points, so pick the right column per sex and only fall back when the
+     * preferred one is missing.
+     */
     private function navyFor(BodyMeasurement $m): ?float
     {
         $height = $this->user->height_cm;
-        $abdomen = $m->abdomen ?? $m->waist;
-        if (! $height || ! $m->neck_cm || ! $abdomen) {
+        $isFemale = BodyComposition::isFemale($this->user->sex);
+
+        $circumference = $isFemale
+            ? ($m->waist ?? $m->abdomen)
+            : ($m->abdomen ?? $m->waist);
+
+        if (! $height || ! $m->neck_cm || ! $circumference) {
             return null;
         }
 
-        return BodyComposition::navyBodyFatMen((float) $m->neck_cm, (float) $abdomen, (float) $height);
+        return BodyComposition::navyBodyFat(
+            $this->user->sex ?? 'male',
+            (float) $m->neck_cm,
+            (float) $circumference,
+            (float) $height,
+            $m->hips !== null ? (float) $m->hips : null,
+        );
     }
 
     private function manualFatFor(Carbon $date): ?float
@@ -70,9 +88,21 @@ class BodyCompAnalytics
         return $best;
     }
 
-    /** @return Collection<int, BodyMeasurement> */
+    /**
+     * @return Collection<int, BodyMeasurement>
+     *
+     * The single history entry point for body data — series() reads through it —
+     * so the entitlement floor is applied here and nowhere else.
+     *
+     * latest(), latestValue() and symmetry() deliberately do NOT clamp. Those
+     * answer "what am I right now", and an athlete on the free tier should still
+     * see today's weight. It is the depth of history that is capped, not the
+     * existence of their current numbers.
+     */
     public function measurements(?Carbon $from = null, ?Carbon $to = null): Collection
     {
+        $from = $this->user->entitlements()->clampFrom($from);
+
         return $this->user->bodyMeasurements()
             ->when($from, fn ($q) => $q->where('date', '>=', $from))
             ->when($to, fn ($q) => $q->where('date', '<=', $to))
@@ -157,9 +187,18 @@ class BodyCompAnalytics
         $waist = $this->latestValue('waist');
         $hips = $this->latestValue('hips');
 
-        $navyBf = ($neck && $abdomen && $height)
-            ? BodyComposition::navyBodyFatMen($neck, $abdomen, $height)
-            : null;
+        // Women's Navy equation takes the natural waist, men's the abdomen.
+        $navySite = BodyComposition::isFemale($this->user->sex)
+            ? ($waist ?? $abdomen)
+            : $abdomen;
+
+        $navyBf = BodyComposition::navyBodyFat(
+            $this->user->sex ?? 'male',
+            $neck,
+            $navySite,
+            $height !== null ? (float) $height : null,
+            $hips,
+        );
 
         // Effective body-fat per chosen source.
         $fat = match ($this->bodyFatSource()) {
@@ -228,7 +267,10 @@ class BodyCompAnalytics
         $y = [];
         $base = Carbon::parse($series[0]['label']);
         foreach ($series as $p) {
-            $x[] = Carbon::parse($p['label'])->diffInDays($base);
+            // Days elapsed SINCE the first point. Carbon 3's diffInDays is
+            // signed, so the receiver must be the earlier date or every slope
+            // comes out negated.
+            $x[] = $base->diffInDays(Carbon::parse($p['label']));
             $y[] = $p['value'];
         }
         $reg = LinearRegression::fit($x, $y);
@@ -256,7 +298,8 @@ class BodyCompAnalytics
         $x = [];
         $y = [];
         foreach ($series as $p) {
-            $x[] = (float) Carbon::parse($p['label'])->diffInDays($base);
+            // See weightRateKgPerWeek(): the earlier date must be the receiver.
+            $x[] = (float) $base->diffInDays(Carbon::parse($p['label']));
             $y[] = (float) $p['value'];
         }
         $reg = LinearRegression::fit($x, $y);

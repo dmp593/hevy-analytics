@@ -25,7 +25,13 @@ class StrengthLevelController extends Controller
             'levels' => $levels,
             'bodyweight' => $bw ? (float) $bw : null,
             'ageFactor' => $ageFactor,
-            'sex' => $user->sex ?? 'male',
+            // Passed separately from the value actually used, so the view can
+            // say the comparison was ASSUMED rather than stating it as fact.
+            // Defaulting to male and then printing "compared against male
+            // lifters" told every woman who had not filled in her profile that
+            // she was being ranked against men, flatly and without warning.
+            'sex' => $user->sex,
+            'assumedSex' => $user->sex === null,
             'age' => $user->age,
         ]);
     }

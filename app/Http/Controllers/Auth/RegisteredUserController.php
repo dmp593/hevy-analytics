@@ -42,6 +42,18 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // The trial starts here and Paddle is not involved: no card, no
+        // customer record, no outbound call. Sign-up must not be able to fail
+        // because a payment provider is having a bad afternoon.
+        $user->forceFill([
+            'trial_ends_at' => now()->addDays((int) config('billing.trial_days', 14)),
+            // On an install with no mail provider the verification email goes
+            // to the log and every new account is locked out of the entire app
+            // by the `verified` middleware. AUTO_VERIFY_EMAIL is the explicit,
+            // documented escape hatch for test deployments — never the default.
+            'email_verified_at' => config('auth.auto_verify_email') ? now() : null,
+        ])->save();
+
         event(new Registered($user));
 
         Auth::login($user);

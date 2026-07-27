@@ -25,16 +25,31 @@ class HevySync
      *
      * @return array<string,int> counts
      */
-    public function run(bool $force = false): array
+    public function run(bool $force = false, ?SyncLog $log = null): array
     {
         $incremental = ! $force && $this->user->hevy_last_synced_at !== null;
 
-        $log = SyncLog::create([
-            'user_id' => $this->user->id,
-            'type' => $incremental ? 'incremental' : 'full',
-            'status' => 'running',
-            'started_at' => now(),
-        ]);
+        // Take the watermark BEFORE fetching. Stamping it on completion means
+        // anything the user logs while the sync is running falls between the old
+        // and new watermark and is never picked up by a later incremental run.
+        $startedAt = now();
+
+        // The controller writes a 'queued' row at dispatch so the UI can show
+        // that something is pending; take it over rather than opening a second.
+        if ($log !== null) {
+            $log->update([
+                'type' => $incremental ? 'incremental' : 'full',
+                'status' => 'running',
+                'started_at' => now(),
+            ]);
+        } else {
+            $log = SyncLog::create([
+                'user_id' => $this->user->id,
+                'type' => $incremental ? 'incremental' : 'full',
+                'status' => 'running',
+                'started_at' => now(),
+            ]);
+        }
 
         $counts = ['templates' => 0, 'routine_folders' => 0, 'routines' => 0, 'workouts' => 0, 'body_measurements' => 0];
 
@@ -45,7 +60,7 @@ class HevySync
             $counts['workouts'] = $incremental ? $this->syncWorkoutEvents() : $this->syncAllWorkouts();
             $counts['body_measurements'] = $this->syncBodyMeasurements();
 
-            $this->user->forceFill(['hevy_last_synced_at' => now()])->save();
+            $this->user->forceFill(['hevy_last_synced_at' => $startedAt])->save();
 
             $log->update(['status' => 'success', 'counts' => $counts, 'finished_at' => now()]);
         } catch (Throwable $e) {

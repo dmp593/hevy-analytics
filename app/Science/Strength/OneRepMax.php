@@ -11,7 +11,19 @@ namespace App\Science\Strength;
  */
 class OneRepMax
 {
+    /** Beyond this many reps an estimate is not trustworthy enough to headline. */
     public const MAX_RELIABLE_REPS = 12;
+
+    /**
+     * Hard ceiling on the reps fed to the formulas.
+     *
+     * Distinct from MAX_RELIABLE_REPS, which is a judgement about trust. This is
+     * a numerical guard: Brzycki's denominator (37 - reps) approaches zero, so
+     * 36 reps returns ~19x the load. Clamping at the reliability threshold
+     * instead would erase RPE information entirely — a 12-rep set at RPE 6 and
+     * at RPE 10 would report the same e1RM.
+     */
+    public const MAX_FORMULA_REPS = 15;
 
     /** Epley: w * (1 + reps/30). */
     public static function epley(float $weight, float $reps): float
@@ -54,11 +66,30 @@ class OneRepMax
             $effectiveReps = $reps + $rir;
         }
 
+        // Numerical guard only — see MAX_FORMULA_REPS. Whether the result should
+        // be trusted is a separate question, answered by isReliableSet().
+        $effectiveReps = min($effectiveReps, (float) self::MAX_FORMULA_REPS);
+
         if ($effectiveReps <= 1) {
             return round($weight, 2);
         }
 
         return round((self::epley($weight, $effectiveReps) + self::brzycki($weight, $effectiveReps)) / 2, 2);
+    }
+
+    /**
+     * Whether an estimate built from this set is trustworthy enough to headline
+     * as a personal record. RPE-derived reps-in-reserve are an inference, not a
+     * measurement, so a set well short of failure does not qualify however few
+     * reps were performed.
+     */
+    public static function isReliableSet(float $reps, ?float $rpe = null): bool
+    {
+        if (! self::isReliable($reps)) {
+            return false;
+        }
+
+        return $rpe === null || $rpe >= 7.0;
     }
 
     /** Whether an estimate from this rep count is considered reliable. */

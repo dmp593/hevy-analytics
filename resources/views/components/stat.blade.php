@@ -2,21 +2,21 @@
 
 @php
 $tones = [
-    'default' => 'bg-white',
-    'good' => 'bg-green-50 border-green-200',
-    'warn' => 'bg-amber-50 border-amber-200',
-    'bad' => 'bg-red-50 border-red-200',
-    'accent' => 'bg-indigo-50 border-indigo-200',
+    'default' => 'bg-surface',
+    'good' => 'bg-good-soft border-good/30',
+    'warn' => 'bg-warn-soft border-warn/30',
+    'bad' => 'bg-bad-soft border-bad/30',
+    'accent' => 'bg-brand-soft border-brand',
 ];
 @endphp
 
-<div {{ $attributes->merge(['class' => 'rounded-xl border border-gray-200 p-4 shadow-sm '.($tones[$tone] ?? $tones['default'])]) }}>
-    <div class="text-xs font-medium uppercase tracking-wide text-gray-500">
+<div {{ $attributes->merge(['class' => 'rounded-xl border border-line p-4 shadow-xs '.($tones[$tone] ?? $tones['default'])]) }}>
+    <div class="text-xs font-medium uppercase tracking-wide text-muted">
         {{ $label }}@if($tip)<x-info :title="$tipTitle ?? $label" :text="$tip" />@endif
     </div>
     <div class="mt-1 flex items-baseline gap-1">
-        <span class="text-2xl font-bold text-gray-900">{{ $value }}</span>
-        @if($unit)<span class="text-sm text-gray-500">{{ $unit }}</span>@endif
+        <span class="text-2xl font-bold text-ink">{{ $value }}</span>
+        @if($unit)<span class="text-sm text-muted">{{ $unit }}</span>@endif
     </div>
-    @if($sub)<div class="mt-1 text-xs text-gray-500">{{ $sub }}</div>@endif
+    @if($sub)<div class="mt-1 text-xs text-muted">{{ $sub }}</div>@endif
 </div>

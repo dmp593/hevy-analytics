@@ -114,4 +114,16 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Auto-verify new accounts
+    |--------------------------------------------------------------------------
+    | For deployments that have no mail provider configured yet. Without email,
+    | the verification link never reaches anyone and the `verified` middleware
+    | locks every new account out of the whole app. Turn this OFF the moment
+    | real mail is set up — verification is what keeps a stranger from
+    | registering with someone else's address.
+    */
+    'auto_verify_email' => (bool) env('AUTO_VERIFY_EMAIL', false),
+
 ];

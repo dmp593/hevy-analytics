@@ -1,50 +1,69 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800">Strength levels</h2>
-            <x-info title="Strength level" text="Strength level measures your strength in this exercise compared to people at the same age, weight and sex group as you. 0% = beginner, 100% = elite. Based on Strength Level community standards (millions of lifts)." />
-        </div>
-    </x-slot>
+<x-ui.page :title="__('app.pages.levels')" :subtitle="__('app.pages.levels_sub')" width="4xl">
+    <x-slot:actions>
+        <x-info :title="__('app.pages.levels')" :text="__('app.tips.strength_level')" />
+    </x-slot:actions>
 
-    <div class="py-8 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <x-flash />
+    <x-flash />
 
-        @if(! $bodyweight)
-            <x-panel>
-                <p class="text-sm text-gray-600">Log a body weight in Hevy and set your <a href="{{ route('profile.edit') }}" class="text-indigo-600 underline">age &amp; sex</a> — strength levels compare you to lifters of the same age, bodyweight and sex.</p>
-            </x-panel>
-        @elseif(empty($levels))
-            <x-panel>
-                <p class="text-sm text-gray-600">No standard-mapped lifts found yet. Strength standards cover barbell movements like Bench, Squat, Deadlift, Overhead Press, Barbell Row and Barbell Curl. Log some and re-sync.</p>
-            </x-panel>
-        @else
-            <x-panel class="mb-6">
-                <p class="text-sm text-gray-600">
-                    Compared against {{ $sex }} lifters
-                    @if($age) aged {{ $age }} @endif
-                    at {{ $bodyweight }}kg bodyweight.
-                    @if($ageFactor && $ageFactor != 1)
-                        <span class="text-gray-400">Standards age-adjusted ×{{ $ageFactor }}.</span>
-                    @endif
-                </p>
-            </x-panel>
+    {{-- Above the branches on purpose. When sex is unset the analytics layer
+         must pick something and picks male, and the page then stated that
+         comparison as fact. An athlete needs to see this before any percentile,
+         including on the empty state where they are about to log their first
+         lift. --}}
+    @if ($assumedSex)
+        <x-ui.insight tone="warn" :title="__('app.levels.assumed_sex')" class="mb-6">
+            <p>{!! __('app.levels.assumed_sex_body', [
+                'profile' => '<a href="'.route('profile.edit').'" class="underline font-medium">'.__('app.nav.profile').'</a>',
+            ]) !!}</p>
+        </x-ui.insight>
+    @endif
 
-            <div class="space-y-4">
-                @foreach($levels as $l)
-                    <x-panel>
-                        <x-strength-bar :eval="$l" :exercise="$l['exercise']" />
-                    </x-panel>
-                @endforeach
-            </div>
+    @if(! $bodyweight)
+        <x-ui.card>
+            <p class="text-sm text-body">{!! __('app.levels.no_bodyweight', [
+                'profile' => '<a href="'.route('profile.edit').'" class="text-brand-ink underline">'.__('app.levels.no_bodyweight_profile').'</a>',
+            ]) !!}</p>
+        </x-ui.card>
+    @elseif(empty($levels))
+        <x-ui.card>
+            <p class="text-sm text-body">{{ __('app.levels.no_lifts') }}</p>
+        </x-ui.card>
+    @else
+        {{-- Say what the comparison assumed, not just what it concluded.
 
-            <p class="mt-6 text-xs text-gray-400">
-                Levels use a layered data source: <strong>FitnessVolt</strong> (free, CC BY 4.0 — serving verified
-                <a href="https://www.openpowerlifting.org/" target="_blank" rel="noopener" class="underline">OpenPowerlifting</a>
-                competition percentiles + self-reported gym percentiles), falling back to a locally-built OpenPowerlifting
-                table, then an offline ratio model. The headline % is the <strong>gym</strong> population (comparable to
-                general lifting apps); the verified/competition % is shown alongside. See the
-                <a href="{{ route('guide') }}" class="underline">Guide</a> for details. Powered by FitnessVolt (CC BY 4.0).
+             When sex is unset the analytics layer has to pick something to
+             compute with and picks male; the page then printed "compared against
+             male lifters" as a statement of fact. For a woman who had not filled
+             in her profile, every percentile on the page was wrong and nothing
+             said so. The age factor is likewise only applied on the offline
+             fallback rows, so it is stated per row rather than page-wide. --}}
+        <x-ui.card class="mb-6">
+            <p class="text-sm text-body">
+                {{ __('app.levels.compared_against', [
+                    'sex' => __('app.levels.sex_'.($sex ?? 'male')),
+                    'bodyweight' => $bodyweight,
+                ]) }}
+                @if ($age)
+                    {{ __('app.levels.aged', ['age' => $age]) }}
+                @else
+                    <a href="{{ route('profile.edit') }}" class="underline">{{ __('app.levels.add_age') }}</a>
+                @endif
             </p>
-        @endif
-    </div>
-</x-app-layout>
+        </x-ui.card>
+
+        <div class="space-y-4">
+            @foreach ($levels as $l)
+                <x-ui.card>
+                    <x-strength-bar :eval="$l" :exercise="$l['exercise']" />
+                </x-ui.card>
+            @endforeach
+        </div>
+
+        <p class="mt-6 text-xs text-faint">
+            {!! __('app.levels.sources', [
+                'opl' => '<a href="https://www.openpowerlifting.org/" target="_blank" rel="noopener" class="underline">OpenPowerlifting</a>',
+                'guide' => '<a href="'.route('guide').'" class="underline">'.__('app.pages.guide').'</a>',
+            ]) !!}
+        </p>
+    @endif
+</x-ui.page>

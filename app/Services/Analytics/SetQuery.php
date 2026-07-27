@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\DB;
  */
 class SetQuery
 {
+    /** @var array<string, Collection<int, object>> */
+    private static array $memo = [];
+
     public function __construct(
         private readonly User $user,
         private readonly FilterCriteria $filter,
@@ -49,8 +52,18 @@ class SetQuery
                 't.equipment',
             ]);
 
-        if ($this->filter->from) {
-            $q->where('w.start_time', '>=', $this->filter->from);
+        // The entitlement floor is applied HERE, not in the controllers.
+        //
+        // Every analytics service reads through this builder, so clamping at
+        // this point means a page cannot be added that forgets the wall. Doing
+        // it per-controller is how one of eleven gets it wrong and quietly gives
+        // the product away — or worse, quietly withholds it from someone paying.
+        //
+        // It narrows, never widens: a request for the last 7 days stays 7 days.
+        $from = $this->user->entitlements()->clampFrom($this->filter->from);
+
+        if ($from) {
+            $q->where('w.start_time', '>=', $from);
         }
         if ($this->filter->to) {
             $q->where('w.start_time', '<=', $this->filter->to);
@@ -78,15 +91,61 @@ class SetQuery
         return $q->orderBy('w.start_time');
     }
 
-    /** @return Collection<int, object> */
+    /**
+     * @return Collection<int, object>
+     *
+     * Memoised for the lifetime of the request. Analytics services each build
+     * their own SetQuery from the same user and filter, so a single dashboard
+     * render was re-running this join six or seven times. The cache key is the
+     * user plus the filter, so different windows still get their own result.
+     */
     public function rows(): Collection
     {
-        return $this->builder()->get()->map(function ($row) {
+        $key = $this->cacheKey();
+
+        if (isset(self::$memo[$key])) {
+            return self::$memo[$key];
+        }
+
+        return self::$memo[$key] = $this->builder()->get()->map(function ($row) {
             $row->secondary_muscle_groups = $row->secondary_muscle_groups
                 ? (json_decode($row->secondary_muscle_groups, true) ?: [])
                 : [];
 
             return $row;
         });
+    }
+
+    /**
+     * Keyed on the full filter, at full timestamp precision.
+     *
+     * FilterCriteria::toArray() is for display and renders dates as Y-m-d, which
+     * would make "today up to 09:00" and "today up to 23:59" the same key and
+     * hand one window the other's rows.
+     */
+    private function cacheKey(): string
+    {
+        return $this->user->id.':'.md5(serialize([
+            // The effective window depends on the entitlement as well as the
+            // request, so an athlete who subscribes mid-session does not keep
+            // being served the clamped rows from before they paid.
+            $this->user->entitlements()->historyDays(),
+            $this->filter->from?->toIso8601String(),
+            $this->filter->to?->toIso8601String(),
+            $this->filter->routineHevyId,
+            $this->filter->exerciseTemplateHevyId,
+            $this->filter->muscle,
+            $this->filter->equipment,
+            $this->filter->includeWarmups,
+        ]));
+    }
+
+    /**
+     * Drop the in-request cache. Only needed by tests and long-running workers,
+     * where "the request" spans more than one logical read.
+     */
+    public static function flushMemo(): void
+    {
+        self::$memo = [];
     }
 }

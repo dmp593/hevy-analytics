@@ -173,4 +173,81 @@ class ScienceTest extends TestCase
         // Dumbbell bench has no barbell standard.
         $this->assertNull(StrengthStandards::keyForTitle('Bench Press (Dumbbell)'));
     }
+
+    // --- Regression: e1RM must not blow up outside its validated rep range ---
+
+    public function test_e1rm_is_clamped_outside_the_formulas_usable_range(): void
+    {
+        // Brzycki's denominator (37 - reps) approaches zero: unclamped this
+        // returned ~1910 kg from a 100 kg set.
+        $absurd = OneRepMax::estimate(100, 36);
+        $this->assertNotNull($absurd);
+        $this->assertLessThan(200.0, $absurd);
+        $this->assertSame(OneRepMax::estimate(100, OneRepMax::MAX_FORMULA_REPS), $absurd);
+    }
+
+    public function test_clamping_does_not_erase_the_rpe_signal(): void
+    {
+        // The numerical guard sits above the reliability threshold, so a set
+        // taken to failure and one left well short still differ.
+        $toFailure = OneRepMax::estimate(100, 12, 10.0);
+        $wellShort = OneRepMax::estimate(100, 12, 8.0);
+
+        $this->assertNotSame($toFailure, $wellShort);
+        $this->assertGreaterThan($toFailure, $wellShort);
+    }
+
+    public function test_e1rm_never_decreases_as_reps_increase(): void
+    {
+        $previous = 0.0;
+        foreach (range(1, 40) as $reps) {
+            $value = OneRepMax::estimate(100, (float) $reps);
+            $this->assertNotNull($value);
+            $this->assertGreaterThanOrEqual($previous, $value, "e1RM fell going into {$reps} reps");
+            $previous = $value;
+        }
+    }
+
+    public function test_rpe_inflated_estimate_is_not_treated_as_a_reliable_pr(): void
+    {
+        // 12 reps at RPE 6 implies 4 reps in reserve — an inference, not a lift.
+        $this->assertFalse(OneRepMax::isReliableSet(12, 6.0));
+        $this->assertTrue(OneRepMax::isReliableSet(8, 9.0));
+        $this->assertTrue(OneRepMax::isReliableSet(8, null));
+        $this->assertFalse(OneRepMax::isReliableSet(20, 10.0));
+    }
+
+    // --- Regression: women must not be scored with the men's Navy equation ---
+
+    public function test_navy_body_fat_uses_the_female_equation_for_women(): void
+    {
+        // Reference figures: 1.65 m woman, neck 32, waist 76, hip 98.
+        $female = BodyComposition::navyBodyFatWomen(32, 76, 98, 165);
+        $this->assertNotNull($female);
+        $this->assertEqualsWithDelta(29.4, $female, 0.2);
+
+        // The men's equation on the same person reads far too low, which is
+        // exactly the bug: it silently under-reported women by ~12 points.
+        $male = BodyComposition::navyBodyFatMen(32, 76, 165);
+        $this->assertGreaterThan($male + 8, $female);
+    }
+
+    public function test_navy_dispatcher_routes_by_sex(): void
+    {
+        $this->assertSame(
+            BodyComposition::navyBodyFatWomen(32, 76, 98, 165),
+            BodyComposition::navyBodyFat('female', 32, 76, 165, 98),
+        );
+
+        $this->assertSame(
+            BodyComposition::navyBodyFatMen(39, 84, 178),
+            BodyComposition::navyBodyFat('male', 39, 84, 178),
+        );
+    }
+
+    public function test_navy_returns_null_for_women_without_a_hip_measurement(): void
+    {
+        // Better to ask for the measurement than to quietly use the men's formula.
+        $this->assertNull(BodyComposition::navyBodyFat('female', 32, 76, 165));
+    }
 }

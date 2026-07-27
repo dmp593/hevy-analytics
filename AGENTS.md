@@ -10,19 +10,34 @@ database and turns it into evidence-based training & body-composition analytics
 composer install
 npm install
 cp .env.example .env && php artisan key:generate
-touch database/database.sqlite
+# point .env at a Postgres database you have created
 php artisan migrate
-npm run dev            # vite dev server (hot reload)
-php artisan serve      # http://127.0.0.1:8000
+php artisan app:demo   # a populated account, so nothing is blank while you work
+composer dev           # server + queue worker + logs + vite, all at once
 ```
 
-Then, in the app: register → **Profile** (add your Hevy API key + height/age/sex)
-→ click **Sync Hevy**. Or from the CLI: `php artisan hevy:sync {email}`.
+**Run `composer dev`, not `php artisan serve` on its own.** Syncing is a queued
+job, so without a worker the app will say "Sync queued" and then nothing will
+ever happen. If you do run the pieces separately you need at least:
+
+```bash
+php artisan serve
+php artisan queue:work   # required, or syncs never run
+npm run dev
+```
+
+The dashboard warns you when a sync has been sitting in the queue unclaimed, so
+this failure is visible rather than silent.
+
+Then, in the app: register → verify your email (in local dev the link is written
+to `storage/logs/laravel.log`) → **Profile** (add your Hevy API key +
+height/age/sex) → click **Sync Hevy**. Or from the CLI:
+`php artisan hevy:sync {email}`.
 
 Run the checks before committing:
 
 ```bash
-php artisan test        # 77 tests
+php artisan test        # 121 tests
 ./vendor/bin/pint       # code style (PSR-12 via Laravel Pint)
 npm run build           # production assets
 ```
@@ -32,11 +47,11 @@ npm run build           # production assets
 | Concern | Choice |
 |---|---|
 | Backend | Laravel 13 (PHP 8.3+) |
-| Database | SQLite (zero-config; file at `database/database.sqlite`) |
+| Database | PostgreSQL 16+ (dev, CI and production alike — one set of behaviours) |
 | Auth | Laravel Breeze (Blade), multi-user |
 | Frontend | Blade + Alpine.js + [Alpine AJAX](https://alpine-ajax.js.org) |
-| Styling | Tailwind CSS **only** (v3) |
-| Charts | Chart.js (via CDN, wrapped in one Alpine component) |
+| Styling | Tailwind CSS **only** (v4, configured in `resources/css/app.css`) |
+| Charts | Chart.js, bundled via Vite (never a CDN — see `resources/js/components/chart.js`) |
 | AI | DeepSeek (OpenAI-compatible), optional |
 
 There is **no SPA / frontend framework**. Pages are server-rendered Blade;
@@ -99,33 +114,74 @@ a query in Science, it's in the wrong place.
   `x-balance-ratios`, `x-strength-bar`.
 - **Charts:** build datasets in PHP with `App\Support\Chart` and pass simple
   `['label'=>..,'value'=>..]` series to `<x-line-chart>`. Don't hand-write
-  Chart.js config in views.
+  Chart.js config in views. For two or more series on one axis use
+  `<x-multi-line-chart>`, never several `Chart::line()` datasets against one
+  series' labels — that plots the later series against the wrong dates.
 - **Filtering:** a `<form x-target="results-id" method="get" action="…/data">`
   submits via Alpine AJAX; the controller returns a `_results.blade.php` partial
   whose root element has the matching `id`. No custom JS needed.
 - **CSS:** compose Tailwind utilities in markup. For repeated primitives use the
   semantic classes in `app.css` (`.btn-primary`, `.form-control`, `.form-label`,
   `.table-head`, `.badge`). Add a new one only when a pattern repeats 3+ times.
+- **Tailwind v4 has no `tailwind.config.js`.** Theme tokens live in `@theme`,
+  plugins in `@plugin`, and scanned paths in `@source`, all inside
+  `resources/css/app.css`. Component classes go in `@layer components`, not
+  `@utility`: a custom `@utility` cannot be `@apply`'d inside another one, and
+  doing so silently drops the rest of the declaration.
 
 ## Testing
 
 - `tests/Unit/ScienceTest.php` — pure formula correctness (fast, no DB).
-- `tests/Feature/*` — pages render (200), sync upserts, write-back, strength
-  resolver fallback order, etc. External HTTP is always mocked (`Http::fake`).
+- `tests/Feature/AnalyticsCorrectnessTest.php` — the analytics layer against
+  REAL seeded data (use the `SeedsTrainingData` trait). Every metric bug found so
+  far hid behind tests that only ever ran on an empty database, so new analytics
+  work belongs here.
+- `tests/Feature/AbuseControlsTest.php` — the guards on things that cost money or
+  touch the user's real Hevy account: AI quota, sync queueing, write idempotency.
+- `tests/Feature/*` — pages render (200), strength resolver fallback order, auth.
+  External HTTP is always mocked (`Http::fake`).
 - When adding a feature: put the math in `Science/` with a unit test, the
   orchestration in a `Service/` (feature test), and keep the controller thin.
 
 ## External services (all optional / graceful)
 
 - **Hevy API** — per-user API key (Profile). Stored encrypted.
-- **DeepSeek** — set `DEEPSEEK_API_KEY` in `.env` to enable the AI page.
+- **DeepSeek** — set `DEEPSEEK_API_KEY` in `.env` to enable the AI page. Usage is
+  capped per user and app-wide (`config/services.php` → `ai`), counted in
+  `ai_usage_events` by requests ATTEMPTED, not analyses stored.
 - **Strength levels** — layered: FitnessVolt API (free, CC BY 4.0) →
   OpenPowerlifting (`php artisan strength:build-opl-standards`) → offline model.
   Everything degrades gracefully if a source is down.
 
+## Localisation
+
+Every user-facing string goes through `__('app.…')` and lives in `lang/en/app.php`.
+Adding a language means adding `config/locales.php` entry + a `lang/<code>/`
+directory — nothing else in the codebase needs to know which languages exist.
+
+Rules that matter:
+
+- **Services return KEYS, not sentences.** `MuscleBalance` emits `push`/`pull`,
+  `MuscleLandmarks::classify()` emits `below_maintenance`. The view turns them
+  into words via `App\Support\Labels`. A service has no business deciding what
+  language the reader speaks.
+- **Never `sprintf` a user-facing string.** Use `:placeholders`, so a translator
+  never has to reproduce a format specifier.
+- **`LocalisationTest` is the guard.** It fails if any language is missing a key
+  or a file, if a placeholder is dropped, or if a translation file looks like a
+  copied English placeholder. Adding an English string without translating it
+  breaks the build — deliberately.
+- Dates go through Carbon, which the `SetLocale` middleware localises. Do not
+  hand-format month or day names.
+
 ## Conventions cheat-sheet
 
 - Weights/measurements are stored in **kg**; dates as `Y-m-d`.
+- Timestamps are stored in **UTC**. Anything that buckets by day or week must
+  convert to the athlete's zone first — use `$user->resolvedTimezone()` and
+  `PeriodService`. Bucketing in UTC silently misfiles evening sessions.
+- Every claim the UI makes should be backed by a test. Several metrics here were
+  confidently wrong for months because nothing asserted them against real data.
 - Money-free: never store secrets in code; use `.env` + `config/services.php`.
 - Prefer readable names over comments; comment the *why*, not the *what*.
 - Keep methods small and single-purpose (SRP). If a class mixes DB + math +

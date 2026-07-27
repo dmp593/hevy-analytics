@@ -19,48 +19,81 @@ class MuscleBalance
 
     private const LOWER = ['quadriceps', 'hamstrings', 'glutes', 'calves', 'abductors', 'adductors'];
 
+    /** Combined sets across both sides in the window below which a ratio is noise. */
+    private const MIN_TOTAL_SETS = 12.0;
+
     public function __construct(
         private readonly User $user,
         private readonly FilterCriteria $filter,
     ) {}
 
+    /**
+     * Balance is measured in SETS, not tonnage.
+     *
+     * Tonnage is load x reps, so a squat set contributes several times what a
+     * lateral raise set does purely because the bar is heavier. Summing it by
+     * region means lower-body tonnage structurally swamps upper body and the
+     * "balanced" band is unreachable no matter how someone trains. Hard sets are
+     * the unit hypertrophy research actually prescribes, and the unit the rest
+     * of this app already grades against MEV/MAV/MRV.
+     */
     public function ratios(): array
     {
-        $volume = collect((new VolumeAnalytics($this->user, $this->filter))->volumePerMuscle())
-            ->keyBy('muscle')
-            ->map(fn ($x) => $x['tonnage']);
+        $rows = collect((new VolumeAnalytics($this->user, $this->filter))->weeklySetsPerMuscle())
+            ->keyBy('muscle');
 
-        $push = $this->sum($volume, self::PUSH);
-        $pull = $this->sum($volume, self::PULL);
-        $quads = $this->sum($volume, self::QUADS);
-        $posterior = $this->sum($volume, self::POSTERIOR_CHAIN);
-        $upper = $this->sum($volume, self::UPPER);
-        $lower = $this->sum($volume, self::LOWER);
+        $perWeek = $rows->map(fn ($x) => (float) $x['per_week']);
+        // Totals drive the "is there enough data" gate. Per-week values shrink
+        // as the window widens, so gating on them would let the chosen date
+        // range decide whether a ratio exists at all.
+        $totals = $rows->map(fn ($x) => (float) $x['total_sets']);
+
+        $group = fn (array $muscles) => [
+            $this->sum($perWeek, $muscles),
+            $this->sum($totals, $muscles),
+        ];
+
+        [$pushWk, $pushTotal] = $group(self::PUSH);
+        [$pullWk, $pullTotal] = $group(self::PULL);
+        [$quadWk, $quadTotal] = $group(self::QUADS);
+        [$postWk, $postTotal] = $group(self::POSTERIOR_CHAIN);
+        [$upperWk, $upperTotal] = $group(self::UPPER);
+        [$lowerWk, $lowerTotal] = $group(self::LOWER);
 
         return [
-            'push_pull' => $this->ratio($push, $pull, 'Push', 'Pull'),
-            'quad_posterior' => $this->ratio($quads, $posterior, 'Quads', 'Posterior chain'),
-            'upper_lower' => $this->ratio($upper, $lower, 'Upper', 'Lower'),
+            'push_pull' => $this->ratio($pushWk, $pullWk, $pushTotal + $pullTotal, 'push', 'pull'),
+            'quad_posterior' => $this->ratio($quadWk, $postWk, $quadTotal + $postTotal, 'quads', 'posterior'),
+            'upper_lower' => $this->ratio($upperWk, $lowerWk, $upperTotal + $lowerTotal, 'upper', 'lower'),
         ];
     }
 
-    private function sum(Collection $volume, array $muscles): float
+    private function sum(Collection $sets, array $muscles): float
     {
-        return array_sum(array_map(fn ($m) => $volume[$m] ?? 0, $muscles));
+        return array_sum(array_map(fn ($m) => $sets[$m] ?? 0, $muscles));
     }
 
-    private function ratio(float $a, float $b, string $labelA, string $labelB): array
+    /**
+     * A ratio is only meaningful once both sides carry enough sets for the
+     * comparison to mean anything; below that we report it as indeterminate
+     * rather than flagging a beginner's first week as "imbalanced".
+     *
+     * $labelA/$labelB are translation KEYS, not display text: a service has no
+     * business deciding what language the user reads.
+     */
+    private function ratio(float $a, float $b, float $totalSets, string $labelA, string $labelB): array
     {
-        $ratio = $b > 0 ? round($a / $b, 2) : null;
+        $enoughData = $totalSets >= self::MIN_TOTAL_SETS;
+        $ratio = ($enoughData && $b > 0) ? round($a / $b, 2) : null;
         $balanced = $ratio !== null && $ratio >= 0.8 && $ratio <= 1.25;
 
         return [
             'label_a' => $labelA,
             'label_b' => $labelB,
-            'value_a' => round($a, 0),
-            'value_b' => round($b, 0),
+            'value_a' => round($a, 1),
+            'value_b' => round($b, 1),
             'ratio' => $ratio,
             'balanced' => $balanced,
+            'has_data' => $enoughData,
         ];
     }
 }

@@ -57,6 +57,11 @@ class ProfileController extends Controller
 
         Auth::logout();
 
+        // Delete photos through the model so its deleting hook removes the files
+        // from disk. A database cascade would drop the rows and leave the images
+        // behind — for GDPR purposes, still holding the data.
+        $user->progressPhotos->each->delete();
+
         $user->delete();
 
         $request->session()->invalidate();

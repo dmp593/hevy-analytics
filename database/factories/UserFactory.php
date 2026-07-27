@@ -30,7 +30,29 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            // Matches what registration does. A factory user represents someone
+            // who signed up, and everyone who signs up gets the trial — without
+            // this, every test silently ran against the free tier's 30-day
+            // history cap and any test seeding older data broke for reasons that
+            // had nothing to do with what it was testing.
+            'trial_ends_at' => now()->addDays((int) config('billing.trial_days', 14)),
         ];
+    }
+
+    /** Trial expired, never subscribed: the free tier. */
+    public function free(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'trial_ends_at' => now()->subDay(),
+        ]);
+    }
+
+    /** Mid-trial, with the trial ending on a known day. */
+    public function trialing(int $daysLeft = 7): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'trial_ends_at' => now()->addDays($daysLeft),
+        ]);
     }
 
     /**

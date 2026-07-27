@@ -8,6 +8,7 @@ use App\Services\Analytics\GoalAlerts;
 use App\Services\Analytics\MuscleBalance;
 use App\Services\Analytics\NutritionService;
 use App\Services\Analytics\VolumeAnalytics;
+use App\Services\Hevy\SyncStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -17,8 +18,10 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
+        $onboarding = \App\Support\Onboarding::for($user);
+
         if (! $user->hasHevyKey()) {
-            return view('dashboard', ['needsSetup' => true]);
+            return view('dashboard', ['needsSetup' => true, 'onboarding' => $onboarding]);
         }
 
         $filter = new FilterCriteria(from: Carbon::now()->subDays(28), to: Carbon::now());
@@ -30,6 +33,7 @@ class DashboardController extends Controller
 
         return view('dashboard', [
             'needsSetup' => false,
+            'onboarding' => $onboarding,
             'status' => $bc->status(),
             'rate' => $bc->weightRateKgPerWeek(),
             'partitioning' => $bc->partitioning(),
@@ -44,6 +48,7 @@ class DashboardController extends Controller
             'balance' => (new MuscleBalance($user, new FilterCriteria(from: Carbon::now()->subMonths(3))))->ratios(),
             'workoutCount' => $user->workouts()->count(),
             'lastSync' => $user->hevy_last_synced_at,
+            'syncStatus' => (new SyncStatus($user))->current(),
             'nutrition' => (new NutritionService($user))->computeTargets(),
         ]);
     }

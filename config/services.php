@@ -37,12 +37,31 @@ return [
 
     'hevy' => [
         'base_url' => env('HEVY_BASE_URL', 'https://api.hevyapp.com'),
+
+        // On login, queue an incremental sync if the last one is older than
+        // this. 0 disables login syncs entirely.
+        'auto_sync_hours' => (int) env('HEVY_AUTO_SYNC_HOURS', 6),
     ],
 
-    'deepseek' => [
-        'key' => env('DEEPSEEK_API_KEY'),
-        'base_url' => env('DEEPSEEK_BASE_URL', 'https://api.deepseek.com'),
-        'model' => env('DEEPSEEK_MODEL', 'deepseek-chat'),
+    /*
+     * The operator's own AI provider — the "included with your subscription"
+     * path. Athletes may instead supply their own key in Settings, in which case
+     * this is not used and the limits below do not apply to them.
+     *
+     * The limits bound third-party spend: without them, accounts each able to
+     * force an uncached call have nothing between them and the operator's API
+     * balance but a per-minute throttle. Set the global ceiling to 0 to disable
+     * the circuit breaker.
+     */
+    'ai' => [
+        'provider' => env('AI_PROVIDER', 'deepseek'),
+        'key' => env('AI_API_KEY', env('DEEPSEEK_API_KEY')),
+        'model' => env('AI_MODEL', env('DEEPSEEK_MODEL', 'deepseek-v4-flash')),
+        // Empty falls back to the provider's default endpoint in ProviderRegistry.
+        'base_url' => env('AI_BASE_URL', env('DEEPSEEK_BASE_URL')),
+
+        'monthly_limit_per_user' => (int) env('AI_MONTHLY_LIMIT_PER_USER', 30),
+        'monthly_limit_global' => (int) env('AI_MONTHLY_LIMIT_GLOBAL', 5000),
     ],
 
     'fitnessvolt' => [

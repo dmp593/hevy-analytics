@@ -1,0 +1,64 @@
+# Render blueprint — one free web service running the Dockerfile.
+#
+# The database is NOT declared here on purpose: Render's free Postgres expires
+# after 30 days, which is a trap dressed as a favour. Use Neon's free tier
+# instead (neon.tech) and paste its connection string as DATABASE_URL.
+#
+# Set in the Render dashboard, never in this file:
+#   APP_KEY                      php artisan key:generate --show
+#   DATABASE_URL                 from Neon
+#   BOOTSTRAP_OWNER_EMAIL / BOOTSTRAP_OWNER_PASSWORD
+#   BOOTSTRAP_ADMIN_EMAIL / BOOTSTRAP_ADMIN_PASSWORD
+
+services:
+  - type: web
+    name: hevy-analytics
+    runtime: docker
+    plan: free
+    healthCheckPath: /up
+    envVars:
+      # sync: false = Render prompts for these at blueprint creation instead
+      # of deploying a broken app that cannot reach its database.
+      - key: APP_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: BOOTSTRAP_OWNER_EMAIL
+        sync: false
+      - key: BOOTSTRAP_OWNER_PASSWORD
+        sync: false
+      - key: BOOTSTRAP_ADMIN_EMAIL
+        sync: false
+      - key: BOOTSTRAP_ADMIN_PASSWORD
+        sync: false
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_URL
+        fromService:
+          type: web
+          name: hevy-analytics
+          envVarKey: RENDER_EXTERNAL_URL
+      # "*" is safe HERE because only Render's own proxy can reach the
+      # container — there is no direct route for a client to spoof
+      # X-Forwarded-For. On a host where the app port is publicly reachable,
+      # list the proxy's address instead.
+      - key: TRUSTED_PROXIES
+        value: "*"
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: SESSION_DRIVER
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: CACHE_STORE
+        value: database
+      # No mail provider yet: verification links would go nowhere, so new
+      # accounts are auto-verified. Turn this off when real mail is set up.
+      - key: AUTO_VERIFY_EMAIL
+        value: "true"
+      - key: MAIL_MAILER
+        value: log
