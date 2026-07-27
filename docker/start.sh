@@ -17,19 +17,42 @@ cd /app
 #                         vars, and never touches an account that exists
 # One-shot migration between database hosts.
 #
-# Set MIGRATE_FROM_DATABASE_URL to the OLD database and redeploy; the contents
-# are copied into $DATABASE_URL and the variable can then be removed. Guarded
-# by "does the target already have a users table", so a redeploy that forgets
-# to remove the variable cannot overwrite live data with a stale snapshot —
-# the guard, not the operator's memory, is what makes this safe.
+# Set MIGRATE_FROM_DATABASE_URL to the OLD database and redeploy; its contents
+# are copied into $DATABASE_URL, and the variable is then removed by hand.
+#
+# By default it refuses to touch a target that already has data — the guard,
+# not the operator's memory, is what stops a forgotten variable from restoring
+# a stale snapshot over a live database. MIGRATE_REPLACE=true overrides that
+# and DROPS the target schema first, which is what a redo needs.
 if [ -n "${MIGRATE_FROM_DATABASE_URL:-}" ]; then
-    if psql "$DATABASE_URL" -tAc "select to_regclass('public.users')" | grep -q users; then
-        echo "==> Target database already populated — skipping host migration."
+    echo "==> Host migration requested."
+
+    if [ -z "${DATABASE_URL:-}" ]; then
+        echo "==> DATABASE_URL is empty; nothing to copy into. Skipping." >&2
     else
-        echo "==> Copying $MIGRATE_FROM_DATABASE_URL into the new database…"
-        pg_dump --no-owner --no-acl --no-comments "$MIGRATE_FROM_DATABASE_URL" \
-            | psql --quiet --set ON_ERROR_STOP=1 "$DATABASE_URL"
-        echo "==> Copy finished."
+        TARGET_HAS_DATA=$(psql "$DATABASE_URL" -tAc "select to_regclass('public.users') is not null" 2>/dev/null || echo "error")
+
+        if [ "$TARGET_HAS_DATA" = "error" ]; then
+            echo "==> Could not reach the target database. Skipping." >&2
+        elif [ "$TARGET_HAS_DATA" = "t" ] && [ "${MIGRATE_REPLACE:-}" != "true" ]; then
+            echo "==> Target already populated; set MIGRATE_REPLACE=true to overwrite. Skipping."
+        else
+            if [ "$TARGET_HAS_DATA" = "t" ]; then
+                echo "==> MIGRATE_REPLACE=true — dropping the target schema first."
+                psql --quiet --set ON_ERROR_STOP=1 "$DATABASE_URL" \
+                    -c "drop schema public cascade; create schema public;"
+            fi
+
+            echo "==> Copying the old database in…"
+            # pipefail matters more than it looks: without it a pg_dump that
+            # fails still leaves psql succeeding on empty input, so the copy
+            # "works", restores nothing, and the next line reports success.
+            set -o pipefail
+            pg_dump --no-owner --no-acl --no-comments "$MIGRATE_FROM_DATABASE_URL" \
+                | psql --quiet --set ON_ERROR_STOP=1 "$DATABASE_URL"
+            set +o pipefail
+            echo "==> Copy finished: $(psql "$DATABASE_URL" -tAc 'select count(*) from users') user row(s)."
+        fi
     fi
 fi
 
