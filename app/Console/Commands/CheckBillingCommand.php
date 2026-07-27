@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Laravel\Paddle\Cashier;
 
 /**
  * Reports whether billing is configured, and what is missing.
@@ -14,7 +15,7 @@ use Illuminate\Console\Command;
  */
 class CheckBillingCommand extends Command
 {
-    protected $signature = 'app:billing-check';
+    protected $signature = 'app:billing-check {--offline : Skip the live call to Paddle}';
 
     protected $description = 'Check the Paddle billing configuration and report what is missing';
 
@@ -73,6 +74,11 @@ class CheckBillingCommand extends Command
 
         $this->info('  Billing is configured.');
         $this->newLine();
+
+        if (! $this->option('offline') && ! $this->verifyAgainstPaddle()) {
+            return self::FAILURE;
+        }
+
         $this->line('  In Paddle > Developer tools > Notifications, the destination must be');
         $this->line('  subscribed to exactly these events, or Cashier will not see them:');
         $this->newLine();
@@ -92,5 +98,78 @@ class CheckBillingCommand extends Command
         $this->newLine();
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Actually call Paddle, rather than only checking the values look right.
+     *
+     * Fetching the configured price proves three things at once that no amount
+     * of string validation can: the API key is accepted, the price exists, and
+     * it exists in the environment the key belongs to. Sandbox and live keys
+     * look identical, and a live price id with a sandbox key fails at checkout
+     * with an error the athlete sees rather than the operator.
+     */
+    private function verifyAgainstPaddle(): bool
+    {
+        $this->line('  Asking Paddle whether these actually work…');
+        $this->newLine();
+
+        try {
+            $response = Cashier::api('GET', 'prices/'.config('billing.price_id'));
+        } catch (\Throwable $e) {
+            $this->error('  Could not verify with Paddle.');
+            $this->line('  '.$e->getMessage());
+            $this->newLine();
+            $this->line('  Most likely: the API key belongs to the other environment');
+            $this->line('  (sandbox key with PADDLE_SANDBOX=false, or the reverse),');
+            $this->line('  or the price id is from the other environment.');
+            $this->newLine();
+
+            return false;
+        }
+
+        $price = $response['data'] ?? null;
+
+        if (! $price) {
+            $this->error('  Paddle accepted the key but returned no price for that id.');
+            $this->newLine();
+
+            return false;
+        }
+
+        $amount = $price['unit_price']['amount'] ?? null;
+        $currency = $price['unit_price']['currency_code'] ?? '?';
+        $interval = $price['billing_cycle']['interval'] ?? null;
+
+        $this->line('  <fg=green>✓</> API key accepted');
+        $this->line('  <fg=green>✓</> Price found: <options=bold>'.($price['description'] ?? $price['id']).'</>');
+
+        if ($amount !== null) {
+            // Paddle returns minor units, so 800 is 8.00.
+            $this->line('    '.number_format($amount / 100, 2).' '.$currency
+                .($interval ? ' per '.$interval : ''));
+        }
+
+        // A one-off price would take a payment and never create a subscription,
+        // and the app would sit there waiting for a subscription.created that
+        // is never coming.
+        if ($interval === null) {
+            $this->newLine();
+            $this->error('  That price is one-time, not recurring.');
+            $this->line('  A subscription needs a recurring price — create one and use its id.');
+            $this->newLine();
+
+            return false;
+        }
+
+        if ($currency !== config('cashier.currency')) {
+            $this->newLine();
+            $this->warn("  Price is in {$currency} but CASHIER_CURRENCY is ".config('cashier.currency').'.');
+            $this->line('  Amounts shown in the app will carry the wrong symbol.');
+        }
+
+        $this->newLine();
+
+        return true;
     }
 }
