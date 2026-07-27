@@ -37,20 +37,42 @@ if [ -n "${MIGRATE_FROM_DATABASE_URL:-}" ]; then
         elif [ "$TARGET_HAS_DATA" = "t" ] && [ "${MIGRATE_REPLACE:-}" != "true" ]; then
             echo "==> Target already populated; set MIGRATE_REPLACE=true to overwrite. Skipping."
         else
+            # Dump to a file and CHECK IT before touching the target.
+            #
+            # The first attempt piped straight into psql after dropping the
+            # target schema. pg_dump then aborted on a version mismatch, and
+            # the result was a dropped database with nothing to put back — the
+            # site went down holding an empty schema. Destroy nothing until
+            # there is a verified replacement in hand.
+            DUMP=/tmp/migrate-source.sql
+
+            echo "==> Dumping the source database…"
+            if ! pg_dump --no-owner --no-acl --no-comments \
+                    --file="$DUMP" "$MIGRATE_FROM_DATABASE_URL"; then
+                echo "==> pg_dump FAILED — target left untouched." >&2
+                rm -f "$DUMP"
+                exit 1
+            fi
+
+            # A dump that produced no CREATE TABLE is a dump that failed
+            # quietly; restoring it would empty the target just as thoroughly.
+            if ! grep -q "CREATE TABLE" "$DUMP"; then
+                echo "==> Dump contains no tables — target left untouched." >&2
+                rm -f "$DUMP"
+                exit 1
+            fi
+
+            echo "==> Dumped $(wc -c < "$DUMP") bytes, $(grep -c 'CREATE TABLE' "$DUMP") tables."
+
             if [ "$TARGET_HAS_DATA" = "t" ]; then
-                echo "==> MIGRATE_REPLACE=true — dropping the target schema first."
+                echo "==> MIGRATE_REPLACE=true — dropping the target schema."
                 psql --quiet --set ON_ERROR_STOP=1 "$DATABASE_URL" \
                     -c "drop schema public cascade; create schema public;"
             fi
 
-            echo "==> Copying the old database in…"
-            # pipefail matters more than it looks: without it a pg_dump that
-            # fails still leaves psql succeeding on empty input, so the copy
-            # "works", restores nothing, and the next line reports success.
-            set -o pipefail
-            pg_dump --no-owner --no-acl --no-comments "$MIGRATE_FROM_DATABASE_URL" \
-                | psql --quiet --set ON_ERROR_STOP=1 "$DATABASE_URL"
-            set +o pipefail
+            echo "==> Restoring into the target…"
+            psql --quiet --set ON_ERROR_STOP=1 "$DATABASE_URL" --file="$DUMP"
+            rm -f "$DUMP"
             echo "==> Copy finished: $(psql "$DATABASE_URL" -tAc 'select count(*) from users') user row(s)."
         fi
     fi

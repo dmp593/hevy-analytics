@@ -24,12 +24,26 @@ FROM dunglas/frankenphp:1-php8.4 AS app
 RUN install-php-extensions pdo_pgsql intl zip gd opcache pcntl
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# postgresql-client: for the one-shot host migration in start.sh. Moving
-# between managed Postgres providers is a thing every deployment does once,
-# and doing it with pg_dump beats hand-rolling a row copier that has to know
-# about foreign key order, sequences and the migrations table.
+# postgresql-client, from PGDG rather than Debian's archive.
+#
+# For the one-shot host migration in start.sh: moving between managed Postgres
+# providers is something every deployment does once, and pg_dump beats
+# hand-rolling a row copier that has to know foreign key order, sequences and
+# the migrations table.
+#
+# Version 17 specifically. Debian bookworm ships client 15, and pg_dump refuses
+# outright to dump a NEWER server ("server version 16.x; pg_dump version 15.x
+# — aborting"). A client at or above every managed provider's version is the
+# only configuration that works, and 17 reads 13 through 17.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends postgresql-client \
+    && apt-get install -y --no-install-recommends curl ca-certificates gnupg \
+    && install -d /usr/share/postgresql-common/pgdg \
+    && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+        -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+    && echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" \
+        > /etc/apt/sources.list.d/pgdg.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends postgresql-client-17 \
     && rm -rf /var/lib/apt/lists/*
 
 # The base image setcaps cap_net_bind_service onto the frankenphp binary so it
