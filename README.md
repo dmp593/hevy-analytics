@@ -102,6 +102,27 @@ scars to prove it.
 
 ---
 
+## The landing page
+
+`/` serves `resources/views/landing.blade.php` to visitors and redirects anyone
+signed in to their dashboard.
+
+It is held to the same rule as the rest of the app. Every number on it —
+the price, the trial length, the free history cap, the AI allowance — is read
+from `config/billing.php` rather than written into the copy, and
+`LandingPageTest` changes that config and asserts the page follows it. The sample
+verdicts are rendered from the same `lang/*/app.php` keys the product itself
+uses, so rewording a verdict cannot leave the sales page quoting a sentence the
+app no longer says.
+
+The "what it does not do" section is not decoration. `HonestClaimsTest` pins the
+claims that the code has to back — that staging a routine progression writes
+nothing to Hevy, that registration starts the trial without contacting Paddle,
+that the free history cap is really enforced. If you add a claim to that page,
+add the test that would fail when it stops being true.
+
+---
+
 ## Languages
 
 English and Portuguese, switchable from the header (guests included) or from

@@ -177,3 +177,43 @@ for (const theme of ['light', 'dark']) {
         expect(problems, `\n${problems.join('\n')}\n`).toEqual([]);
     });
 }
+
+/**
+ * The signed-out pages, audited separately because signIn() is what the block
+ * above starts with — and `/` redirects to the dashboard once you are signed
+ * in, so the landing page would never be visited at all.
+ *
+ * It matters more than most: it is the first page anyone sees, it is the only
+ * one seen before the app has been judged, and it is the one where a dark-mode
+ * white flash or unreadable small print costs a signup rather than an
+ * eyebrow-raise.
+ */
+const GUEST_PAGES = ['/', '/login', '/register'];
+
+for (const theme of ['light', 'dark']) {
+    test(`${theme} theme: signed-out pages are themed and readable`, async ({ page }) => {
+        await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+
+        const problems = [];
+        for (const path of GUEST_PAGES) {
+            await page.goto(path, { waitUntil: 'networkidle' });
+
+            expect(
+                await page.evaluate(() => document.documentElement.classList.contains('dark')),
+                `${path} did not apply the ${theme} preference`,
+            ).toBe(theme === 'dark');
+
+            const { bright, contrast } = await page.evaluate(audit);
+            for (const b of bright) {
+                problems.push(`${path} unthemed background ${b.bg} on ${b.el}`);
+            }
+            for (const c of contrast) {
+                problems.push(
+                    `${path} contrast ${c.ratio}:1 (needs ${c.need}) — ${c.size} ${c.color} on "${c.text}" ${c.el}`,
+                );
+            }
+        }
+
+        expect(problems, `\n${problems.join('\n')}\n`).toEqual([]);
+    });
+}

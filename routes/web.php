@@ -24,9 +24,13 @@ use Illuminate\Support\Facades\Route;
 // Available to guests: the login page is the first thing anyone sees.
 Route::post('/locale/{locale}', [LocaleController::class, 'update'])->name('locale.update');
 
+// A signed-in athlete wants their dashboard, not the pitch. A signed-out one
+// gets the page that explains what this is before being asked to register —
+// which is also the only page that states the Hevy API key requirement early
+// enough to be useful.
 Route::get('/', function () {
-    return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
-});
+    return auth()->check() ? redirect()->route('dashboard') : view('landing');
+})->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

@@ -13,6 +13,96 @@ return [
 
     'brand' => 'Hevy Analytics',
 
+    /*
+     | The landing page.
+     |
+     | Every sentence here is a claim the code has to be able to back up. If a
+     | metric is removed or a formula changes, the sentence that sells it has to
+     | change with it — the alternative is a page that quietly becomes a lie.
+     */
+    'landing' => [
+        'meta_title' => 'Hevy Analytics — what your training log is actually telling you',
+        'meta_description' => 'Reads your Hevy workouts and answers the questions a training log cannot: which muscles are under the volume that grows them, whether your surplus is buying muscle or fat, and what your real maintenance calories are.',
+
+        'sign_in' => 'Sign in',
+        'footer_note' => 'An independent project. Not affiliated with Hevy.',
+
+        'eyebrow' => 'For people who already log every set',
+        'headline' => 'Your training log knows the answer. It just never tells you.',
+        'subhead' => 'Hevy records what you lifted. This reads all of it and tells you what it means — which muscles are below the volume that actually grows them, whether the weight you are gaining is muscle or fat, and what your maintenance calories really are, measured from your own data rather than guessed by a formula.',
+        'cta' => 'Try it free for :days days',
+        'cta_note' => 'No card. :price/month afterwards, if you want it.',
+        'requirement' => 'You need a :hevy account and an API key from Hevy’s own settings. Without one this app has nothing to read — worth knowing before you sign up, not after.',
+
+        'compare_log' => 'Your log, Tuesday',
+        'compare_log_note' => 'Accurate, complete, and silent about what it means.',
+        'compare_this' => 'The same week, read',
+        'compare_verdict' => 'Chest is at 7.9 hard sets a week. It needs 10 to grow.',
+        'compare_verdict_body' => 'Three sessions, nine sets, all logged correctly — and still under the line where chest training starts building rather than maintaining. Add three sets and check again in a month.',
+
+        'gap_title' => 'The gap between logging and knowing',
+        'gap_body' => 'A workout log is a record. It answers "what did I do", perfectly. It does not answer the three questions that decide whether the next six months are worth anything — because answering them means comparing months of sets, weights and bodyweight against published research, every week, by hand.',
+        'question_sets' => 'Am I doing enough sets?',
+        'question_sets_body' => 'Not in total — per muscle, per week, against the number the research says is the minimum that builds anything. Most stalled body parts are simply under that line.',
+        'question_bulk' => 'Is this bulk working?',
+        'question_bulk_body' => 'A scale that says +2 kg cannot tell you whether that was muscle. Waist, chest, arm and strength trends read together can, and they disagree with the scale more often than people expect.',
+        'question_calories' => 'What do I actually burn?',
+        'question_calories_body' => 'Every calculator gives you a formula estimate. Your own logged intake against your own weight trend gives you the real number, and it is routinely a few hundred calories out from the formula.',
+
+        'output_title' => 'What it actually says',
+        'output_body' => 'Not a wall of charts to interpret. Every page opens with the conclusion in a sentence, and the numbers underneath it are there so you can check the working.',
+        'output_disclaimer' => 'Example output. The wording is the app’s own; the numbers are illustrative, and yours will be computed from your data.',
+        'sets_week' => 'sets/wk',
+        'levels_headline' => 'Where you actually rank',
+        'levels_body' => 'Your estimated 1RM against lifters of your sex, bodyweight and age — shown twice, because gym lifters and competition lifters are different crowds and only showing the flattering one would be dishonest.',
+        'percentile_pair' => ':gym% gym · :meet% competition',
+
+        'how_title' => 'How it works',
+        'step_1' => 'Paste your Hevy API key',
+        'step_1_body' => 'One field in your profile. It is stored encrypted, never displayed again, and never included in your data export.',
+        'step_2' => 'Your history syncs',
+        'step_2_body' => 'Every workout you have ever logged, pulled in and kept up to date. There is nothing to re-enter and no second app to log in.',
+        'step_3' => 'Everything computes',
+        'step_3_body' => 'Weekly sets per muscle against landmarks, estimated 1RM trends, gain partitioning, calorie and macro targets — all of it recalculated as new workouts arrive.',
+        'write_back' => 'It also works in the other direction: the app can build next week’s progression for one of your Hevy routines and push it back. You see the exact change before anything is sent, and nothing is written to Hevy unless you confirm it.',
+
+        'limits_title' => 'What it does not do',
+        'limits_intro' => 'This matters more than the feature list. Here is where the app is weak, guessing, or simply not the right tool — stated now rather than discovered in month two.',
+        'limit_logging' => 'It does not replace Hevy',
+        'limit_logging_body' => 'You keep logging your workouts in Hevy. This reads that log; it is a layer on top, not a replacement, and it is useless without one.',
+        'limit_scale' => 'It cannot fix a bad body-fat reading',
+        'limit_scale_body' => 'Smart-scale body fat is off by roughly 3–8 points against a lab scan and swings with hydration alone. The app works in trends, cross-checks against tape measurements, and labels an estimate low-confidence rather than pretending — but it cannot turn a noisy number into a good one.',
+        'limit_projections' => 'Projections are not promises',
+        'limit_projections_body' => 'They are a straight line fitted through your recent data and extended forward, scaled down at longer horizons. Each one carries an R² badge saying how well that line actually fits. A weak fit is a guess, and the page says so.',
+        'limit_landmarks' => 'Volume landmarks are population guidelines',
+        'limit_landmarks_body' => 'MEV and MRV come from published research on groups of people. Your own recovery may sit above or below them. They are a well-founded starting point, not a measurement of you.',
+        'limit_ai' => 'The written analysis is optional, and it is a language model',
+        'limit_ai_body' => 'It is sent the computed metrics you can already see — never your raw history and never your API keys — and asked for concrete adjustments. It can still be wrong. Everything it says is derived from numbers the app shows you anyway, so you can check it.',
+        'limit_medical' => 'It is not medical or coaching advice',
+        'limit_medical_body' => 'No doctor, dietitian or coach reads any of this. It is arithmetic on your own data, referenced to published research, and it does not know about your injury, your medication or your life.',
+
+        'pricing_title' => 'What it costs',
+        'pricing_body' => 'One plan, and the only thing behind it is how far back the analysis can see. Free accounts get the last :days days of history — enough to use every page and judge whether the app is any good. Everything that makes it worth paying for needs longer than that: a trend needs months, measured maintenance needs weeks of logging, a projection needs a year.',
+        'plan_free' => 'Free',
+        'plan_free_price' => '€0',
+        'per_month' => '/month',
+        'free_history' => 'The last :days days of your training history',
+        'free_pages' => 'Every page and every metric — nothing is hidden',
+        'free_photos' => 'Up to :count progress photos',
+        'free_no_ai' => 'No written AI analysis',
+        'plan_paid' => 'Subscribed',
+        'paid_history' => 'Your entire history, however far back it goes',
+        'paid_adaptive' => 'Maintenance calories measured from your own intake and weight trend',
+        'paid_projections' => 'Projections fitted over a full year of data',
+        'paid_ai' => ':count written AI analyses a month, or unlimited on your own provider key',
+        'paid_photos' => 'Up to :count progress photos',
+        'trial_terms' => ':days days free, no card asked for. Cancel in one click and you keep access until the period you paid for ends.',
+        'data_note' => 'Your data stays yours: export everything as JSON at any time, and deleting your account removes all of it from this server. Nothing is sold, and nothing is sent anywhere except to your own AI provider, and only when you ask for an analysis.',
+
+        'sources_title' => 'Where the numbers come from',
+        'sources_body' => 'Volume landmarks follow Renaissance Periodization (Israetel et al.); 1RM estimates use Epley and Brzycki; energy expenditure uses Mifflin-St Jeor, or Katch-McArdle when body fat is known; protein and lean-gain guidance follows Helms, Aragon and Morton et al.; FFMI ceilings follow Kouri et al. Strength percentiles come from OpenPowerlifting competition data and self-reported gym data. Every one of these is named on the page that uses it, with what it can and cannot tell you.',
+    ],
+
     'billing' => [
         'title' => 'Subscription',
         'subtitle' => 'What you are paying for, and what happens if you stop',

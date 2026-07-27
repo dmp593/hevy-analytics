@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Goal;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 /**
@@ -185,6 +186,52 @@ class HonestClaimsTest extends TestCase
         // Navy from these measurements is far below the 30% scale reading; if
         // the raw column leaked through, the current value would show as 30.
         $this->assertStringNotContainsString('>30<', $card);
+    }
+
+    /**
+     * The landing page says nothing is written to Hevy unless you confirm it.
+     *
+     * Staging is the step people click from a routine page, so it is the step
+     * where an accidental write would happen — and an app that edits someone's
+     * training programme without being asked is a very different product from
+     * the one being sold.
+     */
+    public function test_staging_a_progression_does_not_write_anything_to_hevy(): void
+    {
+        Http::preventStrayRequests();
+
+        $user = $this->athlete();
+        $routine = $user->routines()->create(['hevy_id' => 'r1', 'title' => 'Push']);
+        $routine->exercises()->create([
+            'index' => 0,
+            'title' => 'Bench Press (Barbell)',
+            'exercise_template_hevy_id' => 'BENCH',
+            'sets' => [['index' => 0, 'type' => 'normal', 'weight_kg' => 60, 'reps' => 8]],
+        ]);
+
+        $this->actingAs($user)->post("/routines/{$routine->hevy_id}/stage-progression")->assertRedirect();
+
+        // Staged and waiting, not sent. preventStrayRequests() would have thrown
+        // on any outbound call, so reaching here is itself half the assertion.
+        $this->assertSame('pending', $user->writeOperations()->sole()->status);
+    }
+
+    /**
+     * The landing page states the free history cap as the reason to subscribe.
+     * It is also the only thing behind the paywall, so if it were not actually
+     * enforced the pitch would be selling something already given away.
+     */
+    public function test_the_free_history_cap_is_really_enforced(): void
+    {
+        $user = User::factory()->free()->create();
+        $days = (int) config('billing.entitlements.free.history_days');
+
+        $this->assertSame($days, $user->entitlements()->historyDays());
+
+        // A date older than the cap is pulled forward to it; one inside is left.
+        $this->assertTrue($user->entitlements()->clampFrom(now()->subDays($days * 3))
+            ->greaterThanOrEqualTo(now()->subDays($days + 1)));
+        $this->assertNull(User::factory()->create(['trial_ends_at' => now()->addDay()])->entitlements()->historyDays());
     }
 
     public function test_goal_history_is_preserved_when_a_new_goal_is_set(): void

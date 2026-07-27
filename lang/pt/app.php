@@ -13,6 +13,97 @@ return [
 
     'brand' => 'Hevy Analytics',
 
+    /*
+     | A página de entrada.
+     |
+     | Cada frase aqui é uma afirmação que o código tem de conseguir sustentar.
+     | Se uma métrica desaparecer ou uma fórmula mudar, a frase que a vende tem
+     | de mudar também — a alternativa é uma página que se torna mentira sem
+     | ninguém dar por isso.
+     */
+    'landing' => [
+        'meta_title' => 'Hevy Analytics — o que o teu registo de treino está mesmo a dizer',
+        'meta_description' => 'Lê os teus treinos do Hevy e responde às perguntas que um registo não responde: que músculos estão abaixo do volume que os faz crescer, se o excedente está a comprar músculo ou gordura, e quantas calorias gastas realmente em manutenção.',
+
+        'sign_in' => 'Entrar',
+        'footer_note' => 'Projeto independente. Sem qualquer ligação ao Hevy.',
+
+        'eyebrow' => 'Para quem já regista todas as séries',
+        'headline' => 'O teu registo de treino sabe a resposta. Só nunca ta diz.',
+        'subhead' => 'O Hevy regista o que levantaste. Isto lê tudo e diz-te o que significa — que músculos estão abaixo do volume que os faz mesmo crescer, se o peso que estás a ganhar é músculo ou gordura, e quantas calorias gastas em manutenção, medidas a partir dos teus dados em vez de estimadas por uma fórmula.',
+        'cta' => 'Experimenta :days dias grátis',
+        'cta_note' => 'Sem cartão. :price/mês depois, se quiseres.',
+        'requirement' => 'Precisas de uma conta :hevy e de uma chave de API das definições do próprio Hevy. Sem isso esta aplicação não tem nada para ler — melhor saberes antes de te registares do que depois.',
+
+        'compare_log' => 'O teu registo, terça-feira',
+        'compare_log_note' => 'Exato, completo, e calado sobre o que significa.',
+        'compare_this' => 'A mesma semana, lida',
+        'compare_verdict' => 'O peito está a 7,9 séries duras por semana. Precisa de 10 para crescer.',
+        'compare_verdict_body' => 'Três sessões, nove séries, tudo bem registado — e ainda assim abaixo da linha a partir da qual treinar peito passa de manter a construir. Acrescenta três séries e volta a ver daqui a um mês.',
+
+        'gap_title' => 'A diferença entre registar e saber',
+        'gap_body' => 'Um registo de treino é um histórico. Responde na perfeição a "o que é que eu fiz". Não responde às três perguntas que decidem se os próximos seis meses valem alguma coisa — porque responder-lhes significa comparar meses de séries, cargas e peso corporal com a investigação publicada, todas as semanas, à mão.',
+        'question_sets' => 'Estou a fazer séries que cheguem?',
+        'question_sets_body' => 'Não no total — por músculo, por semana, contra o número que a investigação aponta como o mínimo que constrói alguma coisa. A maioria dos músculos parados está simplesmente abaixo dessa linha.',
+        'question_bulk' => 'Este bulk está a resultar?',
+        'question_bulk_body' => 'Uma balança que diz +2 kg não te diz se aquilo foi músculo. As tendências de cintura, peito, braço e força, lidas em conjunto, dizem — e discordam da balança mais vezes do que se pensa.',
+        'question_calories' => 'Quanto é que eu gasto mesmo?',
+        'question_calories_body' => 'Qualquer calculadora te dá uma estimativa de fórmula. O teu consumo registado contra a tua tendência de peso dá-te o número real, e costuma estar algumas centenas de calorias ao lado da fórmula.',
+
+        'output_title' => 'O que diz, na prática',
+        'output_body' => 'Não é uma parede de gráficos para interpretares. Cada página abre com a conclusão numa frase, e os números por baixo estão lá para poderes conferir as contas.',
+        'output_disclaimer' => 'Exemplo. O texto é mesmo o da aplicação; os números são ilustrativos, e os teus serão calculados a partir dos teus dados.',
+        'sets_week' => 'séries/sem',
+        'levels_headline' => 'Onde estás realmente',
+        'levels_body' => 'O teu 1RM estimado contra atletas do teu sexo, peso e idade — mostrado duas vezes, porque quem treina no ginásio e quem compete são populações diferentes e mostrar só a mais simpática seria desonesto.',
+        'percentile_pair' => ':gym% ginásio · :meet% competição',
+
+        'how_title' => 'Como funciona',
+        'step_1' => 'Coles a tua chave de API do Hevy',
+        'step_1_body' => 'Um campo no teu perfil. Fica guardada cifrada, nunca mais é mostrada, e nunca entra na exportação dos teus dados.',
+        'step_2' => 'O teu histórico sincroniza',
+        'step_2_body' => 'Todos os treinos que alguma vez registaste, importados e mantidos atualizados. Não há nada para reintroduzir nem uma segunda aplicação onde entrar.',
+        'step_3' => 'Fica tudo calculado',
+        'step_3_body' => 'Séries semanais por músculo contra os landmarks, tendências de 1RM estimado, partição do ganho, alvos de calorias e macros — tudo recalculado à medida que chegam treinos novos.',
+        'write_back' => 'Também funciona no sentido inverso: a aplicação constrói a progressão da próxima semana para uma das tuas rotinas do Hevy e envia-a de volta. Vês a alteração exata antes de qualquer coisa ser enviada, e nada é escrito no Hevy sem tu confirmares.',
+
+        'limits_title' => 'O que não faz',
+        'limits_intro' => 'Isto importa mais do que a lista de funcionalidades. Aqui está onde a aplicação é fraca, está a estimar, ou simplesmente não é a ferramenta certa — dito agora, em vez de descoberto ao segundo mês.',
+        'limit_logging' => 'Não substitui o Hevy',
+        'limit_logging_body' => 'Continuas a registar os teus treinos no Hevy. Isto lê esse registo; é uma camada por cima, não um substituto, e sem ele não serve para nada.',
+        'limit_scale' => 'Não consegue corrigir uma leitura de gordura má',
+        'limit_scale_body' => 'A gordura corporal de uma balança inteligente erra qualquer coisa como 3 a 8 pontos face a um exame laboratorial e oscila só com a hidratação. A aplicação trabalha em tendências, cruza com medições de fita e marca uma estimativa como pouco fiável em vez de fingir — mas não transforma um número ruidoso num número bom.',
+        'limit_projections' => 'As projeções não são promessas',
+        'limit_projections_body' => 'São uma reta ajustada aos teus dados recentes e prolongada, atenuada nos horizontes mais longos. Cada uma traz um R² a dizer o quão bem essa reta assenta nos dados. Um ajuste fraco é um palpite, e a página di-lo.',
+        'limit_landmarks' => 'Os landmarks de volume são orientações populacionais',
+        'limit_landmarks_body' => 'MEV e MRV vêm de investigação sobre grupos de pessoas. A tua recuperação pode ficar acima ou abaixo. São um ponto de partida bem fundamentado, não uma medição tua.',
+        'limit_ai' => 'A análise escrita é opcional, e é um modelo de linguagem',
+        'limit_ai_body' => 'Recebe as métricas já calculadas que consegues ver — nunca o teu histórico em bruto e nunca as tuas chaves de API — e é-lhe pedido que sugira ajustes concretos. Continua a poder estar errada. Tudo o que diz sai de números que a aplicação te mostra à mesma, por isso podes conferir.',
+        'limit_medical' => 'Não é aconselhamento médico nem treino',
+        'limit_medical_body' => 'Nenhum médico, nutricionista ou treinador lê nada disto. É aritmética sobre os teus dados, com referência a investigação publicada, e não sabe da tua lesão, da tua medicação nem da tua vida.',
+
+        'pricing_title' => 'Quanto custa',
+        'pricing_body' => 'Um plano, e a única coisa que fica do outro lado é até onde a análise consegue olhar para trás. As contas gratuitas têm os últimos :days dias de histórico — o suficiente para usar todas as páginas e perceber se a aplicação presta. Tudo o que a torna paga precisa de mais do que isso: uma tendência precisa de meses, a manutenção medida precisa de semanas de registo, uma projeção precisa de um ano.',
+        'plan_free' => 'Grátis',
+        'plan_free_price' => '€0',
+        'per_month' => '/mês',
+        'free_history' => 'Os últimos :days dias do teu histórico de treino',
+        'free_pages' => 'Todas as páginas e todas as métricas — nada está escondido',
+        'free_photos' => 'Até :count fotografias de progresso',
+        'free_no_ai' => 'Sem análise escrita por IA',
+        'plan_paid' => 'Subscrito',
+        'paid_history' => 'Todo o teu histórico, por mais atrás que vá',
+        'paid_adaptive' => 'Calorias de manutenção medidas a partir do teu consumo e da tua tendência de peso',
+        'paid_projections' => 'Projeções ajustadas sobre um ano inteiro de dados',
+        'paid_ai' => ':count análises escritas por IA por mês, ou ilimitadas com a tua própria chave',
+        'paid_photos' => 'Até :count fotografias de progresso',
+        'trial_terms' => ':days dias grátis, sem pedir cartão. Cancelas num clique e ficas com acesso até ao fim do período que pagaste.',
+        'data_note' => 'Os teus dados continuam teus: exportas tudo em JSON quando quiseres, e apagar a conta remove tudo deste servidor. Nada é vendido, e nada sai daqui a não ser para o teu próprio fornecedor de IA, e só quando pedes uma análise.',
+
+        'sources_title' => 'De onde vêm os números',
+        'sources_body' => 'Os landmarks de volume seguem a Renaissance Periodization (Israetel et al.); as estimativas de 1RM usam Epley e Brzycki; o gasto energético usa Mifflin-St Jeor, ou Katch-McArdle quando a gordura corporal é conhecida; as recomendações de proteína e de ritmo de ganho seguem Helms, Aragon e Morton et al.; os tetos de FFMI seguem Kouri et al. Os percentis de força vêm de dados de competição do OpenPowerlifting e de dados de ginásio auto-reportados. Cada uma destas fontes está nomeada na página que a usa, com o que consegue e o que não consegue dizer.',
+    ],
+
     'billing' => [
         'title' => 'Subscrição',
         'subtitle' => 'O que estás a pagar, e o que acontece se parares',
