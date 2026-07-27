@@ -8,6 +8,7 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MuscleController;
 use App\Http\Controllers\NutritionController;
 use App\Http\Controllers\PerformanceController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AiSettingsController;
 use App\Http\Controllers\DataExportController;
 use App\Http\Controllers\ProfileController;
@@ -91,6 +92,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/billing', [SubscriptionController::class, 'show'])->name('billing');
     Route::post('/billing/cancel', [SubscriptionController::class, 'cancel'])->name('billing.cancel');
     Route::post('/billing/resume', [SubscriptionController::class, 'resume'])->name('billing.resume');
+
+    /*
+     * Admin. Behind the `admin` middleware, which 404s rather than 403s so a
+     * non-admin does not learn the area exists.
+     */
+    Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users');
+        Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+        Route::post('/users/{user}/grant', [AdminUserController::class, 'grant'])->name('users.grant');
+        Route::post('/users/{user}/revoke', [AdminUserController::class, 'revoke'])->name('users.revoke');
+        Route::post('/users/{user}/cancel-subscription', [AdminUserController::class, 'cancelSubscription'])->name('users.cancel');
+    });
 });
 
 require __DIR__.'/auth.php';

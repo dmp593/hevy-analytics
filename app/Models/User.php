@@ -30,6 +30,8 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'trial_ends_at' => 'datetime',
+            'comped_until' => 'datetime',
+            'is_admin' => 'boolean',
             'password' => 'hashed',
             'hevy_api_key' => 'encrypted',
             'height_cm' => 'float',

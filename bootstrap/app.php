@@ -14,6 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+        ]);
+
         $middleware->web(append: [
             SecurityHeaders::class,
             // Prepended would run before the session is started, and the guest

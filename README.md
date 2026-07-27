@@ -158,6 +158,42 @@ A user's own key always takes priority.
 > must stay off anywhere other people have accounts, and it does not open the
 > private network even when on.
 
+### Subscriptions
+
+Billing runs on [Paddle](https://paddle.com), chosen because Paddle is the
+*merchant of record*: it registers for, charges and remits VAT in every
+jurisdiction. Selling a digital subscription across the EU otherwise means OSS
+registration and quarterly filings, and the UK has no threshold at all for
+non-established sellers.
+
+One paid tier. The free tier is capped on **history depth**, not on which pages
+exist — every page works and every metric is computed, over 30 days instead of
+your whole history. That is the honest lever, because a trend needs months, the
+adaptive-maintenance measurement needs four weeks of logging, and a projection
+needs a year. Someone two weeks into training loses almost nothing.
+
+Never capped: your current numbers, and your data export.
+
+The 14-day trial is card-free and granted locally at registration — Paddle is
+never contacted, so sign-up cannot fail because a payment provider is down.
+
+Leave `PADDLE_PRICE_ID` empty to run without billing entirely.
+
+> **`PADDLE_WEBHOOK_SECRET` is not optional once billing is on.** Cashier only
+> verifies webhook signatures when it is set; without it anyone who knows the
+> URL can POST `subscription.created` and grant themselves a paid account. The
+> app refuses to boot in production with billing enabled and no secret.
+
+### Admin
+
+`php artisan app:make-admin you@example.com` promotes an account. There is no
+"make me an admin" button anywhere — the flag is not fillable and the only way
+to get it is shell access.
+
+Admins get **Account → Admin**: accounts, billing state, and time-boxed
+complimentary access. API keys are never displayed, only whether one is set, and
+every admin action is written to an append-only audit log with who did it.
+
 ### Your data
 
 **Profile & settings → Your data** exports everything the app holds as one JSON

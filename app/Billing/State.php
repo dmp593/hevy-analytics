@@ -19,6 +19,9 @@ enum State: string
     /** Was subscribed, cancelled, still inside the paid period. */
     case GracePeriod = 'grace';
 
+    /** Access granted by an admin: support, a refund, a friend of the house. */
+    case Complimentary = 'comped';
+
     /** Paddle says the payment is failing. Still served, but told about it. */
     case PastDue = 'past_due';
 
@@ -46,6 +49,14 @@ enum State: string
             }
         }
 
+        // Before the trial, after the subscription: a comp is what an admin
+        // deliberately did, so it should not be hidden behind a trial that
+        // happens to still be running, and should not override money the
+        // athlete is actually paying.
+        if ($user->comped_until?->isFuture()) {
+            return self::Complimentary;
+        }
+
         // Checked after the subscription, so someone who subscribes during
         // their trial is reported as subscribed rather than as still trialing.
         //
@@ -70,7 +81,7 @@ enum State: string
     public function configKey(): string
     {
         return match ($this) {
-            self::Subscribed, self::GracePeriod, self::PastDue => 'subscribed',
+            self::Subscribed, self::GracePeriod, self::PastDue, self::Complimentary => 'subscribed',
             self::Trialing => 'trial',
             self::Free => 'free',
         };
@@ -85,6 +96,8 @@ enum State: string
     /** Whether to show a "start subscribing" call to action. */
     public function shouldPromptToSubscribe(): bool
     {
+        // Not shown to a comped account: inviting someone to pay for access an
+        // admin just gave them for free reads as a mistake.
         return in_array($this, [self::Free, self::Trialing, self::GracePeriod], true);
     }
 

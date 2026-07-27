@@ -45,6 +45,9 @@
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">{{ __('app.nav.profile') }}</x-dropdown-link>
                         <x-dropdown-link :href="route('billing')">{{ __('app.nav.billing') }}</x-dropdown-link>
+                        @if (auth()->user()->is_admin)
+                            <x-dropdown-link :href="route('admin.users')">{{ __('app.nav.admin') }}</x-dropdown-link>
+                        @endif
                         <x-dropdown-link :href="route('guide')">{{ __('app.nav.guide') }}</x-dropdown-link>
                         <x-dropdown-link :href="route('write.index')">{{ __('app.nav.write_operations') }}</x-dropdown-link>
                         <form method="POST" action="{{ route('logout') }}">
