@@ -125,6 +125,76 @@ class LocalisationTest extends TestCase
         }
     }
 
+    /**
+     * A key that does not exist renders as its own dotted path — "guide.volume.mv"
+     * appears in the page, in every language, and nothing errors. It is the
+     * failure mode of a rename, and it is invisible unless something looks.
+     *
+     * @param  string  $locale
+     */
+    #[DataProvider('locales')]
+    public function test_no_page_leaks_a_raw_translation_key(string $locale): void
+    {
+        $user = User::factory()->create([
+            'locale' => $locale,
+            'hevy_api_key' => '00000000-0000-0000-0000-000000000000',
+            'sex' => 'male',
+            'age' => 30,
+            'height_cm' => 178,
+            'activity_level' => 1.55,
+        ]);
+
+        $user->goals()->create(['type' => 'lean_bulk', 'is_active' => true, 'started_at' => now()]);
+        $user->routines()->create(['hevy_id' => 'r1', 'title' => 'Push'])
+            ->exercises()->create([
+                'index' => 0,
+                'title' => 'Bench Press (Barbell)',
+                'exercise_template_hevy_id' => 'BENCH',
+                'sets' => [['index' => 0, 'type' => 'normal', 'weight_kg' => 60, 'reps' => 8]],
+            ]);
+
+        // The prefixes are the shipped language FILES: anything that reaches the
+        // page as "<file>.<something>" was a lookup that found nothing.
+        $prefixes = array_map(fn ($f) => preg_quote(basename($f, '.php'), '/'), $this->files());
+        $pattern = '/\b(?:'.implode('|', $prefixes).')\.[a-z0-9_]+(?:\.[a-z0-9_]+)*/i';
+
+        $paths = [
+            '/dashboard', '/performance', '/strength-levels', '/muscle', '/body',
+            '/photos', '/guide', '/nutrition', '/projections', '/routines', '/routines/r1',
+            '/routines/r1/edit', '/goals', '/ai', '/write-operations', '/profile', '/billing',
+        ];
+
+        $leaks = [];
+
+        // The landing page first, while still signed out: / redirects to the
+        // dashboard for anyone authenticated, and actingAs() persists for the
+        // rest of the test.
+        $this->post("/locale/{$locale}");
+        $guest = $this->strip($this->get('/')->assertOk()->getContent());
+
+        if (preg_match_all($pattern, $guest, $m)) {
+            $leaks['/'] = array_values(array_unique($m[0]));
+        }
+
+        foreach ($paths as $path) {
+            $response = $this->actingAs($user)->get($path);
+
+            $this->assertSame(200, $response->status(), "{$path} did not render");
+
+            $html = $response->getContent();
+
+            if (preg_match_all($pattern, $this->strip($html), $m)) {
+                $leaks[$path] = array_values(array_unique($m[0]));
+            }
+        }
+
+        $this->assertSame([], $leaks, sprintf(
+            "[%s] pages rendered raw translation keys:\n%s",
+            $locale,
+            json_encode($leaks, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+        ));
+    }
+
     public function test_a_signed_in_users_choice_wins(): void
     {
         $user = User::factory()->create(['locale' => 'pt']);
@@ -176,6 +246,17 @@ class LocalisationTest extends TestCase
         $this->actingAs($user)->from('/dashboard')->post('/locale/pt');
 
         $this->assertSame('pt', $user->fresh()->locale);
+    }
+
+    /**
+     * The prose of a page: scripts, styles and tags removed.
+     *
+     * Asset URLs and inline JS are full of dotted identifiers that look exactly
+     * like a translation key, so scanning the raw HTML is all false positives.
+     */
+    private function strip(string $html): string
+    {
+        return preg_replace('/<[^>]*>/s', ' ', preg_replace('/<(script|style)\b.*?<\/\1>/s', '', $html));
     }
 
     /** @return array<int, string> */

@@ -129,9 +129,20 @@ English and Portuguese, switchable from the header (guests included) or from
 Profile. A signed-in user's choice follows them between devices; otherwise the
 app honours the browser's `Accept-Language`.
 
-Adding a language is one config entry and one `lang/<code>/` directory. The test
-suite fails if any language falls behind English on keys, files or placeholders,
-so a partially translated language cannot ship unnoticed.
+Adding a language is one config entry and one `lang/<code>/` directory. Three
+tests keep it honest, and each exists because it caught something:
+
+- **Parity** — every language must define the same keys, files and placeholders
+  as English (`LocalisationTest`).
+- **No raw keys** — every page is rendered in every language and checked for
+  text like `guide.volume.mv`, which is what a missing key renders as. It found
+  three on the AI page.
+- **No hardcoded English** — Blade templates are compiled and whatever text
+  survives the removal of every echo and directive is text no language file can
+  reach (`LocalisationCoverageTest`). This is what a parity check cannot see: the
+  guide page sat entirely untranslated while the suite was green. It also rejects
+  `__('Log in')`-style string keys, which resolve from a `lang/<code>.json` this
+  app does not ship and so render in English everywhere.
 
 ## Optional integrations
 

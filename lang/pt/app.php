@@ -373,7 +373,84 @@ return [
         ],
     ],
 
+    /*
+     | Entrada, registo e recuperação de palavra-passe.
+     |
+     | Vinham do scaffold do framework como chaves de texto __('Log in'), que se
+     | resolvem a partir de um ficheiro lang/<código>.json. Esse ficheiro não
+     | existe, por isso todo o percurso de entrada aparecia em inglês em todas as
+     | línguas — a primeira coisa que quem fala português via, e o último sítio
+     | onde isso devia ter acontecido.
+     */
+    'auth' => [
+        'email' => 'Email',
+        'password' => 'Palavra-passe',
+        'confirm_password' => 'Confirmar palavra-passe',
+        'current_password' => 'Palavra-passe atual',
+        'new_password' => 'Nova palavra-passe',
+        'name' => 'Nome',
+
+        'log_in' => 'Entrar',
+        'log_out' => 'Sair',
+        'register' => 'Criar conta',
+        'remember_me' => 'Manter sessão iniciada',
+        'forgot_password' => 'Esqueceste-te da palavra-passe?',
+        'already_registered' => 'Já tens conta?',
+
+        'reset_title' => 'Esqueceste-te da palavra-passe? Sem problema — diz-nos o teu email e enviamos-te uma ligação para escolheres uma nova.',
+        'reset_send' => 'Enviar ligação de recuperação',
+        'reset_password' => 'Repor palavra-passe',
+
+        'verify_intro' => 'Obrigado por te registares. Antes de começares, confirma o teu email clicando na ligação que acabámos de enviar. Se não chegou, enviamos outra com todo o gosto.',
+        'verify_sent' => 'Foi enviada uma nova ligação de confirmação para o email que indicaste no registo.',
+        'verify_resend' => 'Reenviar email de confirmação',
+        'unverified' => 'O teu email ainda não está confirmado.',
+        'unverified_resend' => 'Clica aqui para reenviar o email de confirmação.',
+        'verification_sent' => 'Foi enviada uma nova ligação de confirmação para o teu email.',
+
+        'confirm_area' => 'Esta é uma zona segura da aplicação. Confirma a tua palavra-passe antes de continuares.',
+        'confirm' => 'Confirmar',
+    ],
+
     'profile' => [
+        'title' => 'Informação de perfil',
+        'subtitle' => 'O teu nome, email, e os dados que alimentam o FFMI, o BMR e os alvos de macros.',
+
+        'hevy_section' => 'Hevy & perfil de atleta',
+        'hevy_section_help' => 'A tua chave de API do Hevy fica guardada cifrada. A altura, a idade e o sexo são o que torna possíveis o FFMI, o BMR e os alvos de macros.',
+        'hevy_key' => 'Chave de API do Hevy',
+        'hevy_key_placeholder' => 'Cola aqui a tua chave de API do Hevy',
+        'hevy_key_set' => '•••••••• (deixa em branco para manteres a atual)',
+
+        'sex' => 'Sexo',
+        'sex_male' => 'Masculino',
+        'sex_female' => 'Feminino',
+        'age' => 'Idade',
+        'height' => 'Altura (cm)',
+
+        'activity' => 'Atividade (PAL)',
+        'activity_sedentary' => 'Sedentário',
+        'activity_light' => 'Ligeira',
+        'activity_moderate' => 'Moderada',
+        'activity_very' => 'Muito ativa',
+        'activity_extreme' => 'Extrema',
+
+        'body_fat_source' => 'Fonte da gordura corporal',
+        'body_fat_scale' => 'Balança (BIA) — da tua balança inteligente',
+        'body_fat_navy' => 'Método Navy com fita — pescoço, cintura e altura',
+        'body_fat_manual' => 'Manual — a percentagem de gordura que registas tu',
+        'body_fat_help' => 'Determina a massa magra, o FFMI e a partição. As balanças BIA são ruidosas de um dia para o outro; o método Navy com fita ou uma estimativa manual costumam ser mais estáveis para seguir uma tendência.',
+
+        'password_title' => 'Alterar palavra-passe',
+        'password_help' => 'Usa uma palavra-passe longa e aleatória para manteres a conta segura.',
+
+        'delete_title' => 'Apagar conta',
+        'delete_help' => 'Depois de apagares a conta, tudo o que está nela é apagado em definitivo. Descarrega primeiro o que quiseres guardar.',
+        'delete_button' => 'Apagar conta',
+        'delete_confirm_title' => 'Tens a certeza de que queres apagar a tua conta?',
+        'delete_confirm_help' => 'Depois de apagares a conta, tudo o que está nela é apagado em definitivo. Escreve a tua palavra-passe para confirmares.',
+        'cancel' => 'Cancelar',
+
         'timezone' => 'Fuso horário',
         'timezone_help' => 'Define a que dia e semana pertence cada treino. Se estiver errado, um treino ao fim do dia pode cair na semana anterior e distorcer as séries por semana.',
         'language' => 'Idioma',
@@ -412,10 +489,6 @@ return [
         'unchanged' => 'A mostrar a análise mais recente — os seus dados não mudaram desde que foi gerada.',
     ],
 
-    'routines' => [
-        'edit_progression' => 'Editar / preparar progressão →',
-    ],
-
     'periods' => [
         'week' => 'Semana',
         'month' => 'Mês',
@@ -451,6 +524,76 @@ return [
         'sex_female' => 'do sexo feminino',
         'aged' => 'A idade :age é tida em conta onde a fonte de dados o permite.',
         'add_age' => 'Adiciona a tua idade no Perfil para uma comparação ajustada à idade.',
+
+        'no_bodyweight' => 'Regista um peso corporal no Hevy e define :profile — os níveis de força comparam-te com atletas da mesma idade, peso e sexo.',
+        'no_bodyweight_profile' => 'a tua idade e sexo',
+        'no_lifts' => 'Ainda não há exercícios com referências. As referências de força cobrem movimentos com barra como supino, agachamento, peso morto, press militar, remada e rosca. Regista alguns e sincroniza outra vez.',
+
+        /*
+         | Os cinco degraus. Traduzidos em vez de impressos a partir da
+         | constante, porque "Advanced" chegar em inglês a quem lê em português
+         | é exatamente a localização a meio que esta aplicação testa.
+         */
+        'tier' => [
+            'Beginner' => 'Iniciante',
+            'Novice' => 'Novato',
+            'Intermediate' => 'Intermédio',
+            'Advanced' => 'Avançado',
+            'Elite' => 'Elite',
+        ],
+
+        'stronger_than' => 'És mais forte do que :percent dos atletas :sex :population da tua idade e peso.',
+        'population_gym' => 'de ginásio',
+        'population_competition' => 'de competição',
+        'population_none' => '',
+        'pop_gym' => 'Ginásio: :percent',
+        'pop_verified' => 'Verificado/competição: :percent',
+        'sample' => 'n=:count',
+        'age_factor' => 'idade ×:value',
+        'source_link' => 'fonte',
+        'source' => [
+            'fitnessvolt' => 'FitnessVolt — ginásio + verificado',
+            'openpowerlifting' => 'OpenPowerlifting — competição verificada',
+            'builtin' => 'Modelo interno (estimativa offline)',
+        ],
+        'sources' => 'Os níveis usam uma fonte de dados em camadas: FitnessVolt (gratuita, CC BY 4.0 — a servir percentis de competição verificados do :opl mais percentis de ginásio auto-reportados), com recurso a uma tabela local do OpenPowerlifting e, por fim, a um modelo de rácios offline. A percentagem em destaque é a da população de ginásio; a verificada/de competição aparece ao lado. Vê o :guide para mais detalhes.',
+    ],
+
+    'routines' => [
+        'edit_progression' => 'Editar / preparar progressão →',
+
+        'performance' => 'Desempenho das rotinas',
+        'performance_sub' => 'Progressão de volume ao longo das sessões (6 meses)',
+        'routine' => 'Rotina',
+        'sessions' => 'Sessões',
+        'avg_tonnage' => 'Tonelagem média',
+        'progression' => 'Progressão',
+        'last_performed' => 'Última vez',
+        'noisy' => 'ruidoso',
+        'noisy_tip' => 'A tonelagem varia bastante de sessão para sessão aqui, por isso trata a direção como uma pista e não como uma medição.',
+        'analyse' => 'Analisar',
+        'analyse_arrow' => 'Analisar →',
+        'none' => 'Não foram encontradas sessões de rotinas. Sincroniza os teus dados do Hevy.',
+        'all' => 'Todas as rotinas',
+        'exercise_count' => '{1}1 exercício|[2,*]:count exercícios',
+        'edit' => 'Editar / progredir',
+
+        'progression_title' => 'Progressão assistida',
+        'progression_sub' => 'Dupla progressão, preparada para reveres antes de ser enviada',
+        'progression_body' => 'Constrói uma rotina atualizada com dupla progressão — acrescenta uma repetição até 12, depois soma 2,5 kg e reinicia as repetições — a partir do teu 1RM estimado recente em cada exercício. Fica preparada como operação pendente: vês as alterações exatas e confirmas antes de alguma coisa chegar ao Hevy.',
+        'stage' => 'Preparar progressão',
+        'prescription' => 'Prescrição atual',
+
+        'session_tonnage' => 'Tonelagem por sessão',
+        'no_sessions' => 'Ainda não há sessões registadas nesta rotina.',
+        'exercise_in_routine' => 'Um exercício desta rotina',
+        'exercise_in_routine_sub' => 'Progressão do 1RM estimado para o exercício escolhido',
+        'select_exercise' => 'Escolhe um exercício…',
+        'pick_exercise' => 'Escolhe um exercício para ver o 1RM estimado dentro desta rotina.',
+        'coverage' => 'Cobertura muscular',
+        'coverage_sub' => 'Séries de trabalho prescritas por sessão contra os landmarks semanais',
+        'sets_per_session' => ':count séries',
+        'weekly_landmarks' => 'semanal MEV :mev · MAV :mav',
     ],
 
     'performance' => [
@@ -583,10 +726,28 @@ return [
         'retry' => 'Repetir',
         'stalled' => 'bloqueada',
         'details' => 'detalhes',
+        'intro' => 'Todas as alterações ao Hevy passam primeiro por aqui. Revê o conteúdo e confirma para enviar. Um envio bem sucedido despoleta uma nova sincronização automática.',
+        'none' => 'Nada preparado. Prepara a progressão de uma rotina a partir da página de edição dessa rotina.',
     ],
 
     'photos' => [
-        'limit_reached' => 'Atingiu o limite de :limit fotografias de progresso. Elimine algumas antigas para adicionar mais.',
+        'limit_reached' => 'Atingiste o limite de :limit fotografias de progresso. Apaga algumas mais antigas para adicionares mais.',
+        'add' => 'Adicionar fotografia',
+        'add_sub' => 'O espelho é a métrica mais honesta',
+        'date' => 'Data',
+        'angle' => 'Ângulo',
+        'angle_front' => 'Frente',
+        'angle_side' => 'Lado',
+        'angle_back' => 'Costas',
+        'file' => 'Fotografia',
+        'weight' => 'Peso (kg, opcional)',
+        'upload' => 'Enviar',
+        'privacy' => 'As fotografias são privadas da tua conta e só te são mostradas a ti. É a mesma pose, a mesma luz e a mesma hora do dia que dão sentido a uma comparação.',
+        'compare' => 'Modo de comparação',
+        'compare_hint' => '(escolhe duas fotografias)',
+        'delete_confirm' => 'Apagar esta fotografia?',
+        'delete' => 'Apagar',
+        'none' => 'Ainda não há fotografias. Envia a primeira para começares uma linha temporal visual.',
     ],
 
     'muscles' => [
@@ -676,6 +837,21 @@ return [
         'recomposition' => 'Recomposição',
         'cut' => 'Défice / perda de gordura',
         'strength' => 'Força',
+
+        'choose' => 'Escolhe um objetivo',
+        'choose_sub' => 'Define os teus alvos de calorias e macros, e o ritmo contra o qual esta aplicação te mede',
+        'fine_tune' => 'Afinar (opcional)',
+        'fine_tune_sub' => 'Deixa em branco para usar o valor por omissão baseado na evidência',
+        'calorie_adjustment' => 'Ajuste calórico %',
+        'protein_per_kg' => 'Proteína g/kg',
+        'fat_per_kg' => 'Gordura g/kg',
+        'rate' => 'Ritmo %PC/sem',
+        'training_profile' => 'Perfil de treino:',
+        'reps' => 'reps',
+        'sets_per_muscle' => 'séries/músculo/sem',
+        'save' => 'Guardar objetivo',
+        'history' => 'Histórico',
+        'active' => '(ativo)',
     ],
 
     'units' => [
@@ -763,6 +939,7 @@ return [
         'learn_more' => 'Saber mais →',
         'skip_to_content' => 'Saltar para o conteúdo',
         'more_info' => 'Mais informação',
+        'no_sets_in_range' => 'Sem séries neste intervalo.',
     ],
 
 ];

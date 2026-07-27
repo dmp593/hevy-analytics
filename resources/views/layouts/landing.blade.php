@@ -30,7 +30,7 @@
         <header class="border-b border-subtle">
             <div class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-5 py-4">
                 <a href="{{ route('home') }}" class="flex items-center gap-2 text-sm font-semibold text-ink">
-                    <x-application-logo class="h-7 w-7 fill-current text-brand" />
+                    <x-application-logo class="h-7 w-7 text-brand" />
                     {{ __('app.brand') }}
                 </a>
 

@@ -8,17 +8,17 @@
     <x-flash />
 
     <div class="grid lg:grid-cols-2 gap-6 mb-6">
-        <x-panel title="Per-session tonnage">
+        <x-panel :title="__('app.routines.session_tonnage')">
             <x-line-chart
                 :series="collect($sessionSeries)->map(fn($s) => ['label' => $s['date'], 'value' => $s['tonnage']])->all()"
-                label="Tonnage (kg)" color="#4f46e5"
-                empty="No sessions recorded for this routine yet." />
+                :label="__('app.series.tonnage')" color="#4f46e5"
+                :empty="__('app.routines.no_sessions')" />
         </x-panel>
 
-        <x-panel title="Exercise inside this routine" subtitle="e1RM progression for a chosen exercise">
+        <x-panel :title="__('app.routines.exercise_in_routine')" :subtitle="__('app.routines.exercise_in_routine_sub')">
             <form method="get" x-target="ex-chart" action="{{ route('routines.show', $routine->hevy_id) }}" class="mb-3 flex gap-2">
                 <select name="exercise" class="form-control" onchange="this.form.requestSubmit()">
-                    <option value="">Select an exercise…</option>
+                    <option value="">{{ __('app.routines.select_exercise') }}</option>
                     @foreach($exercises as $e)
                         <option value="{{ $e['template_id'] }}" @selected($selectedExercise === $e['template_id'])>{{ $e['title'] }}</option>
                     @endforeach
@@ -26,20 +26,20 @@
             </form>
             <div id="ex-chart">
                 <x-line-chart :series="$e1rmSeries" label="e1RM (kg)" color="#16a34a" :fill="false"
-                              empty="Pick an exercise to chart its estimated 1RM within this routine." />
+                              :empty="__('app.routines.pick_exercise')" />
             </div>
         </x-panel>
     </div>
 
-    <x-panel title="Muscle coverage" subtitle="Prescribed working sets per session vs weekly landmarks">
+    <x-panel :title="__('app.routines.coverage')" :subtitle="__('app.routines.coverage_sub')">
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
             @foreach($muscleCoverage as $m)
                 <div class="rounded-lg border border-subtle p-3">
                     <div class="flex justify-between text-sm">
-                        <span class="capitalize font-medium">{{ str_replace('_',' ',$m['muscle']) }}</span>
-                        <span>{{ $m['sets_per_session'] }} sets</span>
+                        <span class="font-medium">{{ \App\Support\Labels::muscle($m['muscle']) }}</span>
+                        <span>{{ __('app.routines.sets_per_session', ['count' => $m['sets_per_session']]) }}</span>
                     </div>
-                    <div class="text-[10px] text-faint">weekly MEV {{ $m['landmarks']['mev'] }} · MAV {{ $m['landmarks']['mav'] }}</div>
+                    <div class="text-[10px] text-faint">{{ __('app.routines.weekly_landmarks', ['mev' => $m['landmarks']['mev'], 'mav' => $m['landmarks']['mav']]) }}</div>
                 </div>
             @endforeach
         </div>

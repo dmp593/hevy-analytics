@@ -29,7 +29,7 @@
             </div>
             <div>
                 <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-muted" />
+                    <x-application-logo class="h-14 w-14 text-brand" />
                 </a>
             </div>
 

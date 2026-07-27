@@ -20,11 +20,13 @@
 
     @if(! $bodyweight)
         <x-ui.card>
-            <p class="text-sm text-body">Log a body weight in Hevy and set your <a href="{{ route('profile.edit') }}" class="text-brand-ink underline">age &amp; sex</a> — strength levels compare you to lifters of the same age, bodyweight and sex.</p>
+            <p class="text-sm text-body">{!! __('app.levels.no_bodyweight', [
+                'profile' => '<a href="'.route('profile.edit').'" class="text-brand-ink underline">'.__('app.levels.no_bodyweight_profile').'</a>',
+            ]) !!}</p>
         </x-ui.card>
     @elseif(empty($levels))
         <x-ui.card>
-            <p class="text-sm text-body">No standard-mapped lifts found yet. Strength standards cover barbell movements like Bench, Squat, Deadlift, Overhead Press, Barbell Row and Barbell Curl. Log some and re-sync.</p>
+            <p class="text-sm text-body">{{ __('app.levels.no_lifts') }}</p>
         </x-ui.card>
     @else
         {{-- Say what the comparison assumed, not just what it concluded.
@@ -58,12 +60,10 @@
         </div>
 
         <p class="mt-6 text-xs text-faint">
-            Levels use a layered data source: <strong>FitnessVolt</strong> (free, CC BY 4.0 — serving verified
-            <a href="https://www.openpowerlifting.org/" target="_blank" rel="noopener" class="underline">OpenPowerlifting</a>
-            competition percentiles + self-reported gym percentiles), falling back to a locally-built OpenPowerlifting
-            table, then an offline ratio model. The headline % is the <strong>gym</strong> population (comparable to
-            general lifting apps); the verified/competition % is shown alongside. See the
-            <a href="{{ route('guide') }}" class="underline">Guide</a> for details. Powered by FitnessVolt (CC BY 4.0).
+            {!! __('app.levels.sources', [
+                'opl' => '<a href="https://www.openpowerlifting.org/" target="_blank" rel="noopener" class="underline">OpenPowerlifting</a>',
+                'guide' => '<a href="'.route('guide').'" class="underline">'.__('app.pages.guide').'</a>',
+            ]) !!}
         </p>
     @endif
 </x-ui.page>

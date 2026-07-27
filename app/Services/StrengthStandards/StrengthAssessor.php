@@ -72,7 +72,6 @@ class StrengthAssessor
         return [
             'percentile' => (float) $headline,
             'source' => 'fitnessvolt',
-            'source_label' => 'FitnessVolt — gym + verified',
             'populations' => $populations,
             'attribution' => $r['attribution'] ?? null,
         ];
@@ -91,10 +90,9 @@ class StrengthAssessor
         return [
             'percentile' => (float) $r['percentile'],
             'source' => 'openpowerlifting',
-            'source_label' => 'OpenPowerlifting — verified competition',
             'populations' => ['verified' => ['percentile' => $r['percentile'], 'sample' => $r['sample_size'] ?? null]],
             'attribution' => [
-                'text' => 'Data: OpenPowerlifting (CC0)',
+                'text' => 'OpenPowerlifting (CC0)',
                 'url' => 'https://www.openpowerlifting.org/',
                 'license' => 'CC0',
             ],
@@ -114,7 +112,6 @@ class StrengthAssessor
         return [
             'percentile' => (float) $eval['percentile'],
             'source' => 'builtin',
-            'source_label' => 'Built-in model (offline estimate)',
             'thresholds_kg' => $eval['thresholds_kg'],
             'age_factor' => $eval['age_factor'],
             'ratio' => $eval['ratio'],

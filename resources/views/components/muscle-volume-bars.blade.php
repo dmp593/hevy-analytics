@@ -28,6 +28,6 @@ $barColor = fn (string $status) => [
             @endif
         </div>
     @empty
-        <p class="text-sm text-muted">No sets in range.</p>
+        <p class="text-sm text-muted">{{ __('app.common.no_sets_in_range') }}</p>
     @endforelse
 </div>

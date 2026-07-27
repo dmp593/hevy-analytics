@@ -7,7 +7,7 @@
 
         <form method="POST" action="{{ route('goals.store') }}">
             @csrf
-            <x-panel title="Choose a goal" subtitle="Sets your calorie and macro targets, and the rate this app measures you against" class="mb-6">
+            <x-panel :title="__('app.goals.choose')" :subtitle="__('app.goals.choose_sub')" class="mb-6">
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
                     @foreach($types as $key => $t)
                         <label class="cursor-pointer rounded-lg border p-4 transition"
@@ -20,47 +20,47 @@
                 </div>
             </x-panel>
 
-            <x-panel title="Fine-tune (optional)" subtitle="Leave blank to use the evidence-based preset default" class="mb-6">
+            <x-panel :title="__('app.goals.fine_tune')" :subtitle="__('app.goals.fine_tune_sub')" class="mb-6">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <label class="text-xs text-body">Calorie adj. %
+                    <label class="text-xs text-body">{{ __('app.goals.calorie_adjustment') }}
                         <input type="number" step="0.5" name="calorie_adjustment_pct" class="mt-1 w-full rounded-md border-line text-sm"
                                value="{{ old('calorie_adjustment_pct', $active?->calorie_adjustment_pct) }}"
                                :placeholder="presets[type]?.calorie_adjustment_pct">
                     </label>
-                    <label class="text-xs text-body">Protein g/kg
+                    <label class="text-xs text-body">{{ __('app.goals.protein_per_kg') }}
                         <input type="number" step="0.1" name="protein_g_per_kg" class="mt-1 w-full rounded-md border-line text-sm"
                                value="{{ old('protein_g_per_kg', $active?->protein_g_per_kg) }}"
                                :placeholder="presets[type]?.protein_g_per_kg">
                     </label>
-                    <label class="text-xs text-body">Fat g/kg
+                    <label class="text-xs text-body">{{ __('app.goals.fat_per_kg') }}
                         <input type="number" step="0.1" name="fat_g_per_kg" class="mt-1 w-full rounded-md border-line text-sm"
                                value="{{ old('fat_g_per_kg', $active?->fat_g_per_kg) }}"
                                :placeholder="presets[type]?.fat_g_per_kg">
                     </label>
-                    <label class="text-xs text-body">Rate %BW/wk
+                    <label class="text-xs text-body">{{ __('app.goals.rate') }}
                         <input type="number" step="0.05" name="target_rate_pct_bw_per_week" class="mt-1 w-full rounded-md border-line text-sm"
                                value="{{ old('target_rate_pct_bw_per_week', $active?->target_rate_pct_bw_per_week) }}"
                                :placeholder="presets[type]?.target_rate_pct_bw_per_week">
                     </label>
                 </div>
                 <div class="mt-4 rounded-lg bg-surface-sunk p-3 text-xs text-body">
-                    <span class="font-semibold">Training profile:</span>
+                    <span class="font-semibold">{{ __('app.goals.training_profile') }}</span>
                     <span x-text="presets[type]?.training?.name"></span> ·
-                    reps <span x-text="presets[type]?.training?.rep_range"></span> ·
-                    <span x-text="presets[type]?.training?.sets_min"></span>–<span x-text="presets[type]?.training?.sets_max"></span> sets/muscle/wk ·
+                    {{ __('app.goals.reps') }} <span x-text="presets[type]?.training?.rep_range"></span> ·
+                    <span x-text="presets[type]?.training?.sets_min"></span>–<span x-text="presets[type]?.training?.sets_max"></span> {{ __('app.goals.sets_per_muscle') }} ·
                     RIR <span x-text="presets[type]?.training?.rir_min"></span>–<span x-text="presets[type]?.training?.rir_max"></span>
                 </div>
             </x-panel>
 
-            <button class="rounded-md bg-brand px-5 py-2.5 text-sm font-semibold text-on-fill hover:bg-brand-hover">Save goal</button>
+            <button class="rounded-md bg-brand px-5 py-2.5 text-sm font-semibold text-on-fill hover:bg-brand-hover">{{ __('app.goals.save') }}</button>
         </form>
 
         @if($history->count())
-            <x-panel title="History" class="mt-6">
+            <x-panel :title="__('app.goals.history')" class="mt-6">
                 <div class="space-y-1 text-sm">
                     @foreach($history as $g)
                         <div class="flex justify-between py-1 border-b border-subtle">
-                            <span>{{ \App\Science\Goals\GoalType::label($g->type) }} @if($g->is_active)<span class="text-xs text-good">(active)</span>@endif</span>
+                            <span>{{ \App\Science\Goals\GoalType::label($g->type) }} @if($g->is_active)<span class="text-xs text-good">{{ __('app.goals.active') }}</span>@endif</span>
                             <span class="text-muted">{{ $g->started_at?->toDateString() }}</span>
                         </div>
                     @endforeach

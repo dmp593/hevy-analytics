@@ -22,14 +22,14 @@
              this athlete has not added one. Point at the fix rather than just
              reporting the absence. --}}
         <x-ui.insight tone="warn" :title="__('app.ai.unavailable')" class="mb-6">
-            <p>{!! __('app.ai.add_key', [
+            <p>{!! __('app.settings.ai.add_key', [
                 'settings' => '<a href="'.route('profile.edit').'" class="underline font-medium">'.__('app.nav.profile').'</a>',
             ]) !!}</p>
         </x-ui.insight>
     @elseif ($usesOwnKey)
         {{-- Showing an allowance to someone spending their own key would invent
              a limit that does not apply to them. --}}
-        <p class="mb-4 text-xs text-muted">{{ __('app.ai.no_limit_own_key') }}</p>
+        <p class="mb-4 text-xs text-muted">{{ __('app.settings.ai.no_limit_own_key') }}</p>
     @else
         <p class="mb-4 text-xs text-muted">
             {{ __('app.ai.quota', ['remaining' => $quotaRemaining, 'limit' => $quotaLimit]) }}
@@ -53,7 +53,7 @@
                 ]) }}
             </p>
         @else
-            <p class="text-sm text-body">{{ __('app.ai.intro') }}</p>
+            <p class="text-sm text-body">{{ __('app.settings.ai.intro') }}</p>
         @endif
     </x-ui.card>
 </x-ui.page>

@@ -1,6 +1,6 @@
 <x-ui.page :title="__('app.pages.write')" :subtitle="__('app.pages.write_sub')" width="5xl">
     <x-flash />
-    <p class="text-sm text-muted mb-6">Every change to Hevy is staged here first. Review the payload, then confirm to push. Successful writes trigger an automatic re-sync.</p>
+    <p class="text-sm text-muted mb-6">{{ __('app.write.intro') }}</p>
 
     <x-panel>
         @forelse($operations as $op)
@@ -52,7 +52,7 @@
                 <div class="text-[10px] text-faint mt-1">{{ $op->created_at->diffForHumans() }}</div>
             </div>
         @empty
-            <p class="text-sm text-muted">No write operations yet. Stage a routine progression from any routine's edit page.</p>
+            <p class="text-sm text-muted">{{ __('app.write.none') }}</p>
         @endforelse
     </x-panel>
 </x-ui.page>

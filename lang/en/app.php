@@ -372,7 +372,83 @@ return [
         ],
     ],
 
+    /*
+     | Sign-in, registration and password recovery.
+     |
+     | These came from the framework scaffold as __('Log in')-style string keys,
+     | which resolve from a lang/<code>.json file. There isn't one, so every
+     | language rendered the entire onboarding path in English — the first thing
+     | a Portuguese speaker saw, and the last place it should have happened.
+     */
+    'auth' => [
+        'email' => 'Email',
+        'password' => 'Password',
+        'confirm_password' => 'Confirm password',
+        'current_password' => 'Current password',
+        'new_password' => 'New password',
+        'name' => 'Name',
+
+        'log_in' => 'Log in',
+        'log_out' => 'Log out',
+        'register' => 'Register',
+        'remember_me' => 'Remember me',
+        'forgot_password' => 'Forgot your password?',
+        'already_registered' => 'Already registered?',
+
+        'reset_title' => 'Forgot your password? No problem — tell us your email address and we will send you a link to choose a new one.',
+        'reset_send' => 'Email password reset link',
+        'reset_password' => 'Reset password',
+
+        'verify_intro' => 'Thanks for signing up. Before you get started, please verify your email address by clicking the link we just sent you. If it did not arrive, we will gladly send another.',
+        'verify_sent' => 'A new verification link has been sent to the email address you gave when you registered.',
+        'verify_resend' => 'Resend verification email',
+        'unverified' => 'Your email address is unverified.',
+        'unverified_resend' => 'Click here to re-send the verification email.',
+        'verification_sent' => 'A new verification link has been sent to your email address.',
+
+        'confirm_area' => 'This is a secure area of the application. Please confirm your password before continuing.',
+        'confirm' => 'Confirm',
+    ],
+
     'profile' => [
+        'title' => 'Profile information',
+        'subtitle' => 'Your name, email, and the details that power FFMI, BMR and macro targets.',
+
+        'hevy_section' => 'Hevy & athlete profile',
+        'hevy_section_help' => 'Your Hevy API key is stored encrypted. Height, age and sex are what make FFMI, BMR and macro targets possible.',
+        'hevy_key' => 'Hevy API key',
+        'hevy_key_placeholder' => 'Paste your Hevy API key',
+        'hevy_key_set' => '•••••••• (leave blank to keep the current one)',
+
+        'sex' => 'Sex',
+        'sex_male' => 'Male',
+        'sex_female' => 'Female',
+        'age' => 'Age',
+        'height' => 'Height (cm)',
+
+        'activity' => 'Activity (PAL)',
+        'activity_sedentary' => 'Sedentary',
+        'activity_light' => 'Light',
+        'activity_moderate' => 'Moderate',
+        'activity_very' => 'Very active',
+        'activity_extreme' => 'Extreme',
+
+        'body_fat_source' => 'Body-fat source',
+        'body_fat_scale' => 'Scale (BIA) — from your smart scale',
+        'body_fat_navy' => 'Navy tape method — from neck, waist and height',
+        'body_fat_manual' => 'Manual — the body-fat percentage you log yourself',
+        'body_fat_help' => 'Drives lean mass, FFMI and partitioning. BIA scales are noisy day to day; the Navy tape method or a manual estimate are usually steadier for tracking a trend.',
+
+        'password_title' => 'Update password',
+        'password_help' => 'Use a long, random password to keep your account secure.',
+
+        'delete_title' => 'Delete account',
+        'delete_help' => 'Once your account is deleted, everything in it is permanently deleted. Download anything you want to keep first.',
+        'delete_button' => 'Delete account',
+        'delete_confirm_title' => 'Are you sure you want to delete your account?',
+        'delete_confirm_help' => 'Once your account is deleted, everything in it is permanently deleted. Enter your password to confirm.',
+        'cancel' => 'Cancel',
+
         'timezone' => 'Timezone',
         'timezone_help' => 'Decides which day and week each session counts toward. Get this wrong and an evening workout can land in the previous week, skewing your sets-per-week figures.',
         'language' => 'Language',
@@ -411,10 +487,6 @@ return [
         'unchanged' => 'Showing your latest analysis — your data has not changed since it was generated.',
     ],
 
-    'routines' => [
-        'edit_progression' => 'Edit / stage progression →',
-    ],
-
     'periods' => [
         'week' => 'Week',
         'month' => 'Month',
@@ -450,6 +522,76 @@ return [
         'sex_female' => 'female',
         'aged' => 'Age :age is taken into account where the data source supports it.',
         'add_age' => 'Add your age in Profile for an age-adjusted comparison.',
+
+        'no_bodyweight' => 'Log a body weight in Hevy and set your :profile — strength levels compare you to lifters of the same age, bodyweight and sex.',
+        'no_bodyweight_profile' => 'age and sex',
+        'no_lifts' => 'No standard-mapped lifts found yet. Strength standards cover barbell movements like bench, squat, deadlift, overhead press, barbell row and barbell curl. Log some and re-sync.',
+
+        /*
+         | The five rungs. Translated rather than printed from the constant,
+         | because "Advanced" reaching a Portuguese reader in English is exactly
+         | the half-finished localisation this app tests against.
+         */
+        'tier' => [
+            'Beginner' => 'Beginner',
+            'Novice' => 'Novice',
+            'Intermediate' => 'Intermediate',
+            'Advanced' => 'Advanced',
+            'Elite' => 'Elite',
+        ],
+
+        'stronger_than' => 'You are stronger than :percent of :sex :population lifters your age and bodyweight.',
+        'population_gym' => 'gym',
+        'population_competition' => 'competition',
+        'population_none' => '',
+        'pop_gym' => 'Gym: :percent',
+        'pop_verified' => 'Verified/competition: :percent',
+        'sample' => 'n=:count',
+        'age_factor' => 'age ×:value',
+        'source_link' => 'source',
+        'source' => [
+            'fitnessvolt' => 'FitnessVolt — gym + verified',
+            'openpowerlifting' => 'OpenPowerlifting — verified competition',
+            'builtin' => 'Built-in model (offline estimate)',
+        ],
+        'sources' => 'Levels use a layered data source: FitnessVolt (free, CC BY 4.0 — serving verified :opl competition percentiles plus self-reported gym percentiles), falling back to a locally-built OpenPowerlifting table, then an offline ratio model. The headline percentage is the gym population; the verified/competition one is shown alongside. See the :guide for details.',
+    ],
+
+    'routines' => [
+        'edit_progression' => 'Edit / stage progression →',
+
+        'performance' => 'Routine performance',
+        'performance_sub' => 'Volume progression across sessions (6 months)',
+        'routine' => 'Routine',
+        'sessions' => 'Sessions',
+        'avg_tonnage' => 'Avg tonnage',
+        'progression' => 'Progression',
+        'last_performed' => 'Last performed',
+        'noisy' => 'noisy',
+        'noisy_tip' => 'Session-to-session tonnage varies a lot here, so treat the direction as a hint rather than a measurement.',
+        'analyse' => 'Analyse',
+        'analyse_arrow' => 'Analyse →',
+        'none' => 'No routine sessions found. Sync your Hevy data.',
+        'all' => 'All routines',
+        'exercise_count' => '{1}1 exercise|[2,*]:count exercises',
+        'edit' => 'Edit / progress',
+
+        'progression_title' => 'Assisted progression',
+        'progression_sub' => 'Double progression, staged for your review before anything is sent',
+        'progression_body' => 'Builds an updated routine using double progression — add a rep up to 12, then add 2.5 kg and reset the reps — informed by your recent estimated 1RM for each exercise. It is staged as a pending write operation: you see the exact changes and confirm before anything reaches Hevy.',
+        'stage' => 'Stage progression',
+        'prescription' => 'Current prescription',
+
+        'session_tonnage' => 'Per-session tonnage',
+        'no_sessions' => 'No sessions recorded for this routine yet.',
+        'exercise_in_routine' => 'One exercise inside this routine',
+        'exercise_in_routine_sub' => 'Estimated 1RM progression for a chosen exercise',
+        'select_exercise' => 'Select an exercise…',
+        'pick_exercise' => 'Pick an exercise to chart its estimated 1RM within this routine.',
+        'coverage' => 'Muscle coverage',
+        'coverage_sub' => 'Prescribed working sets per session against the weekly landmarks',
+        'sets_per_session' => ':count sets',
+        'weekly_landmarks' => 'weekly MEV :mev · MAV :mav',
     ],
 
     'performance' => [
@@ -582,10 +724,28 @@ return [
         'retry' => 'Retry',
         'stalled' => 'stalled',
         'details' => 'details',
+        'intro' => 'Every change to Hevy is staged here first. Review the payload, then confirm to push. A successful write triggers an automatic re-sync.',
+        'none' => 'Nothing staged. Stage a routine progression from any routine’s edit page.',
     ],
 
     'photos' => [
         'limit_reached' => 'You have reached the limit of :limit progress photos. Delete some older ones to add more.',
+        'add' => 'Add a photo',
+        'add_sub' => 'The mirror is the most honest metric',
+        'date' => 'Date',
+        'angle' => 'Angle',
+        'angle_front' => 'Front',
+        'angle_side' => 'Side',
+        'angle_back' => 'Back',
+        'file' => 'Photo',
+        'weight' => 'Weight (kg, optional)',
+        'upload' => 'Upload',
+        'privacy' => 'Photos are private to your account and streamed only to you. Same pose, lighting and time of day is what makes a comparison mean anything.',
+        'compare' => 'Compare mode',
+        'compare_hint' => '(pick two photos)',
+        'delete_confirm' => 'Delete this photo?',
+        'delete' => 'Delete',
+        'none' => 'No photos yet. Upload your first progress photo to start a visual timeline.',
     ],
 
     'muscles' => [
@@ -675,6 +835,21 @@ return [
         'recomposition' => 'Recomposition',
         'cut' => 'Cut / fat loss',
         'strength' => 'Strength',
+
+        'choose' => 'Choose a goal',
+        'choose_sub' => 'Sets your calorie and macro targets, and the rate this app measures you against',
+        'fine_tune' => 'Fine-tune (optional)',
+        'fine_tune_sub' => 'Leave blank to use the evidence-based preset default',
+        'calorie_adjustment' => 'Calorie adj. %',
+        'protein_per_kg' => 'Protein g/kg',
+        'fat_per_kg' => 'Fat g/kg',
+        'rate' => 'Rate %BW/wk',
+        'training_profile' => 'Training profile:',
+        'reps' => 'reps',
+        'sets_per_muscle' => 'sets/muscle/wk',
+        'save' => 'Save goal',
+        'history' => 'History',
+        'active' => '(active)',
     ],
 
     'units' => [
@@ -768,6 +943,7 @@ return [
         'learn_more' => 'Learn more →',
         'skip_to_content' => 'Skip to content',
         'more_info' => 'More info',
+        'no_sets_in_range' => 'No sets in this range.',
     ],
 
 ];
