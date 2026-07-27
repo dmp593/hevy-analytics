@@ -198,6 +198,57 @@ class CsvImportTest extends TestCase
         $this->assertTrue($steps()['sync']);
     }
 
+    /**
+     * A Strong-shaped file: different header names, a unit-less Weight column
+     * with the unit beside it, warmups marked "W1" in Set Order, and no
+     * set_type at all. One parser, several apps' dialects — this is the whole
+     * multi-source strategy, since no other lifting app has a public API.
+     */
+    public function test_a_strong_shaped_export_imports_cleanly(): void
+    {
+        $user = $this->athlete();
+
+        $csv = implode("\n", [
+            'Date,Workout Name,Duration,Exercise Name,Set Order,Weight,Weight Unit,Reps,RPE,Notes',
+            '"2025-07-20 09:00:00","Morning Push","1h 5m","Bench Press (Barbell)","W1","135","lbs","10","",""',
+            '"2025-07-20 09:00:00","Morning Push","1h 5m","Bench Press (Barbell)","1","225","lbs","5","8",""',
+            '"2025-07-20 09:00:00","Morning Push","1h 5m","Lateral Raise (Dumbbell)","1","20","lbs","15","",""',
+        ]);
+
+        $this->upload($user, $csv)->assertRedirect(route('dashboard'))->assertSessionHas('status');
+
+        $workout = $user->workouts()->where('title', 'Morning Push')->firstOrFail();
+        $bench = $workout->exercises()->where('title', 'Bench Press (Barbell)')->firstOrFail();
+
+        $sets = $bench->sets()->orderBy('index')->get();
+
+        $this->assertSame('warmup', $sets[0]->type);
+        $this->assertSame('normal', $sets[1]->type);
+        // 225 lbs → 102.06 kg: the unit column, not the header, carried it.
+        $this->assertEqualsWithDelta(102.06, (float) $sets[1]->weight_kg, 0.01);
+    }
+
+    /** European Excel and some apps write semicolons; a comma parser sees one giant column. */
+    public function test_a_semicolon_delimited_file_is_sniffed_and_parsed(): void
+    {
+        $user = $this->athlete();
+
+        $csv = implode("\n", [
+            'Date;Workout Name;Exercise Name;Set Order;Weight;Weight Unit;Reps',
+            '2025-07-21 18:00:00;Legs;Squat (Barbell);1;100;kg;5',
+            '2025-07-21 18:00:00;Legs;Squat (Barbell);2;100;kg;5',
+        ]);
+
+        $this->upload($user, $csv)->assertSessionHas('status');
+
+        $workout = $user->workouts()->where('title', 'Legs')->firstOrFail();
+
+        $this->assertSame(2, WorkoutSet::whereHas(
+            'workoutExercise', fn ($q) => $q->where('workout_id', $workout->id),
+        )->count());
+        $this->assertSame('quadriceps', $user->exerciseTemplates()->where('title', 'Squat (Barbell)')->value('primary_muscle_group'));
+    }
+
     /** Spot checks on the classifier, including the traps in the rule order. */
     public function test_the_muscle_classifier_resolves_the_awkward_names(): void
     {

@@ -40,9 +40,14 @@ class HevyCsvImport
         'set_type' => ['set_type', 'type'],
         'weight_kg' => ['weight_kg'],
         'weight_lbs' => ['weight_lbs', 'weight_lb'],
+        // Strong's shape: a unit-less "Weight" column with its unit beside it.
+        'weight' => ['weight'],
+        'weight_unit' => ['weight_unit'],
         'reps' => ['reps', 'repetitions'],
         'distance_km' => ['distance_km'],
         'distance_miles' => ['distance_miles', 'distance_mi'],
+        'distance' => ['distance'],
+        'distance_unit' => ['distance_unit'],
         'duration_seconds' => ['duration_seconds', 'seconds'],
         'rpe' => ['rpe'],
         'superset_id' => ['superset_id'],
@@ -75,15 +80,26 @@ class HevyCsvImport
     /** @param resource $handle */
     private function parse($handle): array
     {
-        $header = fgetcsv($handle);
+        $firstLine = fgets($handle);
 
-        if ($header === false || count($header) < 3) {
+        if ($firstLine === false) {
             throw new ImportException(__('app.import.errors.not_csv'));
         }
 
         // Strip the BOM Excel loves to prepend; it otherwise glues itself to
         // the first header name and nothing matches.
-        $header[0] = preg_replace('/^\xEF\xBB\xBF/', '', (string) $header[0]);
+        $firstLine = preg_replace('/^\xEF\xBB\xBF/', '', $firstLine);
+
+        // Sniff the delimiter from the header line. Strong's exports (and any
+        // file that passed through European Excel) use semicolons; assuming
+        // commas would read the whole header as one unmatchable column.
+        $delimiter = substr_count($firstLine, ';') > substr_count($firstLine, ',') ? ';' : ',';
+
+        $header = str_getcsv(rtrim($firstLine, "\r\n"), $delimiter);
+
+        if (count($header) < 3) {
+            throw new ImportException(__('app.import.errors.not_csv'));
+        }
 
         $columns = $this->mapHeader($header);
 
@@ -100,7 +116,7 @@ class HevyCsvImport
         $skipped = 0;
         $rows = 0;
 
-        while (($row = fgetcsv($handle)) !== false) {
+        while (($row = fgetcsv($handle, null, $delimiter)) !== false) {
             if ($row === [null] || $row === false) {
                 continue; // blank line
             }
@@ -156,15 +172,24 @@ class HevyCsvImport
                 'sets' => [],
             ];
 
-            $weight = $get('weight_kg') !== '' ? (float) $get('weight_kg')
-                : ($get('weight_lbs') !== '' ? round((float) $get('weight_lbs') * 0.45359237, 2) : null);
+            $weight = $this->weightKg($get);
+            $distance = $this->distanceMeters($get);
 
-            $distance = $get('distance_km') !== '' ? (float) $get('distance_km') * 1000
-                : ($get('distance_miles') !== '' ? (float) $get('distance_miles') * 1609.344 : null);
+            // Strong has no set_type column; it marks warmups by writing the
+            // set order as "W" (or "W1"). Read that shape when no explicit
+            // type exists, so warmups do not pollute the hard-set counts.
+            $rawIndex = $get('set_index');
+            $type = $get('set_type') !== ''
+                ? $this->setType($get('set_type'))
+                : (str_starts_with(mb_strtolower($rawIndex), 'w') ? 'warmup' : 'normal');
 
             $workouts[$key]['exercises'][$exercise]['sets'][] = [
-                'index' => $get('set_index') !== '' ? (int) $get('set_index') : count($workouts[$key]['exercises'][$exercise]['sets']),
-                'type' => $this->setType($get('set_type')),
+                // The file's own row order is the index. Trusting the set
+                // column instead invites collisions — Strong numbers warmups
+                // as "W1" alongside a working set "1" — and both apps write
+                // rows in the order the sets were done anyway.
+                'index' => count($workouts[$key]['exercises'][$exercise]['sets']),
+                'type' => $type,
                 'weight_kg' => $weight,
                 'reps' => $get('reps') !== '' ? (int) $get('reps') : null,
                 'distance_meters' => $distance !== null ? (int) round($distance) : null,
@@ -294,7 +319,9 @@ class HevyCsvImport
         $map = [];
 
         foreach ($header as $i => $name) {
-            $name = mb_strtolower(trim((string) $name));
+            // "Workout Name" and "workout_name" are the same header wearing
+            // different apps' clothes.
+            $name = str_replace(' ', '_', mb_strtolower(trim((string) $name)));
 
             foreach (self::HEADER_ALIASES as $canonical => $aliases) {
                 if (in_array($name, $aliases, true) && ! isset($map[$canonical])) {
@@ -329,6 +356,54 @@ class HevyCsvImport
         } catch (\Throwable) {
             return null;
         }
+    }
+
+    /** @param  callable(string): string  $get */
+    private function weightKg(callable $get): ?float
+    {
+        if ($get('weight_kg') !== '') {
+            return (float) $get('weight_kg');
+        }
+
+        if ($get('weight_lbs') !== '') {
+            return round((float) $get('weight_lbs') * 0.45359237, 2);
+        }
+
+        if ($get('weight') !== '') {
+            $value = (float) $get('weight');
+
+            // A unit column decides; absent one, kg — the app's own unit, and
+            // the wrong guess is at least visible (numbers 2.2× off), where a
+            // silent lbs guess would flatter everyone using kg.
+            return str_starts_with(mb_strtolower($get('weight_unit')), 'lb')
+                ? round($value * 0.45359237, 2)
+                : $value;
+        }
+
+        return null;
+    }
+
+    /** @param  callable(string): string  $get */
+    private function distanceMeters(callable $get): ?int
+    {
+        $km = null;
+
+        if ($get('distance_km') !== '') {
+            $km = (float) $get('distance_km');
+        } elseif ($get('distance_miles') !== '') {
+            $km = (float) $get('distance_miles') * 1.609344;
+        } elseif ($get('distance') !== '') {
+            $value = (float) $get('distance');
+            $unit = mb_strtolower($get('distance_unit'));
+
+            $km = match (true) {
+                str_starts_with($unit, 'mi') => $value * 1.609344,
+                $unit === 'm' || str_starts_with($unit, 'meter') || str_starts_with($unit, 'metre') => $value / 1000,
+                default => $value,
+            };
+        }
+
+        return $km !== null ? (int) round($km * 1000) : null;
     }
 
     private function setType(string $raw): string
