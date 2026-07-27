@@ -179,6 +179,35 @@ never contacted, so sign-up cannot fail because a payment provider is down.
 
 Leave `PADDLE_PRICE_ID` empty to run without billing entirely.
 
+#### Getting the Paddle credentials
+
+Run `php artisan app:billing-check` at any point — it lists what is still
+missing, where in Paddle to find it, and which webhook events to subscribe to.
+
+Sandbox and live are **separate accounts with separate logins and separate
+credentials**. Start at <https://sandbox-vendors.paddle.com> with
+`PADDLE_SANDBOX=true`; nothing carries over when you switch.
+
+| Value | Where |
+|---|---|
+| `PADDLE_SELLER_ID` | Developer tools → Authentication (a number) |
+| `PADDLE_CLIENT_SIDE_TOKEN` | Developer tools → Authentication → Client-side tokens. Public — it ships in the page |
+| `PADDLE_API_KEY` | Developer tools → Authentication → API keys. Secret, shown once |
+| `PADDLE_WEBHOOK_SECRET` | Developer tools → Notifications → your destination |
+| `PADDLE_PRICE_ID` | Catalog → Products → your product → its price, starts `pri_` |
+
+The notification destination points at `https://yourdomain/paddle/webhook` and
+must be subscribed to exactly these events, or Cashier never learns about a
+payment:
+
+`customer.updated`, `transaction.completed`, `transaction.updated`,
+`subscription.created`, `subscription.updated`, `subscription.paused`,
+`subscription.canceled`
+
+Paddle has to be able to reach that URL, so testing webhooks locally needs a
+tunnel (`ngrok http 8000` or similar) with the tunnel's public URL in the
+destination and in `APP_URL`.
+
 > **`PADDLE_WEBHOOK_SECRET` is not optional once billing is on.** Cashier only
 > verifies webhook signatures when it is set; without it anyone who knows the
 > URL can POST `subscription.created` and grant themselves a paid account. The
