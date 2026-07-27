@@ -1,4 +1,4 @@
-<x-mail::message>
+<x-mail::message :preheader="__('app.mail.payment_failed.preheader')">
 # {{ __('app.mail.payment_failed.heading', ['name' => $user->name]) }}
 
 {{ __('app.mail.payment_failed.body') }}

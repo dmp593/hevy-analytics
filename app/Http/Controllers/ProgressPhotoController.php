@@ -44,7 +44,13 @@ class ProgressPhotoController extends Controller
             ]));
         }
 
-        $path = $request->file('photo')->store("progress-photos/{$request->user()->id}", 'local');
+        // config('filesystems.photos'), never a literal: on a container host
+        // the local disk is wiped on every deploy, and these are the files
+        // nobody can re-create.
+        $path = $request->file('photo')->store(
+            "progress-photos/{$request->user()->id}",
+            ProgressPhoto::disk(),
+        );
 
         $request->user()->progressPhotos()->create([
             'date' => $data['date'],
@@ -60,16 +66,22 @@ class ProgressPhotoController extends Controller
     public function show(Request $request, ProgressPhoto $photo): StreamedResponse
     {
         $this->authorizeOwner($photo);
-        abort_unless(Storage::disk('local')->exists($photo->path), 404);
+        $disk = Storage::disk(ProgressPhoto::disk());
 
-        return Storage::disk('local')->response($photo->path);
+        abort_unless($disk->exists($photo->path), 404);
+
+        // Streamed through the app on purpose, even from object storage: a
+        // public or signed bucket URL is a link that outlives the session
+        // and can be forwarded. These are photographs of someone's body.
+        return $disk->response($photo->path);
     }
 
     public function destroy(Request $request, ProgressPhoto $photo)
     {
         $this->authorizeOwner($photo);
 
-        Storage::disk('local')->delete($photo->path);
+        // The model's deleting hook removes the file, so deleting the row is
+        // enough — and is the one path that also covers the account cascade.
         $photo->delete();
 
         return redirect()->route('photos')->with('status', 'Photo deleted.');

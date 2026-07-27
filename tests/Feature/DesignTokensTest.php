@@ -127,7 +127,18 @@ class DesignTokensTest extends TestCase
             'Tokens defined in .dark with no light-mode default.');
     }
 
-    /** Every Blade view, as [path => [path]] so failures name the file. */
+    /**
+     * Every Blade view, as [path => [path]] so failures name the file.
+     *
+     * Mail templates are excluded, and it is not a shortcut. They are not
+     * Tailwind and never reach the browser: Laravel inlines their CSS at send
+     * time, because email clients support neither stylesheets nor custom
+     * properties — so the design tokens this class exists to enforce are
+     * precisely what an email cannot use. Their colours are hex by necessity,
+     * and their class names are resolved by the CSS inliner rather than by
+     * Tailwind's scanner. Judging them by these rules would fail them for
+     * being correct.
+     */
     public static function viewFiles(): array
     {
         $root = dirname(__DIR__, 2).'/resources/views';
@@ -139,6 +150,11 @@ class DesignTokensTest extends TestCase
                 continue;
             }
             $relative = 'resources/views'.substr($file->getPathname(), strlen($root));
+
+            if (str_starts_with($relative, 'resources/views/vendor/mail/')) {
+                continue;
+            }
+
             $cases[$relative] = [$file->getPathname()];
         }
 

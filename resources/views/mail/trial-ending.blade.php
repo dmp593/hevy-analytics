@@ -1,4 +1,4 @@
-<x-mail::message>
+<x-mail::message :preheader="__('app.mail.trial_ending.preheader')">
 # {{ __('app.mail.trial_ending.heading', ['name' => $user->name]) }}
 
 {{ __('app.mail.trial_ending.body', ['date' => $endsAt->isoFormat('D MMMM')]) }}

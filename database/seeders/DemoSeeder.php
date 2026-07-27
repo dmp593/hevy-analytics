@@ -59,6 +59,11 @@ class DemoSeeder
         $user->forceFill([
             'email_verified_at' => now(),
             'is_demo' => true,
+            // Comped, so the demo shows the SUBSCRIBED experience. Left on the
+            // free tier it capped its own history at 30 days and quietly
+            // demonstrated the cheaper product — the opposite of the point.
+            'comped_reason' => 'Public demonstration account',
+            'comped_until' => null,
             'hevy_api_key' => 'demo-key-not-a-real-credential',
             'sex' => 'male',
             'age' => 32,

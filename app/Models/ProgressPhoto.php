@@ -29,9 +29,15 @@ class ProgressPhoto extends Model
     {
         static::deleting(function (self $photo) {
             if ($photo->path) {
-                Storage::disk('local')->delete($photo->path);
+                Storage::disk(self::disk())->delete($photo->path);
             }
         });
+    }
+
+    /** Where progress photos are stored. One answer, asked from everywhere. */
+    public static function disk(): string
+    {
+        return config('filesystems.photos', 'local');
     }
 
     public function user(): BelongsTo

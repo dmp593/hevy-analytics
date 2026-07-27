@@ -24,6 +24,14 @@ FROM dunglas/frankenphp:1-php8.4 AS app
 RUN install-php-extensions pdo_pgsql intl zip gd opcache pcntl
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# postgresql-client: for the one-shot host migration in start.sh. Moving
+# between managed Postgres providers is a thing every deployment does once,
+# and doing it with pg_dump beats hand-rolling a row copier that has to know
+# about foreign key order, sequences and the migrations table.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
 # The base image setcaps cap_net_bind_service onto the frankenphp binary so it
 # can bind ports 80/443 as non-root. Render (like several PaaS runtimes) runs
 # containers with no-new-privileges, where exec()ing a binary that carries

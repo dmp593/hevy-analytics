@@ -136,7 +136,9 @@ return [
      */
     'mail' => [
         'signoff' => 'Keep lifting,',
+        'footer_reason' => 'You are receiving this because you have a Hevy Analytics account. This is an account notice, not marketing.',
         'trial_ending' => [
+            'preheader' => 'Nothing breaks when it ends — here is exactly what changes.',
             'subject' => '{1}Your trial ends tomorrow|[2,*]Your trial ends in :days days',
             'heading' => 'Hi :name',
             'body' => 'Your free trial of Hevy Analytics ends on :date. Until then you keep full access to everything — your whole history, measured maintenance, projections and the written analysis.',
@@ -145,6 +147,7 @@ return [
             'no_pressure' => 'If the app has not earned it, let it lapse — the free tier is honestly useful, and you can subscribe later at any time.',
         ],
         'payment_failed' => [
+            'preheader' => 'Nothing is cut off yet — it usually just needs a new card.',
             'subject' => 'Your payment did not go through',
             'heading' => 'Hi :name',
             'body' => 'Paddle could not charge your card for this month\'s subscription. This is almost always an expired or replaced card, not something you did.',

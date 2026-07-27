@@ -15,6 +15,24 @@ cd /app
 #                         the weekly schedule does the refreshing)
 #   bootstrap-accounts  — creates the operator accounts from BOOTSTRAP_* env
 #                         vars, and never touches an account that exists
+# One-shot migration between database hosts.
+#
+# Set MIGRATE_FROM_DATABASE_URL to the OLD database and redeploy; the contents
+# are copied into $DATABASE_URL and the variable can then be removed. Guarded
+# by "does the target already have a users table", so a redeploy that forgets
+# to remove the variable cannot overwrite live data with a stale snapshot —
+# the guard, not the operator's memory, is what makes this safe.
+if [ -n "${MIGRATE_FROM_DATABASE_URL:-}" ]; then
+    if psql "$DATABASE_URL" -tAc "select to_regclass('public.users')" | grep -q users; then
+        echo "==> Target database already populated — skipping host migration."
+    else
+        echo "==> Copying $MIGRATE_FROM_DATABASE_URL into the new database…"
+        pg_dump --no-owner --no-acl --no-comments "$MIGRATE_FROM_DATABASE_URL" \
+            | psql --quiet --set ON_ERROR_STOP=1 "$DATABASE_URL"
+        echo "==> Copy finished."
+    fi
+fi
+
 php artisan migrate --force
 php artisan app:demo --missing-only || true
 php artisan app:bootstrap-accounts || true

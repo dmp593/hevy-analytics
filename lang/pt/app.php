@@ -136,7 +136,9 @@ return [
      */
     'mail' => [
         'signoff' => 'Bons treinos,',
+        'footer_reason' => 'Recebes isto porque tens uma conta no Hevy Analytics. É um aviso de conta, não publicidade.',
         'trial_ending' => [
+            'preheader' => 'Não se parte nada quando terminar — aqui fica o que muda exatamente.',
             'subject' => '{1}O teu período de teste termina amanhã|[2,*]O teu período de teste termina em :days dias',
             'heading' => 'Olá :name',
             'body' => 'O teu período de teste do Hevy Analytics termina a :date. Até lá manténs acesso completo a tudo — o histórico inteiro, a manutenção medida, as projeções e a análise escrita.',
@@ -145,6 +147,7 @@ return [
             'no_pressure' => 'Se a aplicação não o mereceu, deixa expirar — o plano gratuito é genuinamente útil, e podes subscrever mais tarde a qualquer momento.',
         ],
         'payment_failed' => [
+            'preheader' => 'Ainda não foi cortado nada — normalmente é só um cartão novo.',
             'subject' => 'O teu pagamento não passou',
             'heading' => 'Olá :name',
             'body' => 'A Paddle não conseguiu cobrar a subscrição deste mês no teu cartão. Quase sempre é um cartão expirado ou substituído, não algo que tenhas feito.',
