@@ -9,6 +9,7 @@ use App\Services\Analytics\MuscleBalance;
 use App\Services\Analytics\NutritionService;
 use App\Services\Analytics\VolumeAnalytics;
 use App\Services\Hevy\SyncStatus;
+use App\Support\DataConfidence;
 use App\Support\Onboarding;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -35,6 +36,7 @@ class DashboardController extends Controller
         return view('dashboard', [
             'needsSetup' => false,
             'onboarding' => $onboarding,
+            'confidence' => DataConfidence::for($user),
             'status' => $bc->status(),
             'rate' => $bc->weightRateKgPerWeek(),
             'partitioning' => $bc->partitioning(),

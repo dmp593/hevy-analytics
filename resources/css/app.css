@@ -120,7 +120,13 @@
     --tier-1: oklch(0.53 0.012 260);
     --tier-2: oklch(0.47 0.13 230);
     --tier-3: oklch(0.47 0.15 150);
-    --tier-4: oklch(0.53 0.14 75);
+    /*
+     | 0.50, not 0.53: the tier badge sits on an 18% soft mix of itself, and at
+     | 0.53 the amber measured 4.19:1 there — just under AA. Found by the theme
+     | audit the first time live FitnessVolt data put an "Advanced" badge on
+     | the page.
+     */
+    --tier-4: oklch(0.50 0.14 75);
     --tier-5: oklch(0.55 0.20 300);
 
     /*

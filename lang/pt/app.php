@@ -34,7 +34,7 @@ return [
         'cta' => 'Experimenta :days dias grátis',
         'demo_cta' => 'Espreita primeiro — demo ao vivo',
         'cta_note' => 'Sem cartão. :price/mês depois, se quiseres.',
-        'requirement' => 'Precisas de uma conta :hevy e de uma chave de API das definições do próprio Hevy. Sem isso esta aplicação não tem nada para ler — melhor saberes antes de te registares do que depois.',
+        'requirement' => 'Precisas de uma conta :hevy — é lá que o treino fica registado. Trazer os dados para cá funciona de duas formas: uma chave de API (Hevy Pro) sincroniza sozinha, e a exportação CSV que qualquer conta Hevy gratuita produz importa-se num único envio.',
 
         'compare_log' => 'O teu registo, terça-feira',
         'compare_log_note' => 'Exato, completo, e calado sobre o que significa.',
@@ -80,6 +80,8 @@ return [
         'limit_landmarks_body' => 'MEV e MRV vêm de investigação sobre grupos de pessoas. A tua recuperação pode ficar acima ou abaixo. São um ponto de partida bem fundamentado, não uma medição tua.',
         'limit_ai' => 'A análise escrita é opcional, e é um modelo de linguagem',
         'limit_ai_body' => 'Recebe as métricas já calculadas que consegues ver — nunca o teu histórico em bruto e nunca as tuas chaves de API — e é-lhe pedido que sugira ajustes concretos. Continua a poder estar errada. Tudo o que diz sai de números que a aplicação te mostra à mesma, por isso podes conferir.',
+        'limit_sessions' => 'Precisa de um mínimo de histórico antes de ser fiável',
+        'limit_sessions_body' => 'Abaixo de cerca de dez sessões ao longo de três semanas, os ritmos semanais e as tendências são extrapolações, não medições. A aplicação di-lo no teu dashboard até cruzares essa linha — e o período de teste chega para a cruzar.',
         'limit_medical' => 'Não é aconselhamento médico nem treino',
         'limit_medical_body' => 'Nenhum médico, nutricionista ou treinador lê nada disto. É aritmética sobre os teus dados, com referência a investigação publicada, e não sabe da tua lesão, da tua medicação nem da tua vida.',
 
@@ -116,13 +118,51 @@ return [
     ],
 
     /*
+     | Importação por CSV — a porta de dados para contas que a API não serve.
+     */
+    'import' => [
+        'title' => 'Importar de um ficheiro CSV',
+        'subtitle' => 'Para contas Hevy sem chave de API — a exportação que qualquer conta consegue fazer',
+        'how_title' => 'Como obter o ficheiro',
+        'step_export' => 'Na app Hevy: Perfil → Definições → Exportar e importar dados → Exportar treinos.',
+        'step_email' => 'O Hevy envia-te por email um ficheiro workouts.csv em poucos minutos.',
+        'step_upload' => 'Envia aqui esse ficheiro, exatamente como chegou.',
+        'submit' => 'Importar o ficheiro',
+        'idempotent' => 'Importar o mesmo ficheiro duas vezes é seguro: um treino já importado é atualizado, nunca duplicado. Quando treinares mais, exporta de novo e envia o ficheiro novo — só as sessões novas são acrescentadas.',
+        'what_title' => 'O que uma importação traz e não traz',
+        'covers' => 'Tudo ao nível da série sobrevive: exercícios, cargas, repetições, tipos de série, RPE e datas — o suficiente para a análise de volume, força e progressão.',
+        'muscles' => 'O CSV não traz dados de músculos, por isso cada exercício é associado aos músculos pelo nome. Nomes de exercícios padrão associam bem; um exercício renomeado pode ficar sem músculo até ser reconhecido.',
+        'no_body' => 'As medições corporais não vêm na exportação do Hevy, por isso as tendências de peso e gordura precisam de registos na página de Nutrição (ou de uma chave de API).',
+        'existing' => '{1}Esta conta já tem :count treino — as importações fundem-se com ele.|[2,*]Esta conta já tem :count treinos — as importações fundem-se com eles.',
+        'done' => 'Importados :workouts treinos (:sets séries).',
+        'done_skipped' => ':count linhas não puderam ser lidas e foram ignoradas.',
+        'errors' => [
+            'unreadable' => 'Não foi possível abrir o ficheiro.',
+            'not_csv' => 'Isso não parece um ficheiro CSV. Envia o workouts.csv exatamente como o Hevy o enviou.',
+            'missing_columns' => 'Faltam colunas de que esta importação precisa (:columns). Envia a exportação original do Hevy, não uma cópia editada.',
+            'too_many_rows' => 'O ficheiro tem mais de :max linhas, o que está além de qualquer registo de treino. Se for uma exportação legítima, divide-a.',
+            'nothing_found' => 'Não foi possível ler nenhum treino desse ficheiro. Confirma que é a exportação de treinos, não a de medições.',
+            'row_missing' => 'A linha :row não tem data ou nome de exercício.',
+            'bad_date' => 'A linha :row tem uma data que esta importação não consegue ler (":value").',
+        ],
+    ],
+
+    /*
+     | O aviso de dados recentes, ao nível da conta.
+     */
+    'confidence' => [
+        'title' => 'Os teus números ainda estão a assentar',
+        'body' => '{1}Há uma sessão registada. Os ritmos semanais e as tendências passam de palpite a medição por volta de :needed_sessions sessões ao longo de :needed_days dias — até lá, lê a direção, não os dígitos.|[2,*]Há :sessions sessões ao longo de :days dias registadas. Os ritmos semanais e as tendências passam de palpite a medição por volta de :needed_sessions sessões ao longo de :needed_days dias — até lá, lê a direção, não os dígitos.',
+    ],
+
+    /*
      | A lista de arranque de uma conta nova, no dashboard.
      */
     'onboarding' => [
         'title' => 'Primeiros passos',
         'progress' => ':done de :total feitos',
-        'hevy_key' => 'Cola a tua chave de API do Hevy',
-        'hevy_key_help' => 'No teu perfil. O Hevy emite-a em Settings → Developer, em hevy.com.',
+        'hevy_key' => 'Liga os teus dados de treino',
+        'hevy_key_help' => 'Duas portas: cola a chave de API do Hevy no teu perfil (Hevy Pro), ou importa a exportação CSV que qualquer conta Hevy consegue fazer.',
         'sync' => 'Deixa o teu histórico sincronizar',
         'sync_help' => 'Arranca sozinho assim que a chave fica guardada. Um histórico longo pode demorar um ou dois minutos.',
         'profile' => 'Adiciona altura, idade e sexo',
@@ -481,6 +521,7 @@ return [
         'hevy_key' => 'Chave de API do Hevy',
         'hevy_key_placeholder' => 'Cola aqui a tua chave de API do Hevy',
         'hevy_key_set' => '•••••••• (deixa em branco para manteres a atual)',
+        'no_key_csv' => 'Sem chave de API? Isso é uma funcionalidade Hevy Pro — a :import funciona com qualquer conta Hevy.',
 
         'sex' => 'Sexo',
         'sex_male' => 'Masculino',

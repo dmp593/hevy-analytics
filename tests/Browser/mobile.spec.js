@@ -24,7 +24,7 @@ const GUEST_PAGES = ['/', '/login', '/register'];
 const PAGES = [
     '/dashboard', '/performance', '/strength-levels', '/muscle', '/body',
     '/photos', '/nutrition', '/projections', '/routines', '/goals',
-    '/ai', '/guide', '/write-operations', '/profile', '/billing',
+    '/ai', '/guide', '/write-operations', '/profile', '/import', '/billing',
 ];
 
 /** Runs in the page; returns everything that breaks a rule. */

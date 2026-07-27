@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataExportController;
 use App\Http\Controllers\DemoController;
 use App\Http\Controllers\GoalController;
+use App\Http\Controllers\ImportController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MuscleController;
 use App\Http\Controllers\NutritionController;
@@ -77,6 +78,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/ai/generate', [AiController::class, 'generate'])->middleware('throttle:10,1')->name('ai.generate');
 
     Route::post('/sync', [SyncController::class, 'store'])->middleware('throttle:6,1')->name('sync');
+
+    // CSV import: the data door for accounts the API cannot serve — Hevy only
+    // issues API keys to Pro subscribers, the CSV export is available to all.
+    Route::get('/import', [ImportController::class, 'index'])->name('import');
+    Route::post('/import', [ImportController::class, 'store'])
+        ->middleware('throttle:10,10')->name('import.store');
 
     // Write-back (external Hevy mutations — throttled to prevent abuse/duplication)
     Route::get('/write-operations', [WriteBackController::class, 'index'])->name('write.index');

@@ -19,7 +19,7 @@ import { signIn } from './helpers.js';
 const PAGES = [
     '/dashboard', '/body', '/muscle', '/nutrition', '/performance', '/routines',
     '/strength-levels', '/projections', '/goals', '/photos', '/guide', '/ai',
-    '/write-operations', '/profile',
+    '/write-operations', '/profile', '/import',
 ];
 
 /**

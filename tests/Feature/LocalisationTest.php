@@ -159,7 +159,7 @@ class LocalisationTest extends TestCase
         $paths = [
             '/dashboard', '/performance', '/strength-levels', '/muscle', '/body',
             '/photos', '/guide', '/nutrition', '/projections', '/routines', '/routines/r1',
-            '/routines/r1/edit', '/goals', '/ai', '/write-operations', '/profile', '/billing',
+            '/routines/r1/edit', '/goals', '/ai', '/write-operations', '/profile', '/billing', '/import',
         ];
 
         $leaks = [];

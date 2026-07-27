@@ -5,7 +5,7 @@ import { signIn } from './helpers.js';
 const PAGES = [
     '/dashboard', '/performance', '/strength-levels', '/muscle', '/body',
     '/photos', '/nutrition', '/projections', '/routines', '/goals',
-    '/ai', '/guide', '/write-operations', '/profile',
+    '/ai', '/guide', '/write-operations', '/profile', '/import',
 ];
 
 test('every page loads without a JS error', async ({ page }) => {

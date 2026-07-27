@@ -46,6 +46,11 @@
                 <x-text-input id="hevy_api_key" name="hevy_api_key" type="password" class="mt-1 block w-full"
                               :placeholder="$user->hasHevyKey() ? __('app.profile.hevy_key_set') : __('app.profile.hevy_key_placeholder')" autocomplete="off" />
                 <x-input-error class="mt-2" :messages="$errors->get('hevy_api_key')" />
+                <p class="mt-1 text-xs text-muted">
+                    {!! __('app.profile.no_key_csv', [
+                        'import' => '<a href="'.route('import').'" class="underline">'.__('app.import.title').'</a>',
+                    ]) !!}
+                </p>
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">

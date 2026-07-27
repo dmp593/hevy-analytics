@@ -239,7 +239,7 @@
         <p class="mt-3 max-w-3xl text-pretty text-body">{{ __('app.landing.limits_intro') }}</p>
 
         <ul class="mt-8 grid gap-4 sm:grid-cols-2">
-            @foreach (['logging', 'scale', 'projections', 'landmarks', 'ai', 'medical'] as $limit)
+            @foreach (['logging', 'sessions', 'scale', 'projections', 'landmarks', 'ai', 'medical'] as $limit)
                 <li class="flex gap-3 rounded-xl border border-line bg-surface p-5">
                     <svg class="mt-0.5 h-4 w-4 shrink-0 text-muted" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM8.7 7.3a1 1 0 0 0-1.4 1.4L8.6 10l-1.3 1.3a1 1 0 1 0 1.4 1.4L10 11.4l1.3 1.3a1 1 0 0 0 1.4-1.4L11.4 10l1.3-1.3a1 1 0 0 0-1.4-1.4L10 8.6 8.7 7.3z" clip-rule="evenodd" />

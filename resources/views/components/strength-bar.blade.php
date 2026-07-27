@@ -88,7 +88,9 @@
                  language file can reach. --}}
             {{ __('app.levels.source.'.($eval['source'] ?? 'builtin')) }}
             @if(!empty($eval['attribution']['url']))
-                · <a href="{{ $eval['attribution']['url'] }}" target="_blank" rel="noopener" class="underline">{{ $eval['attribution']['text'] ?? __('app.levels.source_link') }}</a>
+                {{-- py + negative my: a thumbable hit area on a link that must
+                     stay one metadata-line tall. --}}
+                · <a href="{{ $eval['attribution']['url'] }}" target="_blank" rel="noopener" class="-my-3.5 inline-flex items-center py-3.5 underline">{{ $eval['attribution']['text'] ?? __('app.levels.source_link') }}</a>
             @endif
         </span>
     </div>

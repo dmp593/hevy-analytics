@@ -114,7 +114,7 @@ class LandingPageTest extends TestCase
     {
         $response = $this->get('/')->assertOk();
 
-        foreach (['logging', 'scale', 'projections', 'landmarks', 'ai', 'medical'] as $limit) {
+        foreach (['logging', 'sessions', 'scale', 'projections', 'landmarks', 'ai', 'medical'] as $limit) {
             $response->assertSee(__("app.landing.limit_{$limit}"));
         }
     }

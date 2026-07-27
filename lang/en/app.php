@@ -33,7 +33,7 @@ return [
         'cta' => 'Try it free for :days days',
         'demo_cta' => 'Look inside first — live demo',
         'cta_note' => 'No card. :price/month afterwards, if you want it.',
-        'requirement' => 'You need a :hevy account and an API key from Hevy’s own settings. Without one this app has nothing to read — worth knowing before you sign up, not after.',
+        'requirement' => 'You need a :hevy account — that is where training gets logged. Getting the data here works two ways: an API key (Hevy Pro) syncs automatically, and the CSV export every free Hevy account can produce imports in one upload.',
 
         'compare_log' => 'Your log, Tuesday',
         'compare_log_note' => 'Accurate, complete, and silent about what it means.',
@@ -81,6 +81,8 @@ return [
         'limit_ai_body' => 'It is sent the computed metrics you can already see — never your raw history and never your API keys — and asked for concrete adjustments. It can still be wrong. Everything it says is derived from numbers the app shows you anyway, so you can check it.',
         'limit_medical' => 'It is not medical or coaching advice',
         'limit_medical_body' => 'No doctor, dietitian or coach reads any of this. It is arithmetic on your own data, referenced to published research, and it does not know about your injury, your medication or your life.',
+        'limit_sessions' => 'It needs a minimum of history before it is trustworthy',
+        'limit_sessions_body' => 'Below roughly ten sessions across three weeks, weekly rates and trends are extrapolations, not measurements. The app says so on your dashboard until you cross that line, and the free trial is long enough to cross it.',
 
         'pricing_title' => 'What it costs',
         'pricing_body' => 'One plan, and the only thing behind it is how far back the analysis can see. Free accounts get the last :days days of history — enough to use every page and judge whether the app is any good. Everything that makes it worth paying for needs longer than that: a trend needs months, measured maintenance needs weeks of logging, a projection needs a year.',
@@ -115,13 +117,51 @@ return [
     ],
 
     /*
+     | CSV import — the data door for accounts the API cannot serve.
+     */
+    'import' => [
+        'title' => 'Import from a CSV file',
+        'subtitle' => 'For Hevy accounts without an API key — the export every account can make',
+        'how_title' => 'How to get the file',
+        'step_export' => 'In the Hevy app: Profile → Settings → Export & import data → Export workouts.',
+        'step_email' => 'Hevy emails you a workouts.csv file within a few minutes.',
+        'step_upload' => 'Upload that file here, exactly as it arrived.',
+        'submit' => 'Import the file',
+        'idempotent' => 'Importing the same file twice is safe: a workout already imported is updated, never duplicated. When you train more, export again and upload the new file — only the new sessions are added.',
+        'what_title' => 'What an import can and cannot carry',
+        'covers' => 'Everything set-level survives: exercises, weights, reps, set types, RPE and dates — enough for volume, strength and progression analysis.',
+        'muscles' => 'The CSV has no muscle data, so each exercise is matched to its muscles by name. Standard exercise names match well; a renamed exercise may land under no muscle until it is recognised.',
+        'no_body' => 'Body measurements are not in Hevy’s export, so weight and body-fat trends need entries on the Nutrition page (or an API key).',
+        'existing' => '{1}This account already holds :count workout — imports merge into it.|[2,*]This account already holds :count workouts — imports merge into them.',
+        'done' => 'Imported :workouts workouts (:sets sets).',
+        'done_skipped' => ':count rows could not be read and were skipped.',
+        'errors' => [
+            'unreadable' => 'The file could not be opened.',
+            'not_csv' => 'That does not look like a CSV file. Upload the workouts.csv exactly as Hevy sent it.',
+            'missing_columns' => 'The file is missing columns this import needs (:columns). Upload Hevy’s own export rather than an edited copy.',
+            'too_many_rows' => 'The file has more than :max rows, which is beyond anything a training log produces. If this is a legitimate export, split it.',
+            'nothing_found' => 'No workouts could be read from that file. Check it is the workouts export, not the measurements one.',
+            'row_missing' => 'Row :row is missing its date or exercise name.',
+            'bad_date' => 'Row :row has a date this import cannot read (":value").',
+        ],
+    ],
+
+    /*
+     | The account-wide young-data notice.
+     */
+    'confidence' => [
+        'title' => 'Your numbers are still settling',
+        'body' => '{1}One session is on record. Weekly rates and trends become measurements rather than guesses at about :needed_sessions sessions across :needed_days days — until then, treat direction as the signal, not the digits.|[2,*]:sessions sessions across :days days are on record. Weekly rates and trends become measurements rather than guesses at about :needed_sessions sessions across :needed_days days — until then, treat direction as the signal, not the digits.',
+    ],
+
+    /*
      | The new-account checklist on the dashboard.
      */
     'onboarding' => [
         'title' => 'Getting set up',
         'progress' => ':done of :total done',
-        'hevy_key' => 'Paste your Hevy API key',
-        'hevy_key_help' => 'In your profile. Hevy issues it under Settings → Developer on hevy.com.',
+        'hevy_key' => 'Connect your training data',
+        'hevy_key_help' => 'Two ways in: paste your Hevy API key in your profile (Hevy Pro), or import the CSV export any Hevy account can make.',
         'sync' => 'Let your history sync',
         'sync_help' => 'Starts by itself once the key is saved. A long history can take a minute or two.',
         'profile' => 'Add height, age and sex',
@@ -480,6 +520,7 @@ return [
         'hevy_key' => 'Hevy API key',
         'hevy_key_placeholder' => 'Paste your Hevy API key',
         'hevy_key_set' => '•••••••• (leave blank to keep the current one)',
+        'no_key_csv' => 'No API key? That is a Hevy Pro feature — the :import works for every Hevy account.',
 
         'sex' => 'Sex',
         'sex_male' => 'Male',

@@ -21,10 +21,15 @@ class Onboarding
 
     public static function for(User $user): self
     {
+        // Two doors into the app now: the API key (Hevy Pro) and the CSV
+        // import (any Hevy account). Either one satisfies the data steps — a
+        // CSV-only athlete must not be shown a checklist that can never finish.
+        $hasWorkouts = $user->workouts()->exists();
+
         return new self([
             [
                 'key' => 'hevy_key',
-                'done' => $user->hasHevyKey(),
+                'done' => $user->hasHevyKey() || $hasWorkouts,
                 'route' => route('profile.edit'),
             ],
             [
@@ -32,7 +37,7 @@ class Onboarding
                 // but it still needs a worker and a moment — naming it tells
                 // the user what "still empty" means in the meantime.
                 'key' => 'sync',
-                'done' => $user->hevy_last_synced_at !== null,
+                'done' => $user->hevy_last_synced_at !== null || $hasWorkouts,
                 'route' => route('dashboard'),
             ],
             [

@@ -15,6 +15,11 @@
              blank charts, which looks broken rather than empty. --}}
         <x-ui.card :title="__('app.dashboard.welcome_title')" class="mb-6">
             <p class="max-w-prose text-sm text-body">{{ __('app.dashboard.welcome_body') }}</p>
+            <div class="mt-4 flex flex-wrap gap-3">
+                <x-ui.button :href="route('profile.edit')">{{ __('app.dashboard.set_up_profile') }}</x-ui.button>
+                {{-- The door for Hevy accounts without Pro: same data, one file. --}}
+                <x-ui.button :href="route('import')" variant="secondary">{{ __('app.import.title') }}</x-ui.button>
+            </div>
         </x-ui.card>
         <x-onboarding :onboarding="$onboarding" />
     @else
@@ -23,6 +28,21 @@
         @unless (($onboarding ?? null)?->complete() ?? true)
             <div class="mb-6"><x-onboarding :onboarding="$onboarding" /></div>
         @endunless
+
+        {{-- Young data reads as a broken product: weekly rates computed from
+             four days swing wildly, and nothing used to say why. Said once,
+             here, account-wide — and it disappears the day it stops being
+             true. Individual pages keep their own low-confidence hedges. --}}
+        @if (isset($confidence) && $confidence->sessions > 0 && ! $confidence->established())
+            <x-ui.insight tone="info" :title="__('app.confidence.title')" class="mb-6">
+                <p>{{ trans_choice('app.confidence.body', $confidence->sessions, [
+                    'sessions' => $confidence->sessions,
+                    'days' => $confidence->spanDays,
+                    'needed_sessions' => \App\Support\DataConfidence::MIN_SESSIONS,
+                    'needed_days' => \App\Support\DataConfidence::MIN_SPAN_DAYS,
+                ]) }}</p>
+            </x-ui.insight>
+        @endif
         @php
             $goalLabel = $goal ? \App\Science\Goals\GoalType::label($goal->type) : __('app.dashboard.no_goal');
             $ratePct = $rate['pct_bw_per_week'] ?? null;
