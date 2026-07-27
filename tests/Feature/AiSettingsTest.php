@@ -184,7 +184,7 @@ class AiSettingsTest extends TestCase
      */
     public function test_a_key_containing_control_characters_is_rejected_at_the_form(): void
     {
-        foreach (["sk-real\r\nX-Injected: 1", "sk-real\nfoo", "sk with space", "sk-real\ttab"] as $bad) {
+        foreach (["sk-real\r\nX-Injected: 1", "sk-real\nfoo", 'sk with space', "sk-real\ttab"] as $bad) {
             $this->actingAs(User::factory()->create())
                 ->put('/settings/ai', $this->form(['api_key' => $bad]))
                 ->assertSessionHasErrors('api_key');
@@ -212,7 +212,7 @@ class AiSettingsTest extends TestCase
     {
         $this->actingAs(User::factory()->create())
             ->put('/settings/ai', $this->form([
-                'provider' => \App\Services\AI\ProviderRegistry::COMPATIBLE,
+                'provider' => ProviderRegistry::COMPATIBLE,
                 'api_key' => 'sk-a-real-secret-key',
                 'base_url' => 'https://10.0.0.5/v1',
             ]))

@@ -4,11 +4,11 @@ namespace App\Services\AI\Drivers;
 
 use App\Services\AI\ChatResult;
 use App\Services\AI\Contracts\ChatDriver;
+use App\Services\AI\PinnedHttp;
 use App\Services\AI\ProviderCredentials;
 use App\Services\AI\ProviderException;
 use App\Services\AI\ProviderRegistry;
 use Illuminate\Http\Client\ConnectionException;
-use App\Services\AI\PinnedHttp;
 
 /**
  * Anthropic's Messages API, which differs from the OpenAI schema in four ways

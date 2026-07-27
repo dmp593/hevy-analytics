@@ -120,7 +120,7 @@ class StrengthAnalytics
      * Shares one row fetch with the caller so adding it costs no extra queries.
      *
      * @return array<string, array{direction: string, per_week: float, sessions: int, r2: float, reliable: bool}>
-     *                                    Keyed by template id, falling back to the exercise title.
+     *                                                                                                            Keyed by template id, falling back to the exercise title.
      */
     public function exerciseTrends(?Collection $rows = null): array
     {

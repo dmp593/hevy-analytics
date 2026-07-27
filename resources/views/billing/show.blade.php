@@ -63,7 +63,45 @@
         </div>
     </x-ui.card>
 
-    @if ($state->shouldPromptToSubscribe())
+    {{-- A demo visitor is the one person on this page who is deciding whether
+         to pay, and the comped state hid the pitch from exactly them: the
+         subscription page rendered as a bare "Complimentary access" card. They
+         get the offer, with the register button instead of a checkout — there
+         is nothing to charge a shared account for. --}}
+    @if (auth()->user()->is_demo)
+        <x-ui.card :title="__('app.billing.what_you_get')" :subtitle="__('app.billing.price_line', ['price' => $price])">
+            <ul class="space-y-3 text-sm text-body">
+                @foreach ([
+                    __('app.billing.benefit_history', ['days' => config('billing.entitlements.free.history_days')]),
+                    __('app.billing.benefit_trends'),
+                    __('app.billing.benefit_nutrition'),
+                    __('app.billing.benefit_ai', ['count' => config('billing.entitlements.subscribed.ai_analyses_per_month')]),
+                ] as $benefit)
+                    <li class="flex gap-2.5">
+                        <svg class="mt-0.5 h-4 w-4 shrink-0 text-good" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M16.7 5.3a1 1 0 0 1 0 1.4l-7.5 7.5a1 1 0 0 1-1.4 0l-3.5-3.5a1 1 0 1 1 1.4-1.4l2.8 2.8 6.8-6.8a1 1 0 0 1 1.4 0z" clip-rule="evenodd" />
+                        </svg>
+                        <span>{{ $benefit }}</span>
+                    </li>
+                @endforeach
+            </ul>
+
+            <div class="mt-5 rounded-lg border border-line bg-surface-sunk px-4 py-3">
+                <p class="text-xs font-semibold text-muted">{{ __('app.billing.limits_title') }}</p>
+                <p class="mt-1 text-xs text-muted">{{ __('app.billing.limits_body') }}</p>
+            </div>
+
+            <div class="mt-5 flex flex-wrap items-center gap-4">
+                <form method="POST" action="{{ route('demo.leave') }}">
+                    @csrf
+                    <x-ui.button type="submit" size="lg">
+                        {{ __('app.landing.cta', ['days' => config('billing.trial_days')]) }}
+                    </x-ui.button>
+                </form>
+                <p class="text-xs text-muted">{{ __('app.billing.cancel_anytime') }}</p>
+            </div>
+        </x-ui.card>
+    @elseif ($state->shouldPromptToSubscribe())
         <x-ui.card :title="__('app.billing.what_you_get')" :subtitle="__('app.billing.price_line', ['price' => $price])">
             {{-- Stated as the difference it makes, not as a feature grid. Every
                  page works on both tiers; what changes is how far back the

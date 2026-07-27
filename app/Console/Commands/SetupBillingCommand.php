@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Support\EnvFile;
+use Illuminate\Console\Command;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\note;
@@ -178,5 +178,4 @@ class SetupBillingCommand extends Command
 
         return self::SUCCESS;
     }
-
 }

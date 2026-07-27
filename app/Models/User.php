@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Billing\Entitlements;
+use App\Billing\State;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -144,14 +146,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /** What this athlete is allowed to see, given their billing state. */
-    public function entitlements(): \App\Billing\Entitlements
+    public function entitlements(): Entitlements
     {
-        return \App\Billing\Entitlements::for($this);
+        return Entitlements::for($this);
     }
 
-    public function billingState(): \App\Billing\State
+    public function billingState(): State
     {
-        return \App\Billing\State::for($this);
+        return State::for($this);
     }
 
     /**

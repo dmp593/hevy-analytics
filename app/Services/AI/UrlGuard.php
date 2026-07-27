@@ -70,8 +70,8 @@ class UrlGuard
 
     /**
      * @return array{ok: bool, url: ?string, host: ?string, ips: array<int, string>, reason: ?string}
-     *                                    `host` and `ips` are what the caller must connect to; using
-     *                                    anything else reopens the rebinding window.
+     *                                                                                                `host` and `ips` are what the caller must connect to; using
+     *                                                                                                anything else reopens the rebinding window.
      */
     public static function check(string $url): array
     {
@@ -306,7 +306,7 @@ class UrlGuard
             return true;
         }
 
-        $mask = ~((1 << (8 - $remainder)) - 1) & 0xff;
+        $mask = ~((1 << (8 - $remainder)) - 1) & 0xFF;
 
         return (ord($ipBin[$whole]) & $mask) === (ord($netBin[$whole]) & $mask);
     }

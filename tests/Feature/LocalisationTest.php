@@ -129,8 +129,6 @@ class LocalisationTest extends TestCase
      * A key that does not exist renders as its own dotted path — "guide.volume.mv"
      * appears in the page, in every language, and nothing errors. It is the
      * failure mode of a rename, and it is invisible unless something looks.
-     *
-     * @param  string  $locale
      */
     #[DataProvider('locales')]
     public function test_no_page_leaks_a_raw_translation_key(string $locale): void

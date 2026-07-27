@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Providers\AppServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\Subscribes;
 use Tests\TestCase;
@@ -130,7 +131,7 @@ class BillingPageTest extends TestCase
     {
         config(['cashier.webhook_secret' => null, 'billing.price_id' => 'pri_live']);
 
-        $provider = new \App\Providers\AppServiceProvider($this->app);
+        $provider = new AppServiceProvider($this->app);
 
         $this->app->detectEnvironment(fn () => 'production');
 
@@ -147,7 +148,7 @@ class BillingPageTest extends TestCase
 
         $this->app->detectEnvironment(fn () => 'production');
 
-        $provider = new \App\Providers\AppServiceProvider($this->app);
+        $provider = new AppServiceProvider($this->app);
         $provider->boot();
 
         $this->assertTrue(true, 'boot completed without throwing');

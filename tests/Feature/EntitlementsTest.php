@@ -4,9 +4,12 @@ namespace Tests\Feature;
 
 use App\Billing\State;
 use App\Models\User;
+use App\Services\AI\ProviderRegistry;
+use App\Services\Analytics\BodyCompAnalytics;
+use App\Services\Analytics\FilterCriteria;
+use App\Services\Analytics\SetQuery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
-use Laravel\Paddle\Subscription;
 use Tests\Support\SeedsTrainingData;
 use Tests\Support\Subscribes;
 use Tests\TestCase;
@@ -118,12 +121,12 @@ class EntitlementsTest extends TestCase
         $this->seedWorkout($user, Carbon::now()->subDays(5)->setTime(18, 0), ['bench'], setsPerExercise: 4);
         $this->seedWorkout($user, Carbon::now()->subDays(200)->setTime(18, 0), ['bench'], setsPerExercise: 4);
 
-        $filter = new \App\Services\Analytics\FilterCriteria(
+        $filter = new FilterCriteria(
             from: Carbon::now()->subYears(2),
             to: Carbon::now(),
         );
 
-        $sets = (new \App\Services\Analytics\SetQuery($user, $filter))->rows();
+        $sets = (new SetQuery($user, $filter))->rows();
 
         $this->assertCount(4, $sets, 'only the session inside the cap should be visible');
     }
@@ -138,12 +141,12 @@ class EntitlementsTest extends TestCase
         $this->subscribe($user);
         $user = $user->fresh();
 
-        $filter = new \App\Services\Analytics\FilterCriteria(
+        $filter = new FilterCriteria(
             from: Carbon::now()->subYears(2),
             to: Carbon::now(),
         );
 
-        $this->assertCount(8, (new \App\Services\Analytics\SetQuery($user, $filter))->rows());
+        $this->assertCount(8, (new SetQuery($user, $filter))->rows());
     }
 
     /** The cap narrows a window; it must never widen a narrower one. */
@@ -177,7 +180,7 @@ class EntitlementsTest extends TestCase
         $user->bodyMeasurements()->create(['date' => Carbon::now()->subDays(2), 'weight_kg' => 80]);
         $user->bodyMeasurements()->create(['date' => Carbon::now()->subDays(300), 'weight_kg' => 95]);
 
-        $analytics = new \App\Services\Analytics\BodyCompAnalytics($user);
+        $analytics = new BodyCompAnalytics($user);
 
         // History is capped…
         $this->assertCount(1, $analytics->series('weight_kg', Carbon::now()->subYears(2)));
@@ -234,7 +237,7 @@ class EntitlementsTest extends TestCase
     {
         $user = User::factory()->free()->create();
         $user->aiCredentials()->create([
-            'provider' => \App\Services\AI\ProviderRegistry::OPENAI,
+            'provider' => ProviderRegistry::OPENAI,
             'api_key' => 'sk-their-own',
             'model' => 'gpt-4o',
             'base_url' => 'https://api.openai.com/v1',

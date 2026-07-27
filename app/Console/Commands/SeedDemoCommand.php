@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\User;
 use App\Models\WorkoutSet;
 use Database\Seeders\DemoSeeder;
 use Illuminate\Console\Command;
@@ -39,7 +40,7 @@ class SeedDemoCommand extends Command
         // hold the whole app's cold start hostage. The weekly scheduled run
         // does the refreshing; boots only repair a missing demo.
         if ($this->option('missing-only')) {
-            $existing = \App\Models\User::where('email', $email)->where('is_demo', true)->first();
+            $existing = User::where('email', $email)->where('is_demo', true)->first();
 
             if ($existing && $existing->workouts()->exists()) {
                 $this->line('Demo already seeded — skipping.');

@@ -1,22 +1,23 @@
 <?php
 
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AiController;
+use App\Http\Controllers\AiSettingsController;
 use App\Http\Controllers\BodyCompositionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DataExportController;
+use App\Http\Controllers\DemoController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MuscleController;
 use App\Http\Controllers\NutritionController;
 use App\Http\Controllers\PerformanceController;
-use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\AiSettingsController;
-use App\Http\Controllers\DataExportController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\ProgressPhotoController;
 use App\Http\Controllers\ProjectionController;
 use App\Http\Controllers\RoutineController;
 use App\Http\Controllers\StrengthLevelController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\SyncController;
 use App\Http\Controllers\WriteBackController;
 use Illuminate\Support\Facades\Route;
@@ -34,9 +35,9 @@ Route::get('/', function () {
 
 // The one-click demo. Guest-only and rate limited: it performs a login, and a
 // login endpoint with no throttle is a free session-fixation playground.
-Route::post('/demo', [App\Http\Controllers\DemoController::class, 'enter'])
+Route::post('/demo', [DemoController::class, 'enter'])
     ->middleware(['guest', 'throttle:10,1'])->name('demo.enter');
-Route::post('/demo/leave', [App\Http\Controllers\DemoController::class, 'leave'])
+Route::post('/demo/leave', [DemoController::class, 'leave'])
     ->middleware('auth')->name('demo.leave');
 
 Route::middleware(['auth', 'verified'])->group(function () {

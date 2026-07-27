@@ -255,7 +255,7 @@ return [
         'who' => 'Administrador',
         'what' => 'Ação',
         'by_console' => 'Consola do servidor',
-        'no_actions' =>'Nenhum administrador alterou esta conta.',
+        'no_actions' => 'Nenhum administrador alterou esta conta.',
         'actions' => [
             'granted_access' => 'Ofereceu acesso',
             'revoked_access' => 'Retirou o acesso oferecido',
@@ -399,11 +399,11 @@ return [
 
     'settings' => [
         'ai' => [
-        'add_key' => 'Adiciona uma chave de um fornecedor de IA em :settings para ativar a análise escrita. Serve qualquer chave OpenAI, Anthropic ou compatível com OpenAI.',
-        'no_limit_own_key' => 'A usar a tua própria chave — não se aplica limite mensal.',
-        'want_unlimited' => 'Usa a tua própria chave para análises ilimitadas.',
-        'generated_meta' => 'Gerada :when · :model',
-        'intro' => 'Uma análise escrita do teu volume de treino, tendências de força, trajetória da composição corporal e nutrição. O modelo recebe as métricas já calculadas que vês nas outras páginas — séries semanais face às referências, tendências do 1RM estimado, partição dos ganhos, alvos de calorias e macros — e devolve ajustes concretos para as próximas quatro semanas. O teu histórico de treinos em bruto e as tuas chaves de API nunca são enviados.',
+            'add_key' => 'Adiciona uma chave de um fornecedor de IA em :settings para ativar a análise escrita. Serve qualquer chave OpenAI, Anthropic ou compatível com OpenAI.',
+            'no_limit_own_key' => 'A usar a tua própria chave — não se aplica limite mensal.',
+            'want_unlimited' => 'Usa a tua própria chave para análises ilimitadas.',
+            'generated_meta' => 'Gerada :when · :model',
+            'intro' => 'Uma análise escrita do teu volume de treino, tendências de força, trajetória da composição corporal e nutrição. O modelo recebe as métricas já calculadas que vês nas outras páginas — séries semanais face às referências, tendências do 1RM estimado, partição dos ganhos, alvos de calorias e macros — e devolve ajustes concretos para as próximas quatro semanas. O teu histórico de treinos em bruto e as tuas chaves de API nunca são enviados.',
             'title' => 'Fornecedor de análise por IA',
             'subtitle' => 'Usa a tua própria chave de API para análises ilimitadas, ou deixa em branco para usar a quota incluída na tua conta',
             'provider' => 'Fornecedor',
@@ -542,6 +542,7 @@ return [
         'refresh' => 'Procurar nova análise',
         'generate' => 'Gerar análise',
         'regenerate' => 'Gerar de novo',
+        'showing_existing' => 'Uma análise de exemplo, gerada anteriormente',
         'unavailable' => 'A análise por IA ainda não está disponível na sua conta.',
         'quota' => 'Restam :remaining de :limit análises este mês.',
         'quota_spent' => 'Usou as :limit análises por IA deste mês. O limite volta a zero a :date.',

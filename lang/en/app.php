@@ -399,11 +399,11 @@ return [
 
     'settings' => [
         'ai' => [
-        'add_key' => 'Add an AI provider key in :settings to enable written analysis. Any OpenAI, Anthropic or OpenAI-compatible key works.',
-        'no_limit_own_key' => 'Running on your own provider key — no monthly limit applies.',
-        'want_unlimited' => 'Use your own key for unlimited analyses.',
-        'generated_meta' => 'Generated :when · :model',
-        'intro' => 'A written review of your training volume, strength trends, body-composition trajectory and nutrition. The model is sent the computed metrics you can already see on the other pages — weekly sets against landmarks, estimated 1RM trends, gain partitioning, calorie and macro targets — and asked for concrete adjustments for the next four weeks. Your raw workout history and your API keys are never sent.',
+            'add_key' => 'Add an AI provider key in :settings to enable written analysis. Any OpenAI, Anthropic or OpenAI-compatible key works.',
+            'no_limit_own_key' => 'Running on your own provider key — no monthly limit applies.',
+            'want_unlimited' => 'Use your own key for unlimited analyses.',
+            'generated_meta' => 'Generated :when · :model',
+            'intro' => 'A written review of your training volume, strength trends, body-composition trajectory and nutrition. The model is sent the computed metrics you can already see on the other pages — weekly sets against landmarks, estimated 1RM trends, gain partitioning, calorie and macro targets — and asked for concrete adjustments for the next four weeks. Your raw workout history and your API keys are never sent.',
             'title' => 'AI analysis provider',
             'subtitle' => 'Use your own API key for unlimited analyses, or leave this blank to use the allowance included with your account',
             'provider' => 'Provider',
@@ -541,6 +541,7 @@ return [
         'refresh' => 'Check for new analysis',
         'generate' => 'Generate analysis',
         'regenerate' => 'Regenerate',
+        'showing_existing' => 'A sample analysis, generated earlier',
         'unavailable' => "AI analysis isn't available on your account yet.",
         'quota' => ':remaining of :limit analyses left this month.',
         'quota_spent' => 'You have used all :limit AI analyses for this month. Your allowance resets on :date.',

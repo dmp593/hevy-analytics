@@ -4,6 +4,7 @@ namespace App\Services\AI\Contracts;
 
 use App\Services\AI\ChatResult;
 use App\Services\AI\ProviderCredentials;
+use App\Services\AI\ProviderException;
 
 /**
  * A single non-streaming chat completion.
@@ -16,8 +17,8 @@ use App\Services\AI\ProviderCredentials;
 interface ChatDriver
 {
     /**
-     * @throws \App\Services\AI\ProviderException when the call fails or the
-     *                                            response cannot be read.
+     * @throws ProviderException when the call fails or the
+     *                           response cannot be read.
      */
     public function chat(ProviderCredentials $credentials, string $systemPrompt, string $userPrompt): ChatResult;
 

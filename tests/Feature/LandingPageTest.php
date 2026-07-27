@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Support\Locales;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -132,7 +133,7 @@ class LandingPageTest extends TestCase
 
     public function test_it_renders_in_every_shipped_language(): void
     {
-        foreach (\App\Support\Locales::codes() as $locale) {
+        foreach (Locales::codes() as $locale) {
             $this->post("/locale/{$locale}");
 
             $this->get('/')

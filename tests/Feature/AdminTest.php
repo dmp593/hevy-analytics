@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Billing\State;
 use App\Models\AdminAction;
 use App\Models\User;
+use App\Services\AI\ProviderRegistry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\Subscribes;
 use Tests\TestCase;
@@ -289,7 +290,7 @@ class AdminTest extends TestCase
         $target = User::factory()->create();
         $target->forceFill(['hevy_api_key' => 'hevy-secret-value'])->save();
         $target->aiCredentials()->create([
-            'provider' => \App\Services\AI\ProviderRegistry::OPENAI,
+            'provider' => ProviderRegistry::OPENAI,
             'api_key' => 'sk-provider-secret',
             'model' => 'gpt-4o',
             'base_url' => 'https://api.openai.com/v1',

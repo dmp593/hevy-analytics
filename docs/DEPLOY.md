@@ -4,6 +4,12 @@ Two paths. Both end with a public URL, both cost €0, and both need something
 only you can do: create the hosting account. Everything the repository can
 prepare is already prepared.
 
+> **Already deployed?** `deploy/render.sh` does the whole of Path A through
+> Render's API — database, service, environment, first deploy — reading its
+> credentials from the environment. See [`SERVICES.md`](SERVICES.md) for the
+> individual providers and [`PRODUCTION.md`](PRODUCTION.md) for what actually
+> runs once it is up.
+
 > **Secrets go in the host's dashboard, never in chat, never in git.** That
 > includes the two `BOOTSTRAP_*` passwords. Any password that has ever been
 > pasted into a chat or a commit should be changed after first login.

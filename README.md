@@ -12,57 +12,35 @@ review.
 
 ---
 
-## Deploying
+## Documentation
 
-`docs/DEPLOY.md` walks through two free options (Render + Neon, or Laravel
-Cloud's sandbox tier). The repo ships a `Dockerfile` that runs the web server,
-queue worker and scheduler in one container, and a `render.yaml` blueprint.
-Operator accounts are created on first boot from `BOOTSTRAP_*` environment
-variables — never from anything committed here.
+| I want to… | Read |
+|---|---|
+| Run this on my machine | [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) |
+| Understand the code | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) and [`AGENTS.md`](AGENTS.md) |
+| Know what runs in production | [`docs/PRODUCTION.md`](docs/PRODUCTION.md) |
+| Deploy it somewhere free | [`docs/DEPLOY.md`](docs/DEPLOY.md) |
+| Configure database, email, storage, payments | [`docs/SERVICES.md`](docs/SERVICES.md) |
+| Understand the unit economics | [`docs/ECONOMICS.md`](docs/ECONOMICS.md) |
 
-## Running it locally
-
-You need PHP 8.3+, Composer, Node 22+, and Postgres 16+.
-
-```bash
-composer install
-npm install
-cp .env.example .env
-php artisan key:generate
-```
-
-Point `.env` at a Postgres database you have created, then:
+## Quick start
 
 ```bash
+composer install && npm install
+cp .env.example .env && php artisan key:generate
+# point .env at a Postgres database you have created
 php artisan migrate
 php artisan app:demo      # a populated account to look at
 composer dev              # server + queue worker + logs + vite
 ```
 
 Sign in at <http://127.0.0.1:8000> with `demo@example.test` / `password`.
-
-> **Run `composer dev`, not `php artisan serve` on its own.** Syncing is a queued
-> job. Without a worker the app will say "Sync queued" and nothing will happen.
-> The dashboard warns you when that is the case, but it is easier to just start
-> the worker.
-
-### Using your own Hevy data
-
-Register an account, verify your email (in local development the link is written
-to `storage/logs/laravel.log`), then open **Profile** and add:
-
-- your Hevy API key — stored encrypted, never logged, never sent to the AI provider
-- height, age, sex — these drive FFMI, BMR and macro targets
-- your timezone — decides which day and week each session counts toward
-
-Then press **Sync Hevy**, or run `php artisan hevy:sync you@example.com`.
-
----
+`docs/DEVELOPMENT.md` has the rest, including using your own Hevy data.
 
 ## Checks
 
 ```bash
-php artisan test          # 121 tests
+php artisan test          # ~850 tests
 ./vendor/bin/pint --test  # code style
 npm run build             # production assets
 npm run test:browser      # Playwright, needs the app running

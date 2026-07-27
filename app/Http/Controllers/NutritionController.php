@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Services\Analytics\NutritionService;
 use App\Services\Analytics\NutritionVerdict;
-use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class NutritionController extends Controller
 {

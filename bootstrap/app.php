@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\EnsureDemoIsReadOnly;
+use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
@@ -15,7 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+            'admin' => EnsureUserIsAdmin::class,
         ]);
 
         $middleware->web(append: [
@@ -25,7 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
             SetLocale::class,
             // Applied to the whole web group so every future POST route is
             // demo-proof by default rather than by remembering to add it.
-            \App\Http\Middleware\EnsureDemoIsReadOnly::class,
+            EnsureDemoIsReadOnly::class,
         ]);
 
         // Behind a load balancer every request appears to come from the proxy,

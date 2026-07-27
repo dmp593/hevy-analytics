@@ -9,6 +9,7 @@ use App\Services\Analytics\MuscleBalance;
 use App\Services\Analytics\NutritionService;
 use App\Services\Analytics\VolumeAnalytics;
 use App\Services\Hevy\SyncStatus;
+use App\Support\Onboarding;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -18,7 +19,7 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        $onboarding = \App\Support\Onboarding::for($user);
+        $onboarding = Onboarding::for($user);
 
         if (! $user->hasHevyKey()) {
             return view('dashboard', ['needsSetup' => true, 'onboarding' => $onboarding]);

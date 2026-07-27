@@ -17,7 +17,17 @@
 
     <x-flash />
 
-    @unless ($configured)
+    @if (! $configured && $analysis)
+        {{-- An analysis on screen and "not available" above it contradict each
+             other. That is what the demo showed: a written review, headed by a
+             banner saying written reviews were unavailable. Say the true thing
+             instead — this one exists, generating another needs a key. --}}
+        <x-ui.insight tone="info" :title="__('app.ai.showing_existing')" class="mb-6">
+            <p>{!! __('app.settings.ai.add_key', [
+                'settings' => '<a href="'.route('profile.edit').'" class="underline font-medium">'.__('app.nav.profile').'</a>',
+            ]) !!}</p>
+        </x-ui.insight>
+    @elseif (! $configured)
         {{-- No provider at all: the operator shipped without an included key and
              this athlete has not added one. Point at the fix rather than just
              reporting the absence. --}}

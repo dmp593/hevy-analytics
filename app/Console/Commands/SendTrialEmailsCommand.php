@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Billing\State;
 use App\Mail\TrialEndingSoon;
 use App\Models\User;
 use Illuminate\Console\Command;
@@ -36,7 +37,7 @@ class SendTrialEmailsCommand extends Command
             // sold what they already have. Resolved through billingState() so
             // this agrees with the app rather than re-deriving the rules.
             ->filter(fn (User $u) => in_array($u->billingState(), [
-                \App\Billing\State::Trialing,
+                State::Trialing,
             ], true));
 
         foreach ($users as $user) {

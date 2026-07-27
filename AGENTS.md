@@ -37,7 +37,7 @@ height/age/sex) → click **Sync Hevy**. Or from the CLI:
 Run the checks before committing:
 
 ```bash
-php artisan test        # 121 tests
+php artisan test        # ~850 tests
 ./vendor/bin/pint       # code style (PSR-12 via Laravel Pint)
 npm run build           # production assets
 ```
