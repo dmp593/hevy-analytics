@@ -24,6 +24,16 @@ FROM dunglas/frankenphp:1-php8.4 AS app
 RUN install-php-extensions pdo_pgsql intl zip gd opcache pcntl
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# The base image setcaps cap_net_bind_service onto the frankenphp binary so it
+# can bind ports 80/443 as non-root. Render (like several PaaS runtimes) runs
+# containers with no-new-privileges, where exec()ing a binary that carries
+# file capabilities fails outright — "Operation not permitted", exit 126.
+# The capability is useless here anyway: the platform hands us an
+# unprivileged $PORT. Strip it.
+RUN (command -v setcap >/dev/null 2>&1 \
+        || (apt-get update && apt-get install -y --no-install-recommends libcap2-bin && rm -rf /var/lib/apt/lists/*)) \
+    && setcap -r /usr/local/bin/frankenphp || true
+
 WORKDIR /app
 
 COPY composer.json composer.lock ./
