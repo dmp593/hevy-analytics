@@ -15,6 +15,8 @@ cd /app
 #                         the weekly schedule does the refreshing)
 #   bootstrap-accounts  — creates the operator accounts from BOOTSTRAP_* env
 #                         vars, and never touches an account that exists
+
+# ---------------------------------------------------------------------------
 # One-shot migration between database hosts.
 #
 # Set MIGRATE_FROM_DATABASE_URL to the OLD database and redeploy; its contents
@@ -49,31 +51,40 @@ if [ -n "${MIGRATE_FROM_DATABASE_URL:-}" ]; then
             echo "==> Dumping the source database…"
             if ! pg_dump --no-owner --no-acl --no-comments \
                     --file="$DUMP" "$MIGRATE_FROM_DATABASE_URL"; then
-                echo "==> pg_dump FAILED — target left untouched." >&2
+                # WARN, do not exit. This is an optional one-shot import, and
+                # failing the whole boot over it turns "the import did not run"
+                # into "the site is down" — which is how the first attempt at
+                # this took production offline. The target is untouched, so the
+                # normal migrate below brings the app up regardless.
+                echo "==> pg_dump FAILED — skipping the import, target untouched." >&2
+                MIGRATE_SKIPPED=1
                 rm -f "$DUMP"
-                exit 1
             fi
 
             # A dump that produced no CREATE TABLE is a dump that failed
             # quietly; restoring it would empty the target just as thoroughly.
-            if ! grep -q "CREATE TABLE" "$DUMP"; then
-                echo "==> Dump contains no tables — target left untouched." >&2
+            if [ -z "${MIGRATE_SKIPPED:-}" ] && ! grep -q "CREATE TABLE" "$DUMP"; then
+                echo "==> Dump contains no tables — skipping, target untouched." >&2
+                MIGRATE_SKIPPED=1
                 rm -f "$DUMP"
-                exit 1
             fi
 
-            echo "==> Dumped $(wc -c < "$DUMP") bytes, $(grep -c 'CREATE TABLE' "$DUMP") tables."
+            if [ -n "${MIGRATE_SKIPPED:-}" ]; then
+                echo "==> Import skipped; continuing with a normal boot."
+            else
+                echo "==> Dumped $(wc -c < "$DUMP") bytes, $(grep -c 'CREATE TABLE' "$DUMP") tables."
 
-            if [ "$TARGET_HAS_DATA" = "t" ]; then
-                echo "==> MIGRATE_REPLACE=true — dropping the target schema."
-                psql --quiet --set ON_ERROR_STOP=1 "$DATABASE_URL" \
-                    -c "drop schema public cascade; create schema public;"
+                if [ "$TARGET_HAS_DATA" = "t" ]; then
+                    echo "==> MIGRATE_REPLACE=true — dropping the target schema."
+                    psql --quiet --set ON_ERROR_STOP=1 "$DATABASE_URL" \
+                        -c "drop schema public cascade; create schema public;"
+                fi
+
+                echo "==> Restoring into the target…"
+                psql --quiet --set ON_ERROR_STOP=1 "$DATABASE_URL" --file="$DUMP"
+                rm -f "$DUMP"
+                echo "==> Copy finished: $(psql "$DATABASE_URL" -tAc 'select count(*) from users') user row(s)."
             fi
-
-            echo "==> Restoring into the target…"
-            psql --quiet --set ON_ERROR_STOP=1 "$DATABASE_URL" --file="$DUMP"
-            rm -f "$DUMP"
-            echo "==> Copy finished: $(psql "$DATABASE_URL" -tAc 'select count(*) from users') user row(s)."
         fi
     fi
 fi
