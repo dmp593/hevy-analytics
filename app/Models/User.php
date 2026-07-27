@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Paddle\Billable;
 
 #[Fillable(['name', 'email', 'password', 'hevy_api_key', 'sex', 'age', 'height_cm', 'activity_level', 'timezone', 'locale', 'body_fat_source', 'hevy_last_synced_at'])]
 #[Hidden(['password', 'remember_token', 'hevy_api_key'])]
@@ -22,12 +23,13 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use Billable, HasFactory, Notifiable;
 
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
+            'trial_ends_at' => 'datetime',
             'password' => 'hashed',
             'hevy_api_key' => 'encrypted',
             'height_cm' => 'float',
@@ -118,6 +120,33 @@ class User extends Authenticatable implements MustVerifyEmail
     public function writeOperations(): HasMany
     {
         return $this->hasMany(WriteOperation::class);
+    }
+
+    /** What this athlete is allowed to see, given their billing state. */
+    public function entitlements(): \App\Billing\Entitlements
+    {
+        return \App\Billing\Entitlements::for($this);
+    }
+
+    public function billingState(): \App\Billing\State
+    {
+        return \App\Billing\State::for($this);
+    }
+
+    /**
+     * The name and email Paddle should show at checkout.
+     *
+     * Cashier reads this when creating the customer, and without it Paddle asks
+     * for an email the athlete has already given us.
+     */
+    public function paddleName(): string
+    {
+        return $this->name;
+    }
+
+    public function paddleEmail(): string
+    {
+        return $this->email;
     }
 
     /** The athlete's own AI provider keys, encrypted at rest. */

@@ -44,6 +44,7 @@
                     </x-slot>
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">{{ __('app.nav.profile') }}</x-dropdown-link>
+                        <x-dropdown-link :href="route('billing')">{{ __('app.nav.billing') }}</x-dropdown-link>
                         <x-dropdown-link :href="route('guide')">{{ __('app.nav.guide') }}</x-dropdown-link>
                         <x-dropdown-link :href="route('write.index')">{{ __('app.nav.write_operations') }}</x-dropdown-link>
                         <form method="POST" action="{{ route('logout') }}">
@@ -107,6 +108,7 @@
                 <x-responsive-nav-link :href="route('sync')" onclick="event.preventDefault(); this.closest('form').submit();">{{ __('app.nav.sync') }}</x-responsive-nav-link>
             </form>
             <x-responsive-nav-link :href="route('profile.edit')">{{ __('app.nav.profile') }}</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('billing')">{{ __('app.nav.billing') }}</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('guide')">{{ __('app.nav.guide') }}</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('write.index')">{{ __('app.nav.write_operations') }}</x-responsive-nav-link>
             <form method="POST" action="{{ route('logout') }}">

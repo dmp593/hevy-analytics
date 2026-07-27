@@ -88,9 +88,21 @@ class BodyCompAnalytics
         return $best;
     }
 
-    /** @return Collection<int, BodyMeasurement> */
+    /**
+     * @return Collection<int, BodyMeasurement>
+     *
+     * The single history entry point for body data — series() reads through it —
+     * so the entitlement floor is applied here and nowhere else.
+     *
+     * latest(), latestValue() and symmetry() deliberately do NOT clamp. Those
+     * answer "what am I right now", and an athlete on the free tier should still
+     * see today's weight. It is the depth of history that is capped, not the
+     * existence of their current numbers.
+     */
     public function measurements(?Carbon $from = null, ?Carbon $to = null): Collection
     {
+        $from = $this->user->entitlements()->clampFrom($from);
+
         return $this->user->bodyMeasurements()
             ->when($from, fn ($q) => $q->where('date', '>=', $from))
             ->when($to, fn ($q) => $q->where('date', '<=', $to))

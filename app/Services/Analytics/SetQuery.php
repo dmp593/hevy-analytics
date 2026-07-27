@@ -52,8 +52,18 @@ class SetQuery
                 't.equipment',
             ]);
 
-        if ($this->filter->from) {
-            $q->where('w.start_time', '>=', $this->filter->from);
+        // The entitlement floor is applied HERE, not in the controllers.
+        //
+        // Every analytics service reads through this builder, so clamping at
+        // this point means a page cannot be added that forgets the wall. Doing
+        // it per-controller is how one of eleven gets it wrong and quietly gives
+        // the product away — or worse, quietly withholds it from someone paying.
+        //
+        // It narrows, never widens: a request for the last 7 days stays 7 days.
+        $from = $this->user->entitlements()->clampFrom($this->filter->from);
+
+        if ($from) {
+            $q->where('w.start_time', '>=', $from);
         }
         if ($this->filter->to) {
             $q->where('w.start_time', '<=', $this->filter->to);
@@ -116,6 +126,10 @@ class SetQuery
     private function cacheKey(): string
     {
         return $this->user->id.':'.md5(serialize([
+            // The effective window depends on the entitlement as well as the
+            // request, so an athlete who subscribes mid-session does not keep
+            // being served the clamped rows from before they paid.
+            $this->user->entitlements()->historyDays(),
             $this->filter->from?->toIso8601String(),
             $this->filter->to?->toIso8601String(),
             $this->filter->routineHevyId,

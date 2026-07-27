@@ -42,6 +42,13 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // The trial starts here and Paddle is not involved: no card, no
+        // customer record, no outbound call. Sign-up must not be able to fail
+        // because a payment provider is having a bad afternoon.
+        $user->forceFill([
+            'trial_ends_at' => now()->addDays((int) config('billing.trial_days', 14)),
+        ])->save();
+
         event(new Registered($user));
 
         Auth::login($user);

@@ -11,6 +11,7 @@ use App\Http\Controllers\PerformanceController;
 use App\Http\Controllers\AiSettingsController;
 use App\Http\Controllers\DataExportController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\ProgressPhotoController;
 use App\Http\Controllers\ProjectionController;
 use App\Http\Controllers\RoutineController;
@@ -83,6 +84,13 @@ Route::middleware('auth')->group(function () {
 
     // GDPR: everything the app holds about you, and the ability to take it away.
     Route::get('/settings/export', [DataExportController::class, 'download'])->name('settings.export');
+
+    // Billing. Deliberately reachable on every tier: someone on the free tier
+    // needs to be able to subscribe, and someone whose card is failing needs to
+    // be able to fix it.
+    Route::get('/billing', [SubscriptionController::class, 'show'])->name('billing');
+    Route::post('/billing/cancel', [SubscriptionController::class, 'cancel'])->name('billing.cancel');
+    Route::post('/billing/resume', [SubscriptionController::class, 'resume'])->name('billing.resume');
 });
 
 require __DIR__.'/auth.php';

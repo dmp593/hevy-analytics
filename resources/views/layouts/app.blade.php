@@ -21,6 +21,14 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @if (config('cashier.client_side_token') || config('cashier.seller_id'))
+            {{-- Paddle's overlay checkout.
+
+                 The @paddleJS directive rather than a component: Blade resolves
+                 <x-...> tags at COMPILE time, so an unconfigured install would
+                 fail to compile this file even with the @if above it. --}}
+            @paddleJS
+        @endif
     </head>
     <body class="font-sans antialiased">
         {{-- Keyboard users should be able to jump past twelve nav links. --}}
