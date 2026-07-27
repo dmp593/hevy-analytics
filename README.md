@@ -219,9 +219,27 @@ destination and in `APP_URL`.
 "make me an admin" button anywhere — the flag is not fillable and the only way
 to get it is shell access.
 
-Admins get **Account → Admin**: accounts, billing state, and time-boxed
-complimentary access. API keys are never displayed, only whether one is set, and
-every admin action is written to an append-only audit log with who did it.
+Admins get **Account → Admin**: accounts, billing state, and complimentary
+access. API keys are never displayed, only whether one is set, and every admin
+action is written to an append-only audit log with who did it.
+
+#### Free access for an account
+
+```bash
+php artisan app:grant-access you@example.com --reason="My own account"   # no end date
+php artisan app:grant-access someone@example.com --days=30 --reason="Refund"
+php artisan app:grant-access someone@example.com --revoke
+```
+
+The same thing is on each account's admin page. Leaving the days blank means the
+access never expires — which is what your own account wants, since a grant with
+a date on it eventually lapses and locks you out of your own product. Everyone
+else is better off with an end date: an open-ended grant is one nobody revisits.
+
+A comped account gets the full subscribed entitlements and is never shown a
+"subscribe" prompt. The command works with no admin account in the database and
+records itself in the audit log as coming from the server console, so it is also
+the way to give yourself access on a fresh install.
 
 ### Your data
 

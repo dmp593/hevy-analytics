@@ -86,6 +86,32 @@ class AdminTest extends TestCase
             ->assertDontSee('Bob Builder');
     }
 
+    /**
+     * The counts run off a narrowed select, and a column left out of it reads
+     * as null rather than raising — so a comped account would be quietly filed
+     * as free and nobody would ever notice the number was wrong.
+     */
+    public function test_the_state_filter_and_counts_see_comped_accounts(): void
+    {
+        $admin = $this->admin();
+
+        User::factory()->free()->create([
+            'name' => 'Comped Athlete',
+            'comped_reason' => 'Owner',
+            'comped_until' => null,
+        ]);
+        User::factory()->free()->create(['name' => 'Paying Nobody']);
+
+        $this->actingAs($admin)->get('/admin/users?state=comped')
+            ->assertOk()
+            ->assertSee('Comped Athlete')
+            ->assertDontSee('Paying Nobody');
+
+        $counts = $this->actingAs($admin)->get('/admin/users')->viewData('counts');
+
+        $this->assertSame(1, $counts[State::Complimentary->value]);
+    }
+
     // ------------------------------------------------------------------ comps
 
     public function test_granting_access_changes_the_entitlement_and_is_recorded(): void
@@ -112,8 +138,11 @@ class AdminTest extends TestCase
         $this->assertStringContainsString('Refund for a bad month', $action->detail);
     }
 
-    /** An unbounded grant is one nobody ever revisits. */
-    public function test_a_grant_must_have_a_length_and_a_reason(): void
+    /**
+     * The reason is what is mandatory. Without one there is no answer to "why
+     * does this account have free access", which is the whole point of the log.
+     */
+    public function test_a_grant_must_have_a_reason(): void
     {
         $admin = $this->admin();
         $target = User::factory()->free()->create();
@@ -121,13 +150,86 @@ class AdminTest extends TestCase
         $this->actingAs($admin)->post("/admin/users/{$target->id}/grant", ['days' => 30])
             ->assertSessionHasErrors('reason');
 
-        $this->actingAs($admin)->post("/admin/users/{$target->id}/grant", ['reason' => 'x'])
-            ->assertSessionHasErrors('days');
-
         $this->actingAs($admin)->post("/admin/users/{$target->id}/grant", ['days' => 99999, 'reason' => 'x'])
             ->assertSessionHasErrors('days');
 
         $this->assertNull($target->fresh()->comped_until);
+        $this->assertFalse($target->fresh()->isComped());
+    }
+
+    /**
+     * The operator's own account is the reason this exists: an access that
+     * quietly lapses locks you out of your own product, and every dated grant
+     * eventually becomes one.
+     */
+    public function test_a_grant_with_no_days_never_expires(): void
+    {
+        $admin = $this->admin();
+        $target = User::factory()->free()->create();
+
+        $this->actingAs($admin)
+            ->post("/admin/users/{$target->id}/grant", ['reason' => 'My own account'])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $target->refresh();
+
+        $this->assertNull($target->comped_until);
+        $this->assertTrue($target->isComped());
+        $this->assertSame(State::Complimentary, $target->billingState());
+        $this->assertNull($target->entitlements()->historyDays());
+        $this->assertTrue($target->entitlements()->canUseAi());
+
+        // Ten years on, still comped — that is what "no end date" has to mean.
+        $this->travel(10)->years();
+        $this->assertSame(State::Complimentary, $target->fresh()->billingState());
+    }
+
+    /** A grant that has run out is a free account again, not a comped one. */
+    public function test_an_expired_grant_stops_granting_anything(): void
+    {
+        $target = User::factory()->free()->create([
+            'comped_until' => now()->subDay(),
+            'comped_reason' => 'Expired support case',
+        ]);
+
+        $this->assertFalse($target->isComped());
+        $this->assertSame(State::Free, $target->billingState());
+    }
+
+    /**
+     * comped_reason is the marker. A row with a date and no reason is a
+     * half-written record, not a grant — most likely a leftover from a partial
+     * write, and it should not silently hand out the product.
+     */
+    public function test_a_date_with_no_reason_is_not_a_grant(): void
+    {
+        $target = User::factory()->free()->create([
+            'comped_until' => now()->addYear(),
+            'comped_reason' => null,
+        ]);
+
+        $this->assertFalse($target->isComped());
+        $this->assertSame(State::Free, $target->billingState());
+    }
+
+    /** An indefinite grant is still revocable — the form must offer the button. */
+    public function test_an_indefinite_grant_can_be_revoked(): void
+    {
+        $admin = $this->admin();
+        $target = User::factory()->free()->create();
+
+        $this->actingAs($admin)->post("/admin/users/{$target->id}/grant", ['reason' => 'Forever']);
+
+        $this->actingAs($admin)->get("/admin/users/{$target->id}")
+            ->assertOk()
+            ->assertSee(__('app.admin.comped_forever'))
+            ->assertSee(__('app.admin.revoke'));
+
+        $this->actingAs($admin)->post("/admin/users/{$target->id}/revoke")->assertRedirect();
+
+        $this->assertFalse($target->fresh()->isComped());
+        $this->assertSame(State::Free, $target->fresh()->billingState());
     }
 
     public function test_revoking_access_returns_the_athlete_to_their_real_state(): void

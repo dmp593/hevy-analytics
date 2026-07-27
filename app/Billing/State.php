@@ -53,7 +53,13 @@ enum State: string
         // deliberately did, so it should not be hidden behind a trial that
         // happens to still be running, and should not override money the
         // athlete is actually paying.
-        if ($user->comped_until?->isFuture()) {
+        //
+        // comped_reason is what marks a comp as existing; comped_until is an
+        // OPTIONAL expiry. A null expiry means indefinite, which is what the
+        // operator's own account needs — an access grant that quietly lapses
+        // and locks you out of your own product is a bad surprise, and every
+        // dated grant would eventually become one.
+        if ($user->isComped()) {
             return self::Complimentary;
         }
 

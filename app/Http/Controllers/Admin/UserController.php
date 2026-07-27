@@ -67,20 +67,24 @@ class UserController extends Controller
     }
 
     /**
-     * Grant complimentary access for a period.
+     * Grant complimentary access, with or without an end date.
      *
-     * Deliberately time-boxed rather than a permanent flag: an unbounded grant
-     * is one nobody ever revisits, and "why does this account have free access"
-     * should have an answer with an end date on it.
+     * A length is the default because a grant nobody revisits is how accounts
+     * end up permanently free for a reason nobody remembers. But the reason is
+     * what is actually mandatory: leaving the length blank is a deliberate
+     * choice for the accounts that should never lapse — the operator's own, a
+     * permanent partner — and forcing a date on those only guarantees that one
+     * day it quietly expires and locks someone out of their own product.
      */
     public function grant(Request $request, User $user)
     {
         $data = $request->validate([
-            'days' => ['required', 'integer', 'min:1', 'max:3650'],
+            'days' => ['nullable', 'integer', 'min:1', 'max:3650'],
             'reason' => ['required', 'string', 'max:255'],
         ]);
 
-        $until = now()->addDays($data['days']);
+        $days = $data['days'] ?? null;
+        $until = $days === null ? null : now()->addDays($days);
 
         $user->forceFill([
             'comped_until' => $until,
@@ -91,7 +95,9 @@ class UserController extends Controller
             $request->user(),
             $user,
             AdminAction::GRANTED_ACCESS,
-            __('app.admin.granted_detail', ['days' => $data['days'], 'until' => $until->toDateString(), 'reason' => $data['reason']]),
+            $until === null
+                ? __('app.admin.granted_detail_forever', ['reason' => $data['reason']])
+                : __('app.admin.granted_detail', ['days' => $days, 'until' => $until->toDateString(), 'reason' => $data['reason']]),
         );
 
         return back()->with('status', __('app.admin.granted', ['name' => $user->name]));
@@ -99,7 +105,9 @@ class UserController extends Controller
 
     public function revoke(Request $request, User $user)
     {
-        abort_unless($user->comped_until !== null, 404);
+        // Not isComped(): an expired grant still leaves both columns filled, and
+        // an admin looking at that row should be able to clear it.
+        abort_unless($user->comped_until !== null || $user->comped_reason !== null, 404);
 
         $user->forceFill(['comped_until' => null, 'comped_reason' => null])->save();
 
@@ -141,8 +149,11 @@ class UserController extends Controller
     {
         $counts = array_fill_keys(array_column(State::cases(), 'value'), 0);
 
+        // Every column billingState() reads must be in the select, comped_reason
+        // included — a missing attribute reads as null rather than raising, so
+        // leaving it out would silently count comped accounts as free.
         User::with(['subscriptions.items'])
-            ->select(['id', 'trial_ends_at', 'comped_until'])
+            ->select(['id', 'trial_ends_at', 'comped_until', 'comped_reason'])
             ->chunk(500, function ($chunk) use (&$counts) {
                 foreach ($chunk as $user) {
                     $counts[$user->billingState()->value]++;

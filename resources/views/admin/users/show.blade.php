@@ -73,11 +73,20 @@
     @endif
 
     <x-ui.card :title="__('app.admin.comp')" :subtitle="__('app.admin.comp_sub')">
-        @if ($user->comped_until)
+        @if ($user->comped_until || $user->comped_reason)
             <div class="mb-4 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-line bg-surface-sunk px-4 py-3">
                 <div>
+                    {{-- A lapsed grant still has both columns filled. Showing it
+                         as "access until <a date in the past>" reads as active,
+                         so past and future get different sentences. --}}
                     <div class="text-sm text-ink">
-                        {{ __('app.admin.comped_until', ['date' => $user->comped_until->isoFormat('D MMMM YYYY')]) }}
+                        @if (! $user->comped_until)
+                            {{ __('app.admin.comped_forever') }}
+                        @elseif ($user->comped_until->isFuture())
+                            {{ __('app.admin.comped_until', ['date' => $user->comped_until->isoFormat('D MMMM YYYY')]) }}
+                        @else
+                            {{ __('app.admin.comped_expired', ['date' => $user->comped_until->isoFormat('D MMMM YYYY')]) }}
+                        @endif
                     </div>
                     @if ($user->comped_reason)
                         <div class="mt-0.5 text-xs text-muted">{{ $user->comped_reason }}</div>
@@ -94,7 +103,8 @@
             @csrf
             <label class="form-label">
                 {{ __('app.admin.days_label') }}
-                <input type="number" name="days" value="30" min="1" max="3650" class="form-control w-28" required>
+                <input type="number" name="days" value="30" min="1" max="3650" class="form-control w-28"
+                       placeholder="{{ __('app.admin.days_forever') }}">
             </label>
             <label class="form-label flex-1">
                 {{ __('app.admin.reason') }}
@@ -103,6 +113,7 @@
             </label>
             <x-ui.button type="submit" size="sm">{{ __('app.admin.grant') }}</x-ui.button>
         </form>
+        <p class="mt-2 text-xs text-muted">{{ __('app.admin.days_hint') }}</p>
         <x-input-error class="mt-2" :messages="$errors->get('days')" />
         <x-input-error class="mt-2" :messages="$errors->get('reason')" />
     </x-ui.card>
@@ -121,7 +132,7 @@
                     @forelse ($actions as $action)
                         <tr class="table-row">
                             <td class="py-2 pl-5 pr-4 text-muted">{{ $action->created_at->isoFormat('D MMM YYYY HH:mm') }}</td>
-                            <td class="py-2 pr-4">{{ $action->admin?->name ?? '—' }}</td>
+                            <td class="py-2 pr-4">{{ $action->admin?->name ?? __('app.admin.by_console') }}</td>
                             <td class="py-2 pr-5">
                                 <div class="text-ink">{{ $action->describe() }}</div>
                                 @if ($action->detail)

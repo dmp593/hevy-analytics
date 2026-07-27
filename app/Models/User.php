@@ -124,6 +124,22 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(WriteOperation::class);
     }
 
+    /**
+     * Whether an admin has granted this account free access.
+     *
+     * comped_reason is the marker — every comp must have one, so a row with a
+     * reason and no expiry is deliberate rather than a half-written record.
+     * comped_until is optional: null means indefinite.
+     */
+    public function isComped(): bool
+    {
+        if (blank($this->comped_reason)) {
+            return false;
+        }
+
+        return $this->comped_until === null || $this->comped_until->isFuture();
+    }
+
     /** What this athlete is allowed to see, given their billing state. */
     public function entitlements(): \App\Billing\Entitlements
     {

@@ -31,10 +31,15 @@ class AdminAction extends Model
         return $this->belongsTo(User::class, 'target_user_id');
     }
 
-    public static function record(User $admin, User $target, string $action, ?string $detail = null): self
+    /**
+     * @param  User|null  $admin  null when the action came from the server console,
+     *                            which is where the first grant necessarily comes
+     *                            from — there is no admin account yet to blame.
+     */
+    public static function record(?User $admin, User $target, string $action, ?string $detail = null): self
     {
         return self::create([
-            'admin_id' => $admin->id,
+            'admin_id' => $admin?->id,
             'target_user_id' => $target->id,
             'action' => $action,
             'detail' => $detail,
