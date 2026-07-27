@@ -19,6 +19,13 @@
         $price = config('billing.display_price');
     @endphp
 
+    {{-- The "demo unavailable" bounce lands here; without this it is silent. --}}
+    @if (session('error'))
+        <div class="mx-auto max-w-5xl px-5 pt-6">
+            <div class="rounded-md border border-bad/30 bg-bad-soft px-4 py-3 text-sm text-bad">{{ session('error') }}</div>
+        </div>
+    @endif
+
     {{-- ------------------------------------------------------------- hero --}}
     <section class="mx-auto grid max-w-5xl gap-12 px-5 pb-14 pt-16 sm:pb-20 sm:pt-24 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-10">
         <div>
@@ -32,9 +39,15 @@
                 {{ __('app.landing.subhead') }}
             </p>
 
-            <div class="mt-8 flex flex-wrap items-center gap-4">
+            <div class="mt-8 flex flex-wrap items-center gap-3">
                 <x-ui.button :href="route('register')" size="lg">{{ __('app.landing.cta', ['days' => $trialDays]) }}</x-ui.button>
-                <p class="text-sm text-muted">{{ __('app.landing.cta_note', ['price' => $price]) }}</p>
+                {{-- The cheaper promise first-ish: no account, no key, nothing
+                     to configure — one click into a populated account. --}}
+                <form method="POST" action="{{ route('demo.enter') }}">
+                    @csrf
+                    <x-ui.button type="submit" variant="secondary" size="lg">{{ __('app.landing.demo_cta') }}</x-ui.button>
+                </form>
+                <p class="w-full text-sm text-muted sm:w-auto">{{ __('app.landing.cta_note', ['price' => $price]) }}</p>
             </div>
 
             {{-- Said here, in the first screen, rather than discovered after

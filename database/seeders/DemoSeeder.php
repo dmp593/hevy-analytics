@@ -58,12 +58,16 @@ class DemoSeeder
 
         $user->forceFill([
             'email_verified_at' => now(),
+            'is_demo' => true,
             'hevy_api_key' => 'demo-key-not-a-real-credential',
             'sex' => 'male',
             'age' => 32,
             'height_cm' => 178.0,
             'activity_level' => 1.55,
             'timezone' => 'Europe/Lisbon',
+            // Null, always: a stored locale on this shared row would outrank
+            // every visitor's own session choice in SetLocale.
+            'locale' => null,
             'body_fat_source' => 'scale',
             'hevy_last_synced_at' => now(),
         ])->save();
@@ -81,8 +85,28 @@ class DemoSeeder
         $this->seedTraining($user, $templates, $weeks);
         $this->seedBody($user, $weeks);
         $this->seedIntake($user);
+        $this->seedAnalysis($user);
 
         return $user->refresh();
+    }
+
+    /**
+     * A canned written analysis, so the AI page demonstrates its output without
+     * a visitor's curiosity costing a provider call — the demo account is
+     * read-only and could not generate one anyway.
+     */
+    private function seedAnalysis(User $user): void
+    {
+        $user->aiAnalyses()->create([
+            'scope' => 'deep_analysis',
+            'model' => 'demo',
+            'response' => implode("\n\n", [
+                '**Volume.** Nine of eleven muscles sit below MEV for the last month — upper back (2.8/wk against 10) and quads (2.8 against 8) are the widest gaps. The push/pull ratio itself is fine at 1.19, so this is not imbalance, it is total volume: the two training days currently held are not enough sets to grow most of what is being trained. Priority for the next four weeks: a third weekly session carrying ~8 sets of upper back and ~6 of quads.',
+                '**Strength.** e1RM trends on the big lifts are rising steadily (+0.8 kg/wk on squat, R² 0.99) — progressive overload is working where volume is sufficient. Keep the double-progression scheme; nothing to change.',
+                '**Body composition.** Weight is up but at +0.01%BW/wk against a +0.35 target, with partitioning at ~46% lean over 13 readings. The bulk has effectively stalled: intake is not covering the surplus the goal asks for. Add 150–250 kcal/day, mostly carbs, and re-check the weight trend in three weeks.',
+                '**Nutrition.** Measured maintenance (~3,060 kcal) sits close to the formula estimate, so the targets are trustworthy. Protein at 163 g (2.0 g/kg) is adequate; the shortfall is total energy, not macro split.',
+            ]),
+        ]);
     }
 
     /**
@@ -131,6 +155,9 @@ class DemoSeeder
         $user->goals()->delete();
         $user->intakeLogs()->delete();
         $user->nutritionTargets()->delete();
+        $user->aiAnalyses()->delete();
+        // Stale sync logs would show a failed/queued banner to every visitor.
+        $user->syncLogs()->delete();
     }
 
     /** @return array<string, string> exercise title => hevy_id */

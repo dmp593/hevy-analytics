@@ -7,7 +7,7 @@
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center justify-between gap-4">
             <div class="flex min-w-0 items-center gap-8">
-                <a href="{{ route('dashboard') }}" class="shrink-0 whitespace-nowrap text-lg font-bold text-brand-ink">
+                <a href="{{ route('dashboard') }}" class="inline-flex min-h-11 shrink-0 items-center whitespace-nowrap text-lg font-bold text-brand-ink">
                     {{ __('app.brand') }}
                 </a>
 

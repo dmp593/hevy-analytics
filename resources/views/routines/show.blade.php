@@ -39,7 +39,7 @@
                         <span class="font-medium">{{ \App\Support\Labels::muscle($m['muscle']) }}</span>
                         <span>{{ __('app.routines.sets_per_session', ['count' => $m['sets_per_session']]) }}</span>
                     </div>
-                    <div class="text-[10px] text-faint">{{ __('app.routines.weekly_landmarks', ['mev' => $m['landmarks']['mev'], 'mav' => $m['landmarks']['mav']]) }}</div>
+                    <div class="text-[11px] text-faint">{{ __('app.routines.weekly_landmarks', ['mev' => $m['landmarks']['mev'], 'mav' => $m['landmarks']['mav']]) }}</div>
                 </div>
             @endforeach
         </div>

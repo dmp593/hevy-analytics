@@ -37,6 +37,10 @@ return [
 
     'hevy' => [
         'base_url' => env('HEVY_BASE_URL', 'https://api.hevyapp.com'),
+
+        // On login, queue an incremental sync if the last one is older than
+        // this. 0 disables login syncs entirely.
+        'auto_sync_hours' => (int) env('HEVY_AUTO_SYNC_HOURS', 6),
     ],
 
     /*

@@ -12,8 +12,17 @@
             @focus="show()" @blur="hide()" @click.prevent="open = !open"
             @keydown.escape.window="open = false"
             :aria-expanded="open"
-            class="ml-1 h-4 w-4 inline-flex items-center justify-center rounded-full bg-surface-sunk text-body text-[10px] font-bold leading-none hover:bg-strong focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
-            aria-label="{{ __('app.common.more_info') }}">i</button>
+            {{-- The circle stays visually small; the HIT AREA does not. Padding
+                 with negative margins grows the touch target to 44px without
+                 moving a pixel of layout — the old 16×16 button was unhittable
+                 with a thumb, and it sits next to every metric in the app. --}}
+            {{-- -ml-2 = the old 4px visual gap (padding 12px − 8px), because
+                 margin-left outranks the -m-3 shorthand. Plain ml-1 here made
+                 the dot drift 12px away from its label. --}}
+            class="-m-3 -ml-2 inline-flex items-center justify-center p-3 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand"
+            aria-label="{{ __('app.common.more_info') }}">
+        <span class="pointer-events-none inline-flex h-5 w-5 items-center justify-center rounded-full bg-surface-sunk text-[11px] font-bold leading-none text-body">i</span>
+    </button>
     {{-- A centred, fixed-width panel hanging off a card at the edge of the grid
          pushed the document wider than the viewport, so every page scrolled
          sideways. Clamping the width and letting it flip sides keeps it inside. --}}

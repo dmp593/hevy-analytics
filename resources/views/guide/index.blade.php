@@ -8,11 +8,13 @@
     half-sentences.
 --}}
 <x-ui.page :title="__('app.pages.guide')" :subtitle="__('app.pages.guide_sub')" width="4xl" class="space-y-6">
+    <x-flash />
+
     <x-panel>
         <p class="text-sm text-body">{!! __('guide.intro') !!}</p>
         <nav class="mt-4 flex flex-wrap gap-2 text-xs">
             @foreach (['volume', 'strength', 'levels', 'body', 'accuracy', 'leanbulk', 'nutrition', 'projections', 'balance'] as $id)
-                <a href="#{{ $id }}" class="rounded-full bg-surface-sunk px-3 py-1 hover:bg-surface-sunk">{{ __('guide.nav.'.$id) }}</a>
+                <a href="#{{ $id }}" class="inline-flex min-h-10 items-center rounded-full bg-surface-sunk px-3 hover:bg-strong/40">{{ __('guide.nav.'.$id) }}</a>
             @endforeach
         </nav>
     </x-panel>

@@ -26,15 +26,15 @@
 
         <!-- Remember Me -->
         <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded-sm border-line text-brand-ink shadow-xs focus:ring-brand" name="remember">
+            <label for="remember_me" class="inline-flex min-h-11 items-center">
+                <input id="remember_me" type="checkbox" class="h-5 w-5 rounded-sm border-line text-brand-ink shadow-xs focus:ring-brand" name="remember">
                 <span class="ms-2 text-sm text-body">{{ __('app.auth.remember_me') }}</span>
             </label>
         </div>
 
         <div class="flex items-center justify-end mt-4">
             @if (Route::has('password.request'))
-                <a class="underline text-sm text-body hover:text-ink rounded-md focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-brand" href="{{ route('password.request') }}">
+                <a class="inline-flex min-h-11 items-center underline text-sm text-body hover:text-ink rounded-md focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-brand" href="{{ route('password.request') }}">
                     {{ __('app.auth.forgot_password') }}
                 </a>
             @endif

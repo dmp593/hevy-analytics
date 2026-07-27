@@ -5,6 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
+        @include('partials.head-meta')
+
         <title>{{ __('app.brand') }}</title>
 
         {{-- Applied before first paint: setting the class from a deferred module
@@ -15,6 +17,12 @@
                 const dark = pref === 'dark'
                     || (pref === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
                 document.documentElement.classList.toggle('dark', dark);
+                // Keep the phone's status bar in step with a manual override
+                // (the metas' media queries only know the OS scheme).
+                document.querySelectorAll('meta[name="theme-color"]').forEach((m) => {
+                    m.setAttribute('content', dark ? '#0c1015' : '#f9fafb');
+                    m.removeAttribute('media');
+                });
             })();
         </script>
 

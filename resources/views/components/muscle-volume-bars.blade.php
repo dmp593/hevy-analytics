@@ -24,7 +24,7 @@ $barColor = fn (string $status) => [
                 <div class="h-full {{ $barColor($m['status']) }}" style="width: {{ $pct }}%"></div>
             </div>
             @if($showLandmarks)
-                <div class="text-[10px] text-faint mt-0.5">MV {{ $l['mv'] }} · MEV {{ $l['mev'] }} · MAV {{ $l['mav'] }} · MRV {{ $l['mrv'] }}</div>
+                <div class="text-[11px] text-faint mt-0.5">MV {{ $l['mv'] }} · MEV {{ $l['mev'] }} · MAV {{ $l['mav'] }} · MRV {{ $l['mrv'] }}</div>
             @endif
         </div>
     @empty

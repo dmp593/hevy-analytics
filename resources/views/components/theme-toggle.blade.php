@@ -5,7 +5,7 @@
         <x-slot name="trigger">
             <button type="button"
                     :aria-label="isDark ? '{{ __('app.theme.switch_light') }}' : '{{ __('app.theme.switch_dark') }}'"
-                    class="inline-flex items-center rounded-lg px-2 py-2 text-muted transition hover:text-ink">
+                    class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-2 py-2 text-muted transition hover:text-ink">
                 <svg x-show="!isDark" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5m0 15V21m9-9h-1.5m-15 0H3m15.4-6.4-1 1m-10.8 10.8-1 1m12.8 0-1-1M6.6 5.6l-1-1M16.5 12a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" />
                 </svg>

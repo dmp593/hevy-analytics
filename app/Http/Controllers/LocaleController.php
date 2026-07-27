@@ -23,7 +23,13 @@ class LocaleController extends Controller
 
         // A signed-in user switching here should have it persist, not be
         // silently overridden by their profile on the next request.
-        if ($user = $request->user()) {
+        //
+        // Except the demo: hundreds of visitors share that row, and persisting
+        // one visitor's choice would flip the language for everyone after them
+        // (the stored locale outranks the session in SetLocale). Their session
+        // still carries the choice — but only while the shared account's own
+        // locale stays null, so the seeder must never set it.
+        if (($user = $request->user()) && ! $user->is_demo) {
             $user->forceFill(['locale' => $locale])->save();
         }
 

@@ -32,6 +32,13 @@ Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard') : view('landing');
 })->name('home');
 
+// The one-click demo. Guest-only and rate limited: it performs a login, and a
+// login endpoint with no throttle is a free session-fixation playground.
+Route::post('/demo', [App\Http\Controllers\DemoController::class, 'enter'])
+    ->middleware(['guest', 'throttle:10,1'])->name('demo.enter');
+Route::post('/demo/leave', [App\Http\Controllers\DemoController::class, 'leave'])
+    ->middleware('auth')->name('demo.leave');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

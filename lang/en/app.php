@@ -31,6 +31,7 @@ return [
         'headline' => 'Your training log knows the answer. It just never tells you.',
         'subhead' => 'Hevy records what you lifted. This reads all of it and tells you what it means — which muscles are below the volume that actually grows them, whether the weight you are gaining is muscle or fat, and what your maintenance calories really are, measured from your own data rather than guessed by a formula.',
         'cta' => 'Try it free for :days days',
+        'demo_cta' => 'Look inside first — live demo',
         'cta_note' => 'No card. :price/month afterwards, if you want it.',
         'requirement' => 'You need a :hevy account and an API key from Hevy’s own settings. Without one this app has nothing to read — worth knowing before you sign up, not after.',
 
@@ -101,6 +102,55 @@ return [
 
         'sources_title' => 'Where the numbers come from',
         'sources_body' => 'Volume landmarks follow Renaissance Periodization (Israetel et al.); 1RM estimates use Epley and Brzycki; energy expenditure uses Mifflin-St Jeor, or Katch-McArdle when body fat is known; protein and lean-gain guidance follows Helms, Aragon and Morton et al.; FFMI ceilings follow Kouri et al. Strength percentiles come from OpenPowerlifting competition data and self-reported gym data. Every one of these is named on the page that uses it, with what it can and cannot tell you.',
+    ],
+
+    /*
+     | The shared, read-only demonstration account.
+     */
+    'demo' => [
+        'banner' => 'You are looking at a demo account with 40 weeks of sample training.',
+        'create_mine' => 'Create my own account',
+        'read_only' => 'This is the shared demo account, so it is read-only — nothing can be changed or synced here. Create your own account to work with your own training.',
+        'unavailable' => 'The demo is not available right now.',
+    ],
+
+    /*
+     | The new-account checklist on the dashboard.
+     */
+    'onboarding' => [
+        'title' => 'Getting set up',
+        'progress' => ':done of :total done',
+        'hevy_key' => 'Paste your Hevy API key',
+        'hevy_key_help' => 'In your profile. Hevy issues it under Settings → Developer on hevy.com.',
+        'sync' => 'Let your history sync',
+        'sync_help' => 'Starts by itself once the key is saved. A long history can take a minute or two.',
+        'profile' => 'Add height, age and sex',
+        'profile_help' => 'These power FFMI, calorie targets and the strength comparisons.',
+        'goal' => 'Pick a goal',
+        'goal_help' => 'The goal decides your calorie targets and the rate every page measures you against.',
+    ],
+
+    /*
+     | Notification emails. Subjects and bodies together, because a translator
+     | needs to see them as one piece of writing.
+     */
+    'mail' => [
+        'signoff' => 'Keep lifting,',
+        'trial_ending' => [
+            'subject' => '{1}Your trial ends tomorrow|[2,*]Your trial ends in :days days',
+            'heading' => 'Hi :name',
+            'body' => 'Your free trial of Hevy Analytics ends on :date. Until then you keep full access to everything — your whole history, measured maintenance, projections and the written analysis.',
+            'what_changes' => 'If you do nothing, nothing breaks: your account simply moves to the free tier, which keeps every page but only sees your last :days days of history. Your data stays exactly where it is.',
+            'cta' => 'Keep full access — :price/month',
+            'no_pressure' => 'If the app has not earned it, let it lapse — the free tier is honestly useful, and you can subscribe later at any time.',
+        ],
+        'payment_failed' => [
+            'subject' => 'Your payment did not go through',
+            'heading' => 'Hi :name',
+            'body' => 'Paddle could not charge your card for this month\'s subscription. This is almost always an expired or replaced card, not something you did.',
+            'no_cutoff' => 'Nothing is cut off yet — your access continues while Paddle retries. But if the card keeps failing, the subscription will eventually cancel itself, so it is worth a minute now.',
+            'cta' => 'Update your payment details',
+        ],
     ],
 
     'billing' => [
@@ -208,6 +258,14 @@ return [
             'revoked_access' => 'Revoked complimentary access',
             'cancelled_subscription' => 'Cancelled the subscription',
         ],
+    ],
+
+    'pagination' => [
+        'nav' => 'Pagination',
+        'previous' => 'Previous',
+        'next' => 'Next',
+        'showing' => 'Showing :first to :last of :total results',
+        'goto' => 'Go to page :page',
     ],
 
     'nav' => [

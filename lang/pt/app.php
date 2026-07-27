@@ -32,6 +32,7 @@ return [
         'headline' => 'O teu registo de treino sabe a resposta. Só nunca ta diz.',
         'subhead' => 'O Hevy regista o que levantaste. Isto lê tudo e diz-te o que significa — que músculos estão abaixo do volume que os faz mesmo crescer, se o peso que estás a ganhar é músculo ou gordura, e quantas calorias gastas em manutenção, medidas a partir dos teus dados em vez de estimadas por uma fórmula.',
         'cta' => 'Experimenta :days dias grátis',
+        'demo_cta' => 'Espreita primeiro — demo ao vivo',
         'cta_note' => 'Sem cartão. :price/mês depois, se quiseres.',
         'requirement' => 'Precisas de uma conta :hevy e de uma chave de API das definições do próprio Hevy. Sem isso esta aplicação não tem nada para ler — melhor saberes antes de te registares do que depois.',
 
@@ -102,6 +103,54 @@ return [
 
         'sources_title' => 'De onde vêm os números',
         'sources_body' => 'Os landmarks de volume seguem a Renaissance Periodization (Israetel et al.); as estimativas de 1RM usam Epley e Brzycki; o gasto energético usa Mifflin-St Jeor, ou Katch-McArdle quando a gordura corporal é conhecida; as recomendações de proteína e de ritmo de ganho seguem Helms, Aragon e Morton et al.; os tetos de FFMI seguem Kouri et al. Os percentis de força vêm de dados de competição do OpenPowerlifting e de dados de ginásio auto-reportados. Cada uma destas fontes está nomeada na página que a usa, com o que consegue e o que não consegue dizer.',
+    ],
+
+    /*
+     | A conta de demonstração, partilhada e só de leitura.
+     */
+    'demo' => [
+        'banner' => 'Estás a ver uma conta de demonstração com 40 semanas de treino fictício.',
+        'create_mine' => 'Criar a minha conta',
+        'read_only' => 'Esta é a conta de demonstração partilhada, por isso é só de leitura — aqui nada pode ser alterado nem sincronizado. Cria a tua própria conta para trabalhares com o teu treino.',
+        'unavailable' => 'A demonstração não está disponível neste momento.',
+    ],
+
+    /*
+     | A lista de arranque de uma conta nova, no dashboard.
+     */
+    'onboarding' => [
+        'title' => 'Primeiros passos',
+        'progress' => ':done de :total feitos',
+        'hevy_key' => 'Cola a tua chave de API do Hevy',
+        'hevy_key_help' => 'No teu perfil. O Hevy emite-a em Settings → Developer, em hevy.com.',
+        'sync' => 'Deixa o teu histórico sincronizar',
+        'sync_help' => 'Arranca sozinho assim que a chave fica guardada. Um histórico longo pode demorar um ou dois minutos.',
+        'profile' => 'Adiciona altura, idade e sexo',
+        'profile_help' => 'São o que alimenta o FFMI, os alvos de calorias e as comparações de força.',
+        'goal' => 'Escolhe um objetivo',
+        'goal_help' => 'O objetivo determina os teus alvos de calorias e o ritmo contra o qual todas as páginas te medem.',
+    ],
+
+    /*
+     | Emails de notificação.
+     */
+    'mail' => [
+        'signoff' => 'Bons treinos,',
+        'trial_ending' => [
+            'subject' => '{1}O teu período de teste termina amanhã|[2,*]O teu período de teste termina em :days dias',
+            'heading' => 'Olá :name',
+            'body' => 'O teu período de teste do Hevy Analytics termina a :date. Até lá manténs acesso completo a tudo — o histórico inteiro, a manutenção medida, as projeções e a análise escrita.',
+            'what_changes' => 'Se não fizeres nada, nada se parte: a conta passa simplesmente ao plano gratuito, que mantém todas as páginas mas só vê os teus últimos :days dias de histórico. Os teus dados ficam exatamente onde estão.',
+            'cta' => 'Manter acesso completo — :price/mês',
+            'no_pressure' => 'Se a aplicação não o mereceu, deixa expirar — o plano gratuito é genuinamente útil, e podes subscrever mais tarde a qualquer momento.',
+        ],
+        'payment_failed' => [
+            'subject' => 'O teu pagamento não passou',
+            'heading' => 'Olá :name',
+            'body' => 'A Paddle não conseguiu cobrar a subscrição deste mês no teu cartão. Quase sempre é um cartão expirado ou substituído, não algo que tenhas feito.',
+            'no_cutoff' => 'Ainda nada foi cortado — o teu acesso continua enquanto a Paddle tenta de novo. Mas se o cartão continuar a falhar, a subscrição acaba por se cancelar sozinha, por isso vale a pena um minuto agora.',
+            'cta' => 'Atualizar os dados de pagamento',
+        ],
     ],
 
     'billing' => [
@@ -209,6 +258,14 @@ return [
             'revoked_access' => 'Retirou o acesso oferecido',
             'cancelled_subscription' => 'Cancelou a subscrição',
         ],
+    ],
+
+    'pagination' => [
+        'nav' => 'Paginação',
+        'previous' => 'Anterior',
+        'next' => 'Seguinte',
+        'showing' => 'A mostrar :first a :last de :total resultados',
+        'goto' => 'Ir para a página :page',
     ],
 
     'nav' => [

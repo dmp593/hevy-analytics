@@ -21,7 +21,18 @@ export function resolve(preference) {
 }
 
 export function apply(preference) {
-    document.documentElement.classList.toggle('dark', resolve(preference) === 'dark');
+    const dark = resolve(preference) === 'dark';
+
+    document.documentElement.classList.toggle('dark', dark);
+
+    // The browser chrome (phone status bar, PWA title bar) reads theme-color
+    // from <meta>, which media queries pin to the OS scheme — so a manual
+    // in-app override needs the metas rewritten or the bar stays mismatched.
+    // Values are the two --canvas tokens from app.css.
+    for (const meta of document.querySelectorAll('meta[name="theme-color"]')) {
+        meta.setAttribute('content', dark ? '#0c1015' : '#f9fafb');
+        meta.removeAttribute('media');
+    }
 }
 
 export default function theme() {

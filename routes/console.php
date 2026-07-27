@@ -11,3 +11,11 @@ Artisan::command('inspire', function () {
 // Keep every account's Hevy data fresh with incremental syncs. --queue fans out
 // one job per user so a single slow account cannot stall everyone else's sync.
 Schedule::command('hevy:sync --queue')->hourly()->withoutOverlapping();
+
+// Trial-ending warnings. Idempotent (watermarked per user), so daily is a
+// cadence choice, not a correctness requirement.
+Schedule::command('app:send-trial-emails')->dailyAt('09:00');
+
+// Reseed the public demo weekly so its dates never age into "last workout
+// 5 months ago" — a stale demo quietly argues against the product.
+Schedule::command('app:demo')->weeklyOn(1, '04:00');

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+    <!-- The app mark: three rising bars on the brand colour. Kept in sync by
+         hand with resources/views/components/application-logo.blade.php. -->
+    <rect width="32" height="32" rx="7" fill="#5147d9"/>
+    <rect x="6" y="16.5" width="4.6" height="8" rx="1.6" fill="#fff" opacity="0.55"/>
+    <rect x="13.7" y="12" width="4.6" height="12.5" rx="1.6" fill="#fff" opacity="0.78"/>
+    <rect x="21.4" y="7" width="4.6" height="17.5" rx="1.6" fill="#fff"/>
+    <rect x="5" y="26.5" width="22" height="1.8" rx="0.9" fill="#fff"/>
+</svg>

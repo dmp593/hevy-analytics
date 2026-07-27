@@ -5,6 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
+        @include('partials.head-meta')
+
         {{-- Per-page title: every page shared one, which is poor for tabs, history and screen readers. --}}
         <title>{{ isset($title) ? $title.' · ' : '' }}{{ __('app.brand') }}</title>
 
@@ -16,6 +18,12 @@
                 const dark = pref === 'dark'
                     || (pref === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
                 document.documentElement.classList.toggle('dark', dark);
+                // Keep the phone's status bar in step with a manual override
+                // (the metas' media queries only know the OS scheme).
+                document.querySelectorAll('meta[name="theme-color"]').forEach((m) => {
+                    m.setAttribute('content', dark ? '#0c1015' : '#f9fafb');
+                    m.removeAttribute('media');
+                });
             })();
         </script>
 
@@ -37,6 +45,20 @@
         </a>
 
         <div class="min-h-screen bg-canvas">
+            @if (auth()->user()?->is_demo)
+                {{-- Always visible, on every page: a visitor deep in the muscle
+                     page must still know none of this is theirs, and must be one
+                     tap from making it theirs. --}}
+                <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-brand px-4 py-2 text-center text-sm font-medium text-on-fill">
+                    <span>{{ __('app.demo.banner') }}</span>
+                    <form method="POST" action="{{ route('demo.leave') }}">
+                        @csrf
+                        <button type="submit" class="min-h-11 underline underline-offset-2 hover:opacity-90">
+                            {{ __('app.demo.create_mine') }}
+                        </button>
+                    </form>
+                </div>
+            @endif
             @include('layouts.navigation')
 
             <!-- Page Heading -->

@@ -71,9 +71,14 @@ class HevySyncCommand extends Command
 
         // Unverified accounts must not be able to arm recurring outbound work
         // against a third-party API on an address they may not even own.
+        //
+        // The demo account is excluded because its key is fake by design:
+        // syncing it would call Hevy with a bogus credential every hour and
+        // paint a permanent "sync failed" banner across the public demo.
         return User::query()
             ->whereNotNull('hevy_api_key')
             ->whereNotNull('email_verified_at')
+            ->where('is_demo', false)
             ->get();
     }
 }

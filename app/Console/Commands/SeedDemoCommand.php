@@ -19,7 +19,8 @@ class SeedDemoCommand extends Command
     protected $signature = 'app:demo
         {--email=demo@example.test : Account to create or refresh}
         {--weeks=40 : How much training history to generate}
-        {--fresh : Wipe the database first}';
+        {--fresh : Wipe the database first}
+        {--missing-only : Do nothing if a seeded demo already exists}';
 
     protected $description = 'Create a demo account with realistic training history';
 
@@ -32,6 +33,20 @@ class SeedDemoCommand extends Command
 
         $email = (string) $this->option('email');
         $weeks = max(1, (int) $this->option('weeks'));
+
+        // For container boots: a free-tier host restarts the container on
+        // every wake from sleep, and a multi-minute reseed on each wake would
+        // hold the whole app's cold start hostage. The weekly scheduled run
+        // does the refreshing; boots only repair a missing demo.
+        if ($this->option('missing-only')) {
+            $existing = \App\Models\User::where('email', $email)->where('is_demo', true)->first();
+
+            if ($existing && $existing->workouts()->exists()) {
+                $this->line('Demo already seeded — skipping.');
+
+                return self::SUCCESS;
+            }
+        }
 
         $this->info("Seeding {$weeks} weeks of training for {$email}…");
 

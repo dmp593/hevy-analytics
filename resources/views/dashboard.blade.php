@@ -13,11 +13,16 @@
     @if ($needsSetup ?? false)
         {{-- First run. A new account previously landed on a wall of em-dashes and
              blank charts, which looks broken rather than empty. --}}
-        <x-ui.card :title="__('app.dashboard.welcome_title')">
-            <p class="mb-4 max-w-prose text-sm text-body">{{ __('app.dashboard.welcome_body') }}</p>
-            <x-ui.button :href="route('profile.edit')">{{ __('app.dashboard.set_up_profile') }}</x-ui.button>
+        <x-ui.card :title="__('app.dashboard.welcome_title')" class="mb-6">
+            <p class="max-w-prose text-sm text-body">{{ __('app.dashboard.welcome_body') }}</p>
         </x-ui.card>
+        <x-onboarding :onboarding="$onboarding" />
     @else
+        {{-- Key set, but the account is not fully wired yet: keep the checklist
+             in sight until every step is done, then it disappears for good. --}}
+        @unless (($onboarding ?? null)?->complete() ?? true)
+            <div class="mb-6"><x-onboarding :onboarding="$onboarding" /></div>
+        @endunless
         @php
             $goalLabel = $goal ? \App\Science\Goals\GoalType::label($goal->type) : __('app.dashboard.no_goal');
             $ratePct = $rate['pct_bw_per_week'] ?? null;

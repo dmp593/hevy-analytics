@@ -12,6 +12,14 @@ review.
 
 ---
 
+## Deploying
+
+`docs/DEPLOY.md` walks through two free options (Render + Neon, or Laravel
+Cloud's sandbox tier). The repo ships a `Dockerfile` that runs the web server,
+queue worker and scheduler in one container, and a `render.yaml` blueprint.
+Operator accounts are created on first boot from `BOOTSTRAP_*` environment
+variables — never from anything committed here.
+
 ## Running it locally
 
 You need PHP 8.3+, Composer, Node 22+, and Postgres 16+.

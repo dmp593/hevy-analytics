@@ -45,9 +45,9 @@
                                 };
                             @endphp
                             <div class="rounded-lg bg-surface-sunk p-2">
-                                <div class="text-[10px] uppercase text-muted">{{ $h['label'] }}</div>
+                                <div class="text-[11px] uppercase text-muted">{{ $h['label'] }}</div>
                                 <div class="text-sm font-bold text-ink">{{ $h['value'] }}</div>
-                                <div class="text-[10px] {{ $tone }}">{{ $h['delta'] >= 0 ? '+' : '' }}{{ $h['delta'] }}</div>
+                                <div class="text-[11px] {{ $tone }}">{{ $h['delta'] >= 0 ? '+' : '' }}{{ $h['delta'] }}</div>
                             </div>
                         @endforeach
                     </div>

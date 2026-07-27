@@ -23,6 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
             // Prepended would run before the session is started, and the guest
             // language choice lives in the session.
             SetLocale::class,
+            // Applied to the whole web group so every future POST route is
+            // demo-proof by default rather than by remembering to add it.
+            \App\Http\Middleware\EnsureDemoIsReadOnly::class,
         ]);
 
         // Behind a load balancer every request appears to come from the proxy,

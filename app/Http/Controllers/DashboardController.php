@@ -18,8 +18,10 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
+        $onboarding = \App\Support\Onboarding::for($user);
+
         if (! $user->hasHevyKey()) {
-            return view('dashboard', ['needsSetup' => true]);
+            return view('dashboard', ['needsSetup' => true, 'onboarding' => $onboarding]);
         }
 
         $filter = new FilterCriteria(from: Carbon::now()->subDays(28), to: Carbon::now());
@@ -31,6 +33,7 @@ class DashboardController extends Controller
 
         return view('dashboard', [
             'needsSetup' => false,
+            'onboarding' => $onboarding,
             'status' => $bc->status(),
             'rate' => $bc->weightRateKgPerWeek(),
             'partitioning' => $bc->partitioning(),

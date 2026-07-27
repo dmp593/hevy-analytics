@@ -29,7 +29,10 @@
 
 <div {{ $attributes->merge(['class' => 'rounded-xl border border-line bg-surface px-4 py-3 shadow-xs']) }}>
     <div class="flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-muted">
-        <span class="truncate">{{ $label }}</span>
+        {{-- No truncate: on a 2-up phone grid it cut "HARD SETS (4WK)" to
+             "HARD SETS (4W…" — a label that cannot be read is not a label.
+             Two lines is the lesser evil. --}}
+        <span class="min-w-0">{{ $label }}</span>
         @if ($tip)
             <x-info :text="$tip" :title="$label" />
         @endif

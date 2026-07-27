@@ -22,7 +22,7 @@
                             {{ $o['progression_pct'] !== null ? ($o['progression_pct'] > 0 ? '+' : '').$o['progression_pct'].'%' : '—' }}
                             {{-- A trend can be real but scattered. Saying so beats implying precision we do not have. --}}
                             @if($o['progression_pct'] !== null && ! ($o['progression_reliable'] ?? true))
-                                <span class="ml-1 text-[10px] font-normal text-muted" title="{{ __('app.routines.noisy_tip') }}">{{ __('app.routines.noisy') }}</span>
+                                <span class="ml-1 text-[11px] font-normal text-muted" title="{{ __('app.routines.noisy_tip') }}">{{ __('app.routines.noisy') }}</span>
                             @endif
                         </td>
                         <td class="py-2 pr-4 text-muted">{{ $o['last_performed'] }}</td>
@@ -43,8 +43,8 @@
                     <div class="font-medium">{{ $r->title }}</div>
                     <div class="text-xs text-muted mb-3">{{ trans_choice('app.routines.exercise_count', $r->exercises_count, ['count' => $r->exercises_count]) }}</div>
                     <div class="flex gap-3 text-sm">
-                        <a href="{{ route('routines.show', $r->hevy_id) }}" class="text-brand-ink">{{ __('app.routines.analyse') }}</a>
-                        <a href="{{ route('routines.edit', $r->hevy_id) }}" class="text-body">{{ __('app.routines.edit') }}</a>
+                        <a href="{{ route('routines.show', $r->hevy_id) }}" class="inline-flex min-h-11 items-center text-brand-ink">{{ __('app.routines.analyse') }}</a>
+                        <a href="{{ route('routines.edit', $r->hevy_id) }}" class="inline-flex min-h-11 items-center text-body">{{ __('app.routines.edit') }}</a>
                     </div>
                 </div>
             @endforeach

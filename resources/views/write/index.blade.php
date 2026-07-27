@@ -49,7 +49,7 @@
                         <pre class="text-[11px] bg-surface-sunk rounded-lg p-3 overflow-x-auto mt-1">{{ json_encode($op->response, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES) }}</pre>
                     @endif
                 </div>
-                <div class="text-[10px] text-faint mt-1">{{ $op->created_at->diffForHumans() }}</div>
+                <div class="text-[11px] text-faint mt-1">{{ $op->created_at->diffForHumans() }}</div>
             </div>
         @empty
             <p class="text-sm text-muted">{{ __('app.write.none') }}</p>

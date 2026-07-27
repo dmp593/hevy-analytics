@@ -14,7 +14,12 @@
  | whether a refactor actually landed. Build off the source, not off a cache.
  */
 @source '../views/**/*.blade.php';
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+/*
+ | Pagination views are PUBLISHED into resources/views/vendor/pagination (so
+ | the glob above covers them) rather than @source'd out of vendor/. The Docker
+ | asset stage builds without vendor/ installed, and a vendor @source there
+ | either fails the build or silently drops the paginator's classes.
+ */
 
 /*
  | Dark mode is driven by a class on <html>, not by prefers-color-scheme alone,
@@ -277,6 +282,25 @@
     :focus-visible {
         outline: 2px solid var(--brand);
         outline-offset: 2px;
+    }
+
+    /*
+     | Form controls meet the thumb. Every text input and select in the app
+     | measured 38px on a phone — under both Apple's 44px floor and Android's
+     | 48px. A blanket base rule beats per-view classes here for the same
+     | reason the border-color one above does: a control someone adds next
+     | year is born the right size instead of born too small.
+     */
+    input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='range']),
+    select,
+    textarea {
+        min-height: 2.75rem; /* 44px */
+    }
+
+    input[type='checkbox'],
+    input[type='radio'] {
+        min-height: 1.25rem;
+        min-width: 1.25rem;
     }
 
     /*

@@ -39,7 +39,7 @@
         <div class="absolute -top-0.5 h-5 w-0.5 bg-ink" style="left: calc({{ $pct }}% - 1px);"></div>
     </div>
 
-    <div class="relative mt-1 h-4 text-[10px] text-faint">
+    <div class="relative mt-1 h-4 text-[11px] text-faint">
         @foreach($levels as $i => $lvl)
             @php $centre = ($edges[$i] + $edges[$i+1]) / 2; @endphp
             <span class="absolute -translate-x-1/2 {{ $i === $eval['level_index'] ? 'text-ink font-semibold' : '' }}" style="left: {{ $centre }}%;">{{ __('app.levels.tier.'.$lvl) }}</span>
@@ -67,7 +67,7 @@
     @endif
 
     @if($showThresholds && !empty($eval['thresholds_kg']))
-        <div class="mt-2 grid grid-cols-5 gap-1 text-center text-[10px]">
+        <div class="mt-2 grid grid-cols-5 gap-1 text-center text-[11px]">
             @foreach($levels as $i => $lvl)
                 <div class="rounded-sm bg-surface-sunk py-1">
                     <div class="text-faint">{{ __('app.levels.tier.'.$lvl) }}</div>
@@ -77,7 +77,7 @@
         </div>
     @endif
 
-    <div class="mt-1 flex items-center justify-between text-[10px] text-faint">
+    <div class="mt-1 flex items-center justify-between text-[11px] text-faint">
         <span>
             e1RM {{ $eval['e1rm'] }}kg @ {{ $eval['bodyweight'] }}kg · {{ $eval['ratio'] }}×BW
             @if(($eval['age_factor'] ?? 1) != 1) · {{ __('app.levels.age_factor', ['value' => $eval['age_factor']]) }}@endif
