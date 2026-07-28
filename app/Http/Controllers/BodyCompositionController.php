@@ -73,7 +73,7 @@ class BodyCompositionController extends Controller
     }
 
     /** Girth form fields => their storage columns (the schema mixes suffix styles). */
-    private const GIRTHS = [
+    public const GIRTHS = [
         'neck' => 'neck_cm',
         'shoulders' => 'shoulder_cm',
         'chest' => 'chest_cm',

@@ -352,6 +352,7 @@ return [
         'muscle' => 'Músculo',
         'body' => 'Corpo',
         'photos' => 'Fotografias',
+        'compare' => 'Comparar',
         'nutrition' => 'Nutrição',
         'projections' => 'Projeções',
         'routines' => 'Rotinas',
@@ -962,6 +963,29 @@ return [
         'posterior' => 'Cadeia posterior',
         'upper' => 'Tronco superior',
         'lower' => 'Tronco inferior',
+    ],
+
+    /*
+     | Comparação de check-ins: 2-4 datas lado a lado.
+     */
+    'compare' => [
+        'title' => 'Comparar check-ins',
+        'subtitle' => 'Duas a quatro datas lado a lado — a mesma pose na mesma linha',
+        'open' => 'Comparar check-ins',
+        'pick_title' => 'Escolhe as datas',
+        'pick_hint' => 'Qualquer data com fotografia ou medidas pode ser comparada. Escolhe duas a quatro.',
+        'photos_badge' => '{1}:count fotografia|[2,*]:count fotografias',
+        'measured_badge' => 'medidas',
+        'show' => 'Comparar',
+        'need_two' => 'Escolhe pelo menos duas datas.',
+        'none_title' => 'Ainda não há nada para comparar',
+        'none_body' => 'Guarda um check-in na página de Fotografias ou regista medidas na página Corpo, e as datas aparecem aqui.',
+        'photos_title' => 'Fotografias, pose a pose',
+        'values_title' => 'Medidas',
+        'baseline' => '(referência)',
+        'no_photo' => 'sem fotografia',
+        'vs_goal' => 'A variação de peso é lida contra o teu objetivo (:goal): a favor é verde, contra é vermelho, e uma variação abaixo de cerca de 1% do peso corporal conta como estável — isso é água e refeições. A seta e o sinal dizem sempre o mesmo que a cor.',
+        'vs_no_goal' => 'Sem objetivo ativo, as variações aparecem sem julgamento — se um número deve subir ou descer depende do que estás a treinar.',
     ],
 
     'series' => [

@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AiController;
 use App\Http\Controllers\AiSettingsController;
 use App\Http\Controllers\BodyCompositionController;
+use App\Http\Controllers\CompareController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataExportController;
 use App\Http\Controllers\DemoController;
@@ -59,6 +60,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Manual measurements: the body-data door for accounts without an API key.
     Route::post('/body/measurements', [BodyCompositionController::class, 'storeMeasurement'])
         ->middleware('throttle:30,1')->name('body.measurements');
+
+    // Check-in comparison: 2-4 dates side by side, photos aligned by pose.
+    Route::get('/compare', [CompareController::class, 'index'])->name('compare');
 
     Route::get('/photos', [ProgressPhotoController::class, 'index'])->name('photos');
     Route::post('/photos', [ProgressPhotoController::class, 'store'])->middleware('throttle:30,1')->name('photos.store');

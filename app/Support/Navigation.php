@@ -56,6 +56,7 @@ class Navigation
                     self::item('body', __('app.nav.body'), 'body'),
                     self::item('nutrition', __('app.nav.nutrition'), 'nutrition'),
                     self::item('photos', __('app.nav.photos'), 'photos'),
+                    self::item('compare', __('app.nav.compare'), 'compare'),
                 ],
             ],
             [

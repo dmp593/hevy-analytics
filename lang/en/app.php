@@ -352,6 +352,7 @@ return [
         'muscle' => 'Muscle',
         'body' => 'Body',
         'photos' => 'Photos',
+        'compare' => 'Compare',
         'nutrition' => 'Nutrition',
         'projections' => 'Projections',
         'routines' => 'Routines',
@@ -961,6 +962,29 @@ return [
         'posterior' => 'Posterior chain',
         'upper' => 'Upper body',
         'lower' => 'Lower body',
+    ],
+
+    /*
+     | Check-in comparison: 2-4 dates side by side.
+     */
+    'compare' => [
+        'title' => 'Compare check-ins',
+        'subtitle' => 'Two to four dates side by side — the same pose on the same row',
+        'open' => 'Compare check-ins',
+        'pick_title' => 'Pick the dates',
+        'pick_hint' => 'Any date with a photo or a measurement can be compared. Pick two to four.',
+        'photos_badge' => '{1}:count photo|[2,*]:count photos',
+        'measured_badge' => 'measurements',
+        'show' => 'Compare',
+        'need_two' => 'Pick at least two dates.',
+        'none_title' => 'Nothing to compare yet',
+        'none_body' => 'Save a check-in on the Photos page or log measurements on the Body page, and the dates appear here.',
+        'photos_title' => 'Photos, pose by pose',
+        'values_title' => 'Measurements',
+        'baseline' => '(baseline)',
+        'no_photo' => 'no photo',
+        'vs_goal' => 'The weight change is read against your goal (:goal): moving with it is green, against it red, and a change under about 1% of bodyweight counts as stable — that much is water and meal timing. The arrow and sign always carry the same information as the colour.',
+        'vs_no_goal' => 'No active goal, so changes are shown without judgement — whether a number should rise or fall depends on what you are training for.',
     ],
 
     'series' => [

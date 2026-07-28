@@ -90,7 +90,10 @@
         </form>
     </details>
 
-    <h2 class="mb-3 text-xs font-semibold uppercase tracking-wide text-faint">{{ __('app.dashboard.trends') }}</h2>
+    <div class="mb-3 flex items-center justify-between">
+        <h2 class="text-xs font-semibold uppercase tracking-wide text-faint">{{ __('app.dashboard.trends') }}</h2>
+        <a href="{{ route('compare') }}" class="inline-flex min-h-11 items-center text-sm text-body underline hover:text-ink">{{ __('app.compare.open') }}</a>
+    </div>
     <div class="mb-8 grid gap-6 lg:grid-cols-2">
         <x-ui.card :title="__('app.body.weight_lean')">
             <x-multi-line-chart :sets="[

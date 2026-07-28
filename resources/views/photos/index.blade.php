@@ -1,15 +1,4 @@
-<x-ui.page :title="__('app.pages.photos')" :subtitle="__('app.pages.photos_sub')" width="6xl"
-         x-data="{
-            compare: false,
-            a: null,
-            b: null,
-            pick(id) {
-                if (!this.compare) return;
-                if (this.a === id) { this.a = null; return; }
-                if (this.b === id) { this.b = null; return; }
-                if (!this.a) { this.a = id; } else if (!this.b) { this.b = id; }
-            }
-         }">
+<x-ui.page :title="__('app.pages.photos')" :subtitle="__('app.pages.photos_sub')" width="6xl">
     <x-flash />
 
     <div class="grid lg:grid-cols-3 gap-6">
@@ -43,25 +32,10 @@
         </x-panel>
 
         <div class="lg:col-span-2 space-y-4">
-            <div class="flex items-center justify-between">
-                <label class="inline-flex min-h-11 items-center gap-2 text-sm">
-                    <input type="checkbox" x-model="compare" class="rounded-sm border-line">
-                    {{ __('app.photos.compare') }} <span class="text-xs text-faint">{{ __('app.photos.compare_hint') }}</span>
-                </label>
-            </div>
-
-            {{-- Compare view --}}
-            <div x-show="compare && a && b" x-cloak class="grid grid-cols-2 gap-3">
-                @foreach($photos as $p)
-                    <template x-if="a === {{ $p->id }}">
-                        <div><img src="{{ route('photos.file', $p) }}" class="w-full rounded-lg border" alt=""><div class="text-xs text-center mt-1">{{ $p->date->toDateString() }} · {{ __('app.photos.angle_'.$p->angle) }} {{ $p->weight_kg ? '· '.units()->weight($p->weight_kg).units()->weightUnit() : '' }}</div></div>
-                    </template>
-                @endforeach
-                @foreach($photos as $p)
-                    <template x-if="b === {{ $p->id }}">
-                        <div><img src="{{ route('photos.file', $p) }}" class="w-full rounded-lg border" alt=""><div class="text-xs text-center mt-1">{{ $p->date->toDateString() }} · {{ __('app.photos.angle_'.$p->angle) }} {{ $p->weight_kg ? '· '.units()->weight($p->weight_kg).units()->weightUnit() : '' }}</div></div>
-                    </template>
-                @endforeach
+            {{-- The comparison grew into its own page: 2-4 dates, poses
+                 aligned, values with deltas — this is just the door to it. --}}
+            <div class="flex items-center justify-end">
+                <x-ui.button :href="route('compare')" variant="secondary">{{ __('app.compare.open') }}</x-ui.button>
             </div>
 
             {{-- Gallery --}}
@@ -69,9 +43,7 @@
                 <x-panel :title="$date">
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                         @foreach($group as $p)
-                            <div class="relative group cursor-pointer"
-                                 @click="pick({{ $p->id }})"
-                                 :class="(a === {{ $p->id }} || b === {{ $p->id }}) ? 'ring-2 ring-brand rounded-lg' : ''">
+                            <div class="relative group">
                                 <img src="{{ route('photos.file', $p) }}" loading="lazy" class="w-full h-40 object-cover rounded-lg border" alt="">
                                 <span class="absolute top-1 left-1 text-[11px] bg-black/60 text-white px-1.5 py-0.5 rounded-sm">{{ __('app.photos.angle_'.$p->angle) }}</span>
                                 <form method="POST" action="{{ route('photos.destroy', $p) }}" @click.stop
