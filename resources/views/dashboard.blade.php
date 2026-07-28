@@ -20,6 +20,22 @@
                 {{-- The door for Hevy accounts without Pro: same data, one file. --}}
                 <x-ui.button :href="route('import')" variant="secondary">{{ __('app.import.title') }}</x-ui.button>
             </div>
+
+            {{-- Units, decided on day one rather than discovered later in the
+                 profile: someone about to type their first bodyweight needs the
+                 field to already speak lb if that is how they think. --}}
+            <div class="mt-4 flex flex-wrap items-center gap-2 border-t border-subtle pt-4">
+                <span class="text-xs font-medium text-muted">{{ __('app.profile.units') }}</span>
+                @foreach ([\App\Support\Units::METRIC => 'kg · cm', \App\Support\Units::IMPERIAL => 'lb · ft/in'] as $system => $symbols)
+                    <form method="POST" action="{{ route('settings.units', $system) }}">
+                        @csrf
+                        <button class="min-h-11 rounded-md border px-3 text-xs font-semibold transition {{ auth()->user()->unit_system === $system ? 'border-brand bg-brand-soft text-brand-ink' : 'border-line text-body hover:bg-surface-sunk' }}"
+                                @if (auth()->user()->unit_system === $system) aria-pressed="true" @endif>
+                            {{ __('app.profile.unit_'.$system.'_short') }} · {{ $symbols }}
+                        </button>
+                    </form>
+                @endforeach
+            </div>
         </x-ui.card>
         <x-onboarding :onboarding="$onboarding" />
     @else
@@ -90,13 +106,13 @@
             <section aria-label="{{ __('app.dashboard.at_a_glance') }}">
                 <h2 class="mb-3 text-xs font-semibold uppercase tracking-wide text-faint">{{ __('app.dashboard.at_a_glance') }}</h2>
                 <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-                    <x-ui.stat :label="__('app.dashboard.weight')" :value="$status['weight_kg'] ?? null" unit="kg"
+                    <x-ui.stat :label="__('app.dashboard.weight')" :value="units()->weight($status['weight_kg'] ?? null)" :unit="units()->weightUnit()"
                                :sub="$ratePct !== null ? __('app.units.bw_per_week', ['value' => sprintf('%+.2f', $ratePct)]) : null"
                                :tip="__('app.tips.weight')" />
                     <x-ui.stat :label="__('app.dashboard.body_fat')" :value="$status['fat_percent'] ?? null" unit="%"
                                :sub="$status['navy_fat_percent'] ? 'Navy '.$status['navy_fat_percent'].'%' : null"
                                :tip="__('app.tips.body_fat')" />
-                    <x-ui.stat :label="__('app.dashboard.lean_mass')" :value="$status['lean_mass_kg'] ?? null" unit="kg"
+                    <x-ui.stat :label="__('app.dashboard.lean_mass')" :value="units()->weight($status['lean_mass_kg'] ?? null)" :unit="units()->weightUnit()"
                                :sub="$status['ffmi_normalized'] ? 'FFMI '.$status['ffmi_normalized'] : null"
                                :tip="__('app.tips.lean_mass')" />
                     <x-ui.stat :label="__('app.dashboard.hard_sets_4wk')" :value="$weekSets" tone="accent"
@@ -130,8 +146,8 @@
 
                 <x-ui.card :title="__('app.dashboard.body_composition')" :subtitle="__('app.dashboard.body_composition_sub')">
                     <x-multi-line-chart :sets="[
-                        ['series' => $weightSeries, 'label' => __('app.series.weight'), 'color' => \App\Support\Chart::series(1)],
-                        ['series' => $leanSeries, 'label' => __('app.series.lean_mass'), 'color' => \App\Support\Chart::series(2)],
+                        ['series' => units()->weightSeries($weightSeries), 'label' => __('app.series.weight', ['unit' => units()->weightUnit()]), 'color' => \App\Support\Chart::series(1)],
+                        ['series' => units()->weightSeries($leanSeries), 'label' => __('app.series.lean_mass', ['unit' => units()->weightUnit()]), 'color' => \App\Support\Chart::series(2)],
                     ]" :empty="__('app.chart.no_body_data')" />
                 </x-ui.card>
             </section>

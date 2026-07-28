@@ -35,30 +35,30 @@
          check every visit, and at six across they crowded out the ones you do. --}}
     <h2 class="mb-3 text-xs font-semibold uppercase tracking-wide text-faint">{{ __('app.dashboard.at_a_glance') }}</h2>
     <div class="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <x-ui.stat :label="__('app.dashboard.weight')" :value="$status['weight_kg'] ?? '—'" unit="kg"
-                   :sub="isset($rate['kg_per_week']) ? sprintf('%+.2f kg/wk', $rate['kg_per_week']) : null" />
+        <x-ui.stat :label="__('app.dashboard.weight')" :value="units()->weight($status['weight_kg'] ?? null) ?? '—'" :unit="units()->weightUnit()"
+                   :sub="isset($rate['kg_per_week']) ? sprintf('%+.2f %s/wk', units()->weight($rate['kg_per_week'], 2), units()->weightUnit()) : null" />
         <x-ui.stat :label="__('app.dashboard.body_fat')" :value="$status['fat_percent'] ?? '—'" unit="%"
                    :sub="$status['navy_fat_percent'] ? 'Navy '.$status['navy_fat_percent'].'%' : null"
                    :tip="__('app.tips.body_fat')" />
-        <x-ui.stat :label="__('app.dashboard.lean_mass')" :value="$status['lean_mass_kg'] ?? '—'" unit="kg"
+        <x-ui.stat :label="__('app.dashboard.lean_mass')" :value="units()->weight($status['lean_mass_kg'] ?? null) ?? '—'" :unit="units()->weightUnit()"
                    :sub="$status['ffmi_normalized'] ? 'FFMI '.$status['ffmi_normalized'] : null" />
-        <x-ui.stat :label="__('app.body.fat_mass')" :value="$status['fat_mass_kg'] ?? '—'" unit="kg" />
+        <x-ui.stat :label="__('app.body.fat_mass')" :value="units()->weight($status['fat_mass_kg'] ?? null) ?? '—'" :unit="units()->weightUnit()" />
     </div>
 
     <h2 class="mb-3 text-xs font-semibold uppercase tracking-wide text-faint">{{ __('app.dashboard.trends') }}</h2>
     <div class="mb-8 grid gap-6 lg:grid-cols-2">
         <x-ui.card :title="__('app.body.weight_lean')">
             <x-multi-line-chart :sets="[
-                ['series' => $weightSeries, 'label' => __('app.series.weight'), 'color' => \App\Support\Chart::series(0)],
-                ['series' => $leanSeries, 'label' => __('app.series.lean_mass'), 'color' => \App\Support\Chart::series(2)],
+                ['series' => units()->weightSeries($weightSeries), 'label' => __('app.series.weight', ['unit' => units()->weightUnit()]), 'color' => \App\Support\Chart::series(0)],
+                ['series' => units()->weightSeries($leanSeries), 'label' => __('app.series.lean_mass', ['unit' => units()->weightUnit()]), 'color' => \App\Support\Chart::series(2)],
             ]" :empty="__('app.chart.no_body_data')" />
         </x-ui.card>
 
         <x-ui.card :title="__('app.body.tape')" :subtitle="__('app.body.tape_sub')">
             <x-multi-line-chart :sets="[
-                ['series' => $chestSeries, 'label' => __('app.series.chest'), 'color' => \App\Support\Chart::series(0)],
-                ['series' => $waistSeries, 'label' => __('app.series.waist'), 'color' => \App\Support\Chart::series(3)],
-                ['series' => $bicepSeries, 'label' => __('app.series.bicep'), 'color' => \App\Support\Chart::series(2)],
+                ['series' => units()->girthSeries($chestSeries), 'label' => __('app.series.chest').' ('.units()->girthUnit().')', 'color' => \App\Support\Chart::series(0)],
+                ['series' => units()->girthSeries($waistSeries), 'label' => __('app.series.waist').' ('.units()->girthUnit().')', 'color' => \App\Support\Chart::series(3)],
+                ['series' => units()->girthSeries($bicepSeries), 'label' => __('app.series.bicep').' ('.units()->girthUnit().')', 'color' => \App\Support\Chart::series(2)],
             ]" :empty="__('app.chart.no_tape_data')" />
         </x-ui.card>
     </div>
@@ -122,7 +122,7 @@
                 @forelse ($symmetry as $s)
                     <div class="flex items-center justify-between border-b border-subtle py-1.5 text-sm last:border-0">
                         <span class="capitalize">{{ $s['part'] }}</span>
-                        <span class="text-muted">L {{ $s['left'] }} · R {{ $s['right'] }}</span>
+                        <span class="text-muted">L {{ units()->girth($s['left']) }} · R {{ units()->girth($s['right']) }}</span>
                         <span class="font-semibold {{ $s['diff_pct'] > 5 ? 'text-warn' : 'text-good' }}">{{ $s['diff_pct'] }}%</span>
                     </div>
                 @empty

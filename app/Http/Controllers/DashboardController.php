@@ -22,7 +22,11 @@ class DashboardController extends Controller
 
         $onboarding = Onboarding::for($user);
 
-        if (! $user->hasHevyKey()) {
+        // Two doors into the app: the API key and the CSV import. An account
+        // that came in through either one has data to show — keeping the
+        // welcome card up for a key-less CSV importer would hide their own
+        // dashboard from them forever.
+        if (! $user->hasHevyKey() && ! $user->workouts()->exists()) {
             return view('dashboard', ['needsSetup' => true, 'onboarding' => $onboarding]);
         }
 

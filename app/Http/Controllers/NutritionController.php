@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\Analytics\NutritionService;
 use App\Services\Analytics\NutritionVerdict;
+use App\Support\Units;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -44,16 +45,26 @@ class NutritionController extends Controller
 
     public function storeIntake(Request $request)
     {
+        $units = Units::for($request->user());
+
         $data = $request->validate([
             'date' => ['required', 'date'],
             'calories' => ['nullable', 'numeric', 'min:0', 'max:20000'],
             'protein_g' => ['nullable', 'numeric', 'min:0', 'max:2000'],
             'fat_g' => ['nullable', 'numeric', 'min:0', 'max:2000'],
             'carb_g' => ['nullable', 'numeric', 'min:0', 'max:3000'],
-            'weight_kg' => ['nullable', 'numeric', 'min:0', 'max:500'],
+            // Typed in the user's unit; stored metric.
+            'weight' => ['nullable', 'numeric', 'min:0', 'max:'.($units->imperial() ? 1102 : 500)],
             'fat_percent' => ['nullable', 'numeric', 'min:0', 'max:70'],
             'notes' => ['nullable', 'string', 'max:500'],
         ]);
+
+        // Only touch the stored weight when one was typed: an intake-only
+        // submit must not blank a weight logged earlier that day.
+        if (filled($data['weight'] ?? null)) {
+            $data['weight_kg'] = $units->weightToKg($data['weight']);
+        }
+        unset($data['weight']);
 
         $log = $request->user()->intakeLogs()->whereDate('date', $data['date'])->first()
             ?? $request->user()->intakeLogs()->make(['date' => $data['date']]);

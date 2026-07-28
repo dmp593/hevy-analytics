@@ -21,7 +21,7 @@ class ProgressPhotoTest extends TestCase
             'date' => now()->toDateString(),
             'angle' => 'front',
             'photo' => UploadedFile::fake()->image('progress.jpg', 300, 400),
-            'weight_kg' => 70,
+            'weight' => 70,
         ])->assertRedirect();
 
         $photo = $user->progressPhotos()->firstOrFail();

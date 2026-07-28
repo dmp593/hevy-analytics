@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Support\Units;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,6 +33,14 @@ class ProfileController extends Controller
         if (blank($validated['hevy_api_key'] ?? null)) {
             unset($validated['hevy_api_key']);
         }
+
+        // The imperial form submits feet and inches; the column is metric.
+        // Folding happens here, not in the model, so height_cm stays the one
+        // value every calculation reads.
+        if (filled($validated['height_ft'] ?? null)) {
+            $validated['height_cm'] = Units::heightToCm($validated['height_ft'], $validated['height_in'] ?? null);
+        }
+        unset($validated['height_ft'], $validated['height_in']);
 
         $request->user()->fill($validated);
 

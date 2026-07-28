@@ -20,6 +20,7 @@ use App\Http\Controllers\RoutineController;
 use App\Http\Controllers\StrengthLevelController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\SyncController;
+use App\Http\Controllers\UnitSystemController;
 use App\Http\Controllers\WriteBackController;
 use Illuminate\Support\Facades\Route;
 
@@ -95,6 +96,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // One-tap unit switching for the dashboard welcome card; the profile form
+    // sets the same column at full length.
+    Route::post('/settings/units/{system}', UnitSystemController::class)->name('settings.units');
 
     // AI provider settings. Separate from the profile form because the two are
     // saved independently: changing a training preference should not require

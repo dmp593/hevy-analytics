@@ -69,8 +69,8 @@
                     <label class="form-label">{{ __('app.nutrition.calories') }}
                         <input type="number" step="1" name="calories" class="form-control" placeholder="{{ (int) $target->target_calories }}">
                     </label>
-                    <label class="form-label">{{ __('app.nutrition.weight') }}
-                        <input type="number" step="0.1" name="weight_kg" class="form-control">
+                    <label class="form-label">{{ __('app.nutrition.weight', ['unit' => units()->weightUnit()]) }}
+                        <input type="number" step="0.1" name="weight" class="form-control">
                     </label>
                     <label class="form-label">{{ __('app.nutrition.protein') }} (g)
                         <input type="number" step="1" name="protein_g" class="form-control" placeholder="{{ (int) $target->protein_g }}">
@@ -109,7 +109,7 @@
                             <th class="py-2 pr-4">{{ __('app.nutrition.calories') }}</th>
                             <th class="py-2 pr-4">{{ __('app.nutrition.target') }}</th>
                             <th class="py-2 pr-4">{{ __('app.nutrition.protein') }}</th>
-                            <th class="py-2 pr-5">{{ __('app.nutrition.weight') }}</th>
+                            <th class="py-2 pr-5">{{ __('app.nutrition.weight', ['unit' => units()->weightUnit()]) }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -119,7 +119,7 @@
                                 <td class="py-2 pr-4">{{ $row['calories'] ? number_format($row['calories']) : '—' }}</td>
                                 <td class="py-2 pr-4 text-muted">{{ $row['target_calories'] ? number_format($row['target_calories']) : '—' }}</td>
                                 <td class="py-2 pr-4">{{ $row['protein_g'] ? $row['protein_g'].'g' : '—' }}</td>
-                                <td class="py-2 pr-5">{{ collect($recentLogs)->firstWhere('date', \Illuminate\Support\Carbon::parse($row['date']))?->weight_kg ?? '—' }}</td>
+                                <td class="py-2 pr-5">{{ units()->weight(collect($recentLogs)->firstWhere('date', \Illuminate\Support\Carbon::parse($row['date']))?->weight_kg) ?? '—' }}</td>
                             </tr>
                         @empty
                             <tr><td colspan="5" class="px-5 py-3 text-muted">{{ __('app.nutrition.no_intake') }}</td></tr>

@@ -2,6 +2,8 @@
 
 namespace App\Services\Analytics;
 
+use App\Support\Units;
+
 /**
  * Reads the corroborating body signals together and states, in words, what they
  * agree on.
@@ -32,7 +34,14 @@ class BodyVerdict
     /** Bodyweight below this weekly rate is drift, not a direction. */
     private const WEIGHT_NOISE_KG_PER_WEEK = 0.05;
 
-    public function __construct(private readonly array $triangulation) {}
+    private readonly Units $units;
+
+    public function __construct(private readonly array $triangulation, ?Units $units = null)
+    {
+        // Judgements (noise thresholds, directions) always run on the metric
+        // inputs; only the printed detail strings speak the user's unit.
+        $this->units = $units ?? Units::metric();
+    }
 
     /**
      * @return array{
@@ -213,9 +222,9 @@ class BodyVerdict
 
         if ($weight !== null) {
             $out[] = [
-                'label' => __('app.series.weight'),
+                'label' => __('app.series.weight', ['unit' => $this->units->weightUnit()]),
                 'direction' => abs($weight) <= self::WEIGHT_NOISE_KG_PER_WEEK ? 'flat' : 'neutral',
-                'detail' => sprintf('%+.2f kg/wk', $weight),
+                'detail' => sprintf('%+.2f %s/wk', $this->units->weight($weight, 2), $this->units->weightUnit()),
             ];
         }
 
@@ -273,7 +282,9 @@ class BodyVerdict
 
     private function cm(?float $value): string
     {
-        return $value === null ? '—' : sprintf('%+.2f cm/%s', $value, __('app.body.verdict.month_abbr'));
+        return $value === null
+            ? '—'
+            : sprintf('%+.2f %s/%s', $this->units->girth($value, 2), $this->units->girthUnit(), __('app.body.verdict.month_abbr'));
     }
 
     private function waistPhrase(?float $waist): string

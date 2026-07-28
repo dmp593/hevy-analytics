@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ProgressPhoto;
+use App\Support\Units;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -30,11 +31,14 @@ class ProgressPhotoController extends Controller
 
     public function store(Request $request)
     {
+        $units = Units::for($request->user());
+
         $data = $request->validate([
             'date' => ['required', 'date'],
             'angle' => ['required', 'in:front,side,back'],
             'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp,heic', 'max:8192'],
-            'weight_kg' => ['nullable', 'numeric', 'min:0', 'max:500'],
+            // Typed in the user's unit; stored metric.
+            'weight' => ['nullable', 'numeric', 'min:0', 'max:'.($units->imperial() ? 1102 : 500)],
             'notes' => ['nullable', 'string', 'max:500'],
         ]);
 
@@ -56,7 +60,7 @@ class ProgressPhotoController extends Controller
             'date' => $data['date'],
             'angle' => $data['angle'],
             'path' => $path,
-            'weight_kg' => $data['weight_kg'] ?? null,
+            'weight_kg' => $units->weightToKg($data['weight'] ?? null),
             'notes' => $data['notes'] ?? null,
         ]);
 

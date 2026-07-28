@@ -7,6 +7,7 @@ use App\Services\Analytics\BodyCompAnalytics;
 use App\Services\Analytics\BodyVerdict;
 use App\Services\Analytics\FilterCriteria;
 use App\Services\Analytics\StrengthAnalytics;
+use App\Support\Units;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -58,7 +59,7 @@ class BodyCompositionController extends Controller
             // Read the corroborating signals together and say, in words, what
             // they agree on. This leads the page: the numbers below are the
             // evidence for it, not a puzzle for the athlete to solve.
-            'verdict' => (new BodyVerdict($triangulation))->verdict(),
+            'verdict' => (new BodyVerdict($triangulation, Units::for($user)))->verdict(),
             'weightSeries' => $bc->series('weight_kg', $from),
             'fatSeries' => $bc->fatPercentSeries($from),
             'leanSeries' => $bc->leanMassSeries($from),

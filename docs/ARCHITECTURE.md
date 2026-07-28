@@ -46,6 +46,14 @@ class that asks Cashier anything. Everything downstream works from the enum. A
 `$user->subscribed()` call added anywhere else is a second source of truth, and
 the admin list and the app will drift apart.
 
+**3b. A conversion done outside `App\Support\Units`.** The database and every
+calculation are metric, always. Imperial exists only at the edges — a form
+field on its way in (`weightToKg`, `heightToCm`), a number or chart series on
+its way out (`weight`, `girth`, `weightSeries`) — via `Units::for($user)` or
+the `units()` Blade helper. Scope is body data (height, bodyweight, tape);
+training loads stay kg everywhere. An inline `* 2.2046` anywhere else will
+eventually run on a value that was already converted.
+
 **4. A claim written next to code that later moved.** The UI states things —
 "compared against male lifters", "dampened near natural ceilings". When the
 code behind a sentence changes, the sentence has to change with it.

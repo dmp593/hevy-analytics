@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\User;
 use App\Support\Locales;
+use App\Support\Units;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -30,7 +31,12 @@ class ProfileUpdateRequest extends FormRequest
             'hevy_api_key' => ['nullable', 'string', 'max:255'],
             'sex' => ['nullable', 'in:male,female'],
             'age' => ['nullable', 'integer', 'between:10,100'],
+            'unit_system' => ['nullable', Rule::in(Units::SYSTEMS)],
             'height_cm' => ['nullable', 'numeric', 'between:100,250'],
+            // The imperial pair. The form submits either these or height_cm,
+            // never both — the controller folds them into height_cm.
+            'height_ft' => ['nullable', 'integer', 'between:3,8'],
+            'height_in' => ['nullable', 'numeric', 'between:0,11.9'],
             'activity_level' => ['nullable', 'numeric', 'between:1.2,1.9'],
             'body_fat_source' => ['nullable', 'in:scale,navy,manual'],
             // Validated against the real zone list: this value ends up in

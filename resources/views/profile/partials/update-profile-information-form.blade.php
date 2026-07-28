@@ -37,7 +37,7 @@
             @endif
         </div>
 
-        <div class="border-t border-subtle pt-6">
+        <div class="border-t border-subtle pt-6" x-data="{ unit: '{{ old('unit_system', $user->unit_system) }}' }">
             <h3 class="text-sm font-semibold text-ink mb-1">{{ __('app.profile.hevy_section') }}</h3>
             <p class="text-xs text-muted mb-4">{{ __('app.profile.hevy_section_help') }}</p>
 
@@ -51,6 +51,15 @@
                         'import' => '<a href="'.route('import').'" class="underline">'.__('app.import.title').'</a>',
                     ]) !!}
                 </p>
+            </div>
+
+            <div class="mt-4">
+                <x-input-label for="unit_system" :value="__('app.profile.units')" />
+                <select id="unit_system" name="unit_system" x-model="unit" class="mt-1 block w-full md:w-1/2 rounded-md border-line text-sm">
+                    <option value="metric">{{ __('app.profile.unit_metric') }}</option>
+                    <option value="imperial">{{ __('app.profile.unit_imperial') }}</option>
+                </select>
+                <p class="mt-1 text-xs text-muted">{{ __('app.profile.units_help') }}</p>
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
@@ -67,9 +76,33 @@
                     <x-input-label for="age" :value="__('app.profile.age')" />
                     <x-text-input id="age" name="age" type="number" class="mt-1 block w-full" :value="old('age', $user->age)" />
                 </div>
+                @php
+                    [$heightFt, $heightIn] = $user->height_cm
+                        ? \App\Support\Units::heightParts($user->height_cm)
+                        : [null, null];
+                @endphp
                 <div>
-                    <x-input-label for="height_cm" :value="__('app.profile.height')" />
-                    <x-text-input id="height_cm" name="height_cm" type="number" step="0.1" class="mt-1 block w-full" :value="old('height_cm', $user->height_cm)" />
+                    {{-- Templates, not hidden inputs: a removed field does not
+                         submit, so the server only ever receives the pair the
+                         athlete could actually see. --}}
+                    <template x-if="unit !== 'imperial'">
+                        <div>
+                            <x-input-label for="height_cm" :value="__('app.profile.height')" />
+                            <x-text-input id="height_cm" name="height_cm" type="number" step="0.1" class="mt-1 block w-full" :value="old('height_cm', $user->height_cm)" />
+                        </div>
+                    </template>
+                    <template x-if="unit === 'imperial'">
+                        <div>
+                            <x-input-label for="height_ft" :value="__('app.profile.height_imperial')" />
+                            <div class="mt-1 flex gap-2">
+                                <x-text-input id="height_ft" name="height_ft" type="number" step="1" min="3" max="8" class="block w-full" :value="old('height_ft', $heightFt)" :aria-label="__('app.profile.height_ft')" />
+                                <x-text-input id="height_in" name="height_in" type="number" step="0.1" min="0" max="11.9" class="block w-full" :value="old('height_in', $heightIn)" :aria-label="__('app.profile.height_in')" />
+                            </div>
+                        </div>
+                    </template>
+                    <x-input-error class="mt-2" :messages="$errors->get('height_cm')" />
+                    <x-input-error class="mt-2" :messages="$errors->get('height_ft')" />
+                    <x-input-error class="mt-2" :messages="$errors->get('height_in')" />
                 </div>
                 <div>
                     <x-input-label for="activity_level" :value="__('app.profile.activity')" />

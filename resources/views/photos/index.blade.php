@@ -29,8 +29,8 @@
                 <label class="text-xs text-body block">{{ __('app.photos.file') }}
                     <input type="file" name="photo" accept="image/*" class="mt-1 w-full text-sm" required>
                 </label>
-                <label class="text-xs text-body block">{{ __('app.photos.weight') }}
-                    <input type="number" step="0.1" name="weight_kg" class="mt-1 w-full rounded-md border-line text-sm">
+                <label class="text-xs text-body block">{{ __('app.photos.weight', ['unit' => units()->weightUnit()]) }}
+                    <input type="number" step="0.1" name="weight" class="mt-1 w-full rounded-md border-line text-sm">
                 </label>
                 <x-input-error :messages="$errors->all()" class="mt-1" />
                 <button class="w-full rounded-md bg-brand px-4 py-2 text-sm font-semibold text-on-fill hover:bg-brand-hover">{{ __('app.photos.upload') }}</button>
@@ -50,12 +50,12 @@
             <div x-show="compare && a && b" x-cloak class="grid grid-cols-2 gap-3">
                 @foreach($photos as $p)
                     <template x-if="a === {{ $p->id }}">
-                        <div><img src="{{ route('photos.file', $p) }}" class="w-full rounded-lg border" alt=""><div class="text-xs text-center mt-1">{{ $p->date->toDateString() }} · {{ __('app.photos.angle_'.$p->angle) }} {{ $p->weight_kg ? '· '.$p->weight_kg.'kg' : '' }}</div></div>
+                        <div><img src="{{ route('photos.file', $p) }}" class="w-full rounded-lg border" alt=""><div class="text-xs text-center mt-1">{{ $p->date->toDateString() }} · {{ __('app.photos.angle_'.$p->angle) }} {{ $p->weight_kg ? '· '.units()->weight($p->weight_kg).units()->weightUnit() : '' }}</div></div>
                     </template>
                 @endforeach
                 @foreach($photos as $p)
                     <template x-if="b === {{ $p->id }}">
-                        <div><img src="{{ route('photos.file', $p) }}" class="w-full rounded-lg border" alt=""><div class="text-xs text-center mt-1">{{ $p->date->toDateString() }} · {{ __('app.photos.angle_'.$p->angle) }} {{ $p->weight_kg ? '· '.$p->weight_kg.'kg' : '' }}</div></div>
+                        <div><img src="{{ route('photos.file', $p) }}" class="w-full rounded-lg border" alt=""><div class="text-xs text-center mt-1">{{ $p->date->toDateString() }} · {{ __('app.photos.angle_'.$p->angle) }} {{ $p->weight_kg ? '· '.units()->weight($p->weight_kg).units()->weightUnit() : '' }}</div></div>
                     </template>
                 @endforeach
             </div>
@@ -79,7 +79,7 @@
                                     <button class="text-[11px] bg-bad text-on-fill px-1.5 py-0.5 rounded-sm"
                                             aria-label="{{ __('app.photos.delete') }}">✕</button>
                                 </form>
-                                @if($p->weight_kg)<span class="absolute bottom-1 left-1 text-[11px] bg-black/60 text-white px-1.5 py-0.5 rounded-sm">{{ $p->weight_kg }}kg</span>@endif
+                                @if($p->weight_kg)<span class="absolute bottom-1 left-1 text-[11px] bg-black/60 text-white px-1.5 py-0.5 rounded-sm">{{ units()->weight($p->weight_kg) }}{{ units()->weightUnit() }}</span>@endif
                             </div>
                         @endforeach
                     </div>

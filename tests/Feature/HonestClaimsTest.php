@@ -89,7 +89,7 @@ class HonestClaimsTest extends TestCase
         $html = $this->actingAs($user)->get('/projections')->assertOk()->getContent();
 
         // Isolate the waist card and confirm its positive deltas are not good-toned.
-        $start = strpos($html, __('app.projections.waist'));
+        $start = strpos($html, __('app.projections.waist', ['unit' => 'cm']));
         $this->assertNotFalse($start, 'waist projection card not rendered');
         $card = substr($html, $start, 2000);
 
