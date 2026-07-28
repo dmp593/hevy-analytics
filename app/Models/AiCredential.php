@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\TolerantEncrypted;
 use App\Services\AI\ProviderRegistry;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,7 +26,7 @@ class AiCredential extends Model
     protected function casts(): array
     {
         return [
-            'api_key' => 'encrypted',
+            'api_key' => TolerantEncrypted::class,
             'is_active' => 'boolean',
             'last_verified_at' => 'datetime',
         ];

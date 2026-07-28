@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Billing\Entitlements;
 use App\Billing\State;
+use App\Casts\TolerantEncrypted;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -38,7 +39,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'trial_ending_notified_at' => 'datetime',
             'past_due_notified_at' => 'datetime',
             'password' => 'hashed',
-            'hevy_api_key' => 'encrypted',
+            'hevy_api_key' => TolerantEncrypted::class,
             'height_cm' => 'float',
             'activity_level' => 'float',
             'age' => 'integer',
