@@ -3,6 +3,11 @@
 
     <x-ui.card :title="__('app.import.how_title')">
         <p class="text-sm text-body">{{ __('app.import.formats_body') }}</p>
+        <p class="mt-2 text-sm text-body">
+            {!! __('app.import.convert_link', [
+                'convert' => '<a href="'.route('convert').'" class="underline">'.__('app.convert.open').'</a>',
+            ]) !!}
+        </p>
 
         {{-- Per-app export paths, folded: most people only need their own. --}}
         <div class="mt-3 space-y-1">

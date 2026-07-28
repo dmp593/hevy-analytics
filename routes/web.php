@@ -5,6 +5,7 @@ use App\Http\Controllers\AiController;
 use App\Http\Controllers\AiSettingsController;
 use App\Http\Controllers\BodyCompositionController;
 use App\Http\Controllers\CompareController;
+use App\Http\Controllers\ConvertController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataExportController;
 use App\Http\Controllers\DemoController;
@@ -95,6 +96,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // The column-matching screen for files no signature recognised.
     Route::post('/import/map', [ImportController::class, 'map'])
         ->middleware('throttle:10,10')->name('import.map');
+
+    // The platform converter: history out in another app's CSV dialect.
+    // Preview (with its loss manifest) is free; the download is paid.
+    Route::get('/convert', [ConvertController::class, 'index'])->name('convert');
+    Route::post('/convert/preview', [ConvertController::class, 'preview'])
+        ->middleware('throttle:10,10')->name('convert.preview');
+    Route::post('/convert/download', [ConvertController::class, 'download'])
+        ->middleware('throttle:10,10')->name('convert.download');
 
     // Write-back (external Hevy mutations — throttled to prevent abuse/duplication)
     Route::get('/write-operations', [WriteBackController::class, 'index'])->name('write.index');

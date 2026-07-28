@@ -125,6 +125,7 @@ return [
         'subtitle' => 'Para qualquer app de treino — envia a exportação, nós lemos o dialeto',
         'how_title' => 'Como obter o ficheiro',
         'formats_body' => 'As exportações do Hevy, Strong, FitNotes e Jefit são reconhecidas automaticamente. Qualquer outro CSV recebe um ecrã de correspondência de colunas em vez de uma rejeição.',
+        'convert_link' => 'No sentido contrário? :convert — leva o teu histórico para outra app.',
         'unit_label' => 'Os pesos neste ficheiro estão em',
         'unit_help' => 'Só é usado quando o próprio ficheiro não o diz — o Strong no iPhone, por exemplo, exporta sem coluna de unidade.',
         'instructions' => [
@@ -963,6 +964,47 @@ return [
         'posterior' => 'Cadeia posterior',
         'upper' => 'Tronco superior',
         'lower' => 'Tronco inferior',
+    ],
+
+    /*
+     | O conversor entre plataformas: histórico no dialeto CSV de outra app.
+     */
+    'convert' => [
+        'title' => 'Converter entre apps',
+        'subtitle' => 'Leva o teu histórico para outra app — ou converte um ficheiro de alguém — sem perder o que pode ser mantido',
+        'open' => 'Converter entre apps',
+        'pick_title' => 'O que entra, o que sai',
+        'mode_account' => 'Exportar o meu histórico',
+        'mode_file' => 'Converter um ficheiro',
+        'account_help' => '{0}A tua conta ainda não tem treinos — importa ou sincroniza primeiro, ou converte um ficheiro.|{1}A tua conta tem 1 treino.|[2,*]A tua conta tem :count treinos.',
+        'file_help' => 'Qualquer exportação que esta app saiba ler (Hevy, Strong, FitNotes, Jefit). O ficheiro é convertido diretamente — nada é adicionado à tua conta.',
+        'date_from' => 'Desde (opcional)',
+        'date_to' => 'Até (opcional)',
+        'target_label' => 'Formato de destino',
+        'beta' => 'beta',
+        'preview_cta' => 'Ver o que sobrevive',
+        'result_title' => 'Antes de descarregares',
+        'summary' => 'Lidos :workouts treinos (:sets séries) de :source.',
+        'source_account' => 'a tua conta',
+        'losses_title' => 'O que este formato não consegue levar',
+        'nothing_lost' => 'Nada se perde nesta conversão.',
+        'losses' => [
+            'time' => '{1}A hora de 1 treino — o destino só guarda datas.|[2,*]A hora de :count treinos — o destino só guarda datas.',
+            'title' => '{1}O nome de 1 treino.|[2,*]Os nomes de :count treinos.',
+            'set_types' => '{1}O tipo (aquecimento/falha/drop) de 1 série.|[2,*]Os tipos (aquecimento/falha/drop) de :count séries.',
+            'rpe' => '{1}O RPE de 1 série.|[2,*]O RPE de :count séries.',
+            'notes' => '{1}1 nota.|[2,*]:count notas.',
+            'supersets' => '{1}O agrupamento em superset de 1 exercício.|[2,*]O agrupamento em superset de :count exercícios.',
+            'cardio' => '{1}1 série de cardio (distância/duração) — este formato não a consegue exprimir.|[2,*]:count séries de cardio (distância/duração) — este formato não as consegue exprimir.',
+        ],
+        'download' => 'Descarregar o ficheiro convertido',
+        'paywall_title' => 'A pré-visualização é grátis; o ficheiro faz parte da assinatura.',
+        'paywall_body' => 'Tudo acima foi calculado dos teus dados reais para decidires primeiro. Descarregar ficheiros convertidos está incluído no plano pago — os teus próprios dados continuam sempre exportáveis gratuitamente nas Definições.',
+        'paywall_cta' => 'Ver o plano',
+        'names_note' => 'Os nomes dos exercícios viajam tal-e-qual: a app de destino vai criá-los como exercícios personalizados — o histórico chega intacto, mas sem ligação ao catálogo nativo dela.',
+        'kg_note' => 'Os pesos são escritos em kg, declarados dentro do ficheiro onde o formato o permite. O formato do Jefit não declara unidades — configura essa app em kg antes de importar.',
+        'jefit_beta' => 'A saída para Jefit é beta: o importador dele é o menos documentado dos quatro, e ainda está a ser validado num dispositivo real.',
+        'unknown_file' => 'Este ficheiro não corresponde a nenhuma app que reconheçamos. Importa-o primeiro — a página de importação sabe mapear as colunas — e depois converte a partir da conta.',
     ],
 
     /*

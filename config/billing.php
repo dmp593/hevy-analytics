@@ -46,6 +46,9 @@ return [
             'history_days' => 30,
             'ai_analyses_per_month' => 0,
             'progress_photos' => 10,
+            // The platform converter is a paid convenience. The GDPR export
+            // (Settings → data export) is a right and stays free regardless.
+            'converter' => false,
         ],
 
         // The trial shows the whole product. A trial that hides the thing you
@@ -54,12 +57,14 @@ return [
             'history_days' => null,
             'ai_analyses_per_month' => 5,
             'progress_photos' => 100,
+            'converter' => true,
         ],
 
         'subscribed' => [
             'history_days' => null,
             'ai_analyses_per_month' => (int) env('AI_MONTHLY_LIMIT_PER_USER', 30),
             'progress_photos' => 500,
+            'converter' => true,
         ],
     ],
 

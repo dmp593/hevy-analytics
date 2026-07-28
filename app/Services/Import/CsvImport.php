@@ -114,6 +114,37 @@ class CsvImport
      */
     public function run(string $path, array $options = []): array
     {
+        $parsed = $this->read($path, $options);
+
+        // Second pass: write. One transaction per workout, not one giant one —
+        // a 40 000-row import holding a single transaction open for minutes is
+        // how other requests start timing out on locks.
+        $templates = $this->templateMap();
+        $setCount = 0;
+
+        foreach ($parsed['workouts'] as $w) {
+            $setCount += $this->persist($w, $templates);
+        }
+
+        return [
+            'workouts' => count($parsed['workouts']),
+            'sets' => $setCount,
+            'skipped' => $parsed['skipped'],
+            'errors' => $parsed['errors'],
+            'source' => $parsed['source'],
+        ];
+    }
+
+    /**
+     * Parse a file into the normalised structure WITHOUT touching the account.
+     * The converter reads through here: same dialects, same tolerance, no
+     * side effects.
+     *
+     * @param  array{unit?: ?string, map?: array<string, int>}  $options
+     * @return array{workouts: array<int, array>, skipped: int, errors: array<int, string>, source: string}
+     */
+    public function read(string $path, array $options = []): array
+    {
         $this->unitFallback = ($options['unit'] ?? null) === 'lbs' ? 'lbs' : 'kg';
 
         $handle = fopen($path, 'rb');
@@ -332,19 +363,8 @@ class CsvImport
             throw new ImportException(__('app.import.errors.nothing_found'));
         }
 
-        // Second pass: write. One transaction per workout, not one giant one —
-        // a 40 000-row import holding a single transaction open for minutes is
-        // how other requests start timing out on locks.
-        $templates = $this->templateMap();
-        $setCount = 0;
-
-        foreach ($workouts as $w) {
-            $setCount += $this->persist($w, $templates);
-        }
-
         return [
-            'workouts' => count($workouts),
-            'sets' => $setCount,
+            'workouts' => array_values($workouts),
             'skipped' => $skipped,
             'errors' => $errors,
             'source' => $source,

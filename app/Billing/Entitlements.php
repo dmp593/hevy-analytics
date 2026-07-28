@@ -124,6 +124,17 @@ class Entitlements
         return true;
     }
 
+    /**
+     * The platform converter (write history in another app's CSV dialect) is
+     * a paid convenience, distinct from the GDPR export above: the free
+     * export already hands over everything in a structured, machine-readable
+     * format. Reformatting it for a competitor's importer is added value.
+     */
+    public function canConvert(): bool
+    {
+        return (bool) ($this->config()['converter'] ?? false);
+    }
+
     /** @return array{history_days: ?int, ai_analyses_per_month: int, progress_photos: int} */
     private function config(): array
     {

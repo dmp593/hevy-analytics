@@ -124,6 +124,7 @@ return [
         'subtitle' => 'For any training app — upload the export, we read its dialect',
         'how_title' => 'How to get the file',
         'formats_body' => 'Hevy, Strong, FitNotes and Jefit exports are recognised automatically. Any other CSV gets a column-matching screen instead of a rejection.',
+        'convert_link' => 'Going the other way? :convert — take your history to another app.',
         'unit_label' => 'Weights in this file are in',
         'unit_help' => 'Only used when the file itself does not say — Strong on iPhone, for example, exports no unit column.',
         'instructions' => [
@@ -962,6 +963,47 @@ return [
         'posterior' => 'Posterior chain',
         'upper' => 'Upper body',
         'lower' => 'Lower body',
+    ],
+
+    /*
+     | The platform converter: history out in another app's CSV dialect.
+     */
+    'convert' => [
+        'title' => 'Convert between apps',
+        'subtitle' => 'Take your history to another app — or bring a friend’s file over — without losing what can be kept',
+        'open' => 'Convert between apps',
+        'pick_title' => 'What goes in, what comes out',
+        'mode_account' => 'Export my history',
+        'mode_file' => 'Convert a file',
+        'account_help' => '{0}Your account holds no workouts yet — import or sync first, or convert a file instead.|{1}Your account holds 1 workout.|[2,*]Your account holds :count workouts.',
+        'file_help' => 'Any export this app can read (Hevy, Strong, FitNotes, Jefit). The file is converted directly — nothing is added to your account.',
+        'date_from' => 'From (optional)',
+        'date_to' => 'To (optional)',
+        'target_label' => 'Destination format',
+        'beta' => 'beta',
+        'preview_cta' => 'See what survives',
+        'result_title' => 'Before you download',
+        'summary' => 'Read :workouts workouts (:sets sets) from :source.',
+        'source_account' => 'your account',
+        'losses_title' => 'What this format cannot carry',
+        'nothing_lost' => 'Nothing is lost in this conversion.',
+        'losses' => [
+            'time' => '{1}The time of day of 1 workout — the destination keeps only dates.|[2,*]The time of day of :count workouts — the destination keeps only dates.',
+            'title' => '{1}The name of 1 workout.|[2,*]The names of :count workouts.',
+            'set_types' => '{1}The set type (warm-up/failure/drop) of 1 set.|[2,*]The set types (warm-up/failure/drop) of :count sets.',
+            'rpe' => '{1}The RPE of 1 set.|[2,*]The RPE of :count sets.',
+            'notes' => '{1}1 note.|[2,*]:count notes.',
+            'supersets' => '{1}The superset grouping of 1 exercise.|[2,*]The superset grouping of :count exercises.',
+            'cardio' => '{1}1 cardio set (distance/duration) — this format cannot express it.|[2,*]:count cardio sets (distance/duration) — this format cannot express them.',
+        ],
+        'download' => 'Download the converted file',
+        'paywall_title' => 'The preview is free; the file is part of the subscription.',
+        'paywall_body' => 'Everything above was computed from your real data so you could decide first. Downloading converted files is included in the paid plan — your own data always remains exportable for free in Settings.',
+        'paywall_cta' => 'See the plan',
+        'names_note' => 'Exercise names travel unchanged: the destination app will create them as custom exercises — your history arrives intact, but unlinked from its built-in catalogue.',
+        'kg_note' => 'Weights are written in kg, stated inside the file wherever the format allows. Jefit’s format cannot state units — set that app to kg before importing.',
+        'jefit_beta' => 'Jefit output is beta: its importer is the least documented of the four, and a real device is still validating it.',
+        'unknown_file' => 'This file matches no app we recognise. Import it first — the import page can map its columns — then convert from your account.',
     ],
 
     /*
