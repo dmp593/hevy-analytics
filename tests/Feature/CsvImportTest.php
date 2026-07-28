@@ -8,6 +8,7 @@ use App\Support\ExerciseMuscles;
 use App\Support\Onboarding;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 /**
@@ -27,9 +28,9 @@ class CsvImportTest extends TestCase
         return User::factory()->create(['timezone' => 'Europe/Lisbon']);
     }
 
-    private function upload(User $user, string $csv)
+    private function upload(User $user, string $csv, array $extra = [])
     {
-        return $this->actingAs($user)->post('/import', [
+        return $this->actingAs($user)->post('/import', $extra + [
             'file' => UploadedFile::fake()->createWithContent('workouts.csv', $csv),
         ]);
     }
@@ -247,6 +248,126 @@ class CsvImportTest extends TestCase
             'workoutExercise', fn ($q) => $q->where('workout_id', $workout->id),
         )->count());
         $this->assertSame('quadriceps', $user->exerciseTemplates()->where('title', 'Squat (Barbell)')->value('primary_muscle_group'));
+    }
+
+    /**
+     * Strong on iPhone exports NO unit column at all; the form's unit choice
+     * is the only thing standing between a 225 lb bench and a 225 kg one.
+     */
+    public function test_a_unitless_strong_file_honours_the_chosen_unit(): void
+    {
+        $user = $this->athlete();
+
+        $csv = implode("\n", [
+            'Date,Workout Name,Duration,Exercise Name,Set Order,Weight,Reps,RPE,Notes',
+            '"2025-07-20 09:00:00","Push","1h","Bench Press (Barbell)","1","225","5","8",""',
+        ]);
+
+        $this->upload($user, $csv, ['unit' => 'lbs'])->assertRedirect(route('dashboard'));
+
+        $set = WorkoutSet::whereHas(
+            'workoutExercise.workout', fn ($q) => $q->where('user_id', $user->id),
+        )->firstOrFail();
+
+        $this->assertEqualsWithDelta(102.06, (float) $set->weight_kg, 0.01);
+
+        // And the flash names the recognised source.
+        $this->assertStringContainsString('Strong', session('status'));
+    }
+
+    /** FitNotes: no workout name, unit inside the header, durations as 0:30:00. */
+    public function test_a_fitnotes_shaped_export_imports_cleanly(): void
+    {
+        $user = $this->athlete();
+
+        $csv = implode("\n", [
+            'Date,Exercise,Category,Weight (kg),Reps,Distance,Distance Unit,Time',
+            '"2025-07-18","Bench Press (Barbell)","Chest","80","8","","",""',
+            '"2025-07-18","Bench Press (Barbell)","Chest","80","7","","",""',
+            '"2025-07-18","Running","Cardio","","","5","km","0:30:00"',
+        ]);
+
+        $this->upload($user, $csv)->assertRedirect(route('dashboard'));
+
+        $workout = $user->workouts()->firstOrFail();
+        $this->assertSame(2, $workout->exercises()->count());
+
+        $cardio = $workout->exercises()->where('title', 'Running')->firstOrFail()
+            ->sets()->firstOrFail();
+
+        $this->assertSame(1800, (int) $cardio->duration_seconds);
+        $this->assertSame(5000, (int) $cardio->distance_meters);
+    }
+
+    /** Jefit packs a whole exercise into one row: logs = "50x10,55x8". */
+    public function test_a_jefit_shaped_export_unpacks_the_set_column(): void
+    {
+        $user = $this->athlete();
+
+        $csv = implode("\n", [
+            '_id,mydate,ename,logs,bodypart',
+            '1,"2025-07-15","Bench Press (Barbell)","50.0x10,55.0x8,60.0x6","Chest"',
+        ]);
+
+        $this->upload($user, $csv)->assertRedirect(route('dashboard'));
+
+        $bench = $user->workouts()->firstOrFail()
+            ->exercises()->where('title', 'Bench Press (Barbell)')->firstOrFail();
+
+        $sets = $bench->sets()->orderBy('index')->get();
+
+        $this->assertCount(3, $sets);
+        $this->assertEqualsWithDelta(55.0, (float) $sets[1]->weight_kg, 0.01);
+        $this->assertSame(8, (int) $sets[1]->reps);
+    }
+
+    /**
+     * A file nobody recognises is not a rejection: the person gets a
+     * column-matching screen, points each field at a column, and imports.
+     */
+    public function test_an_unknown_format_offers_column_matching_and_imports(): void
+    {
+        Storage::fake('local');
+        $user = $this->athlete();
+
+        $csv = implode("\n", [
+            'Quando,Movimento,Carga,Repeticoes',
+            '"2025-07-10 18:00","Supino","80","8"',
+            '"2025-07-10 18:00","Supino","85","6"',
+        ]);
+
+        // Step 1: upload shows the matching screen instead of an error.
+        $this->upload($user, $csv)
+            ->assertOk()
+            ->assertSee(__('app.import.map.title'))
+            ->assertSee('Movimento');
+
+        $this->assertSame(0, $user->workouts()->count());
+
+        // Step 2: submit the mapping; the parked file imports.
+        $this->actingAs($user)->post('/import/map', [
+            'map' => ['start_time' => 0, 'exercise_title' => 1, 'weight' => 2, 'reps' => 3],
+            'unit' => 'kg',
+        ])->assertRedirect(route('dashboard'));
+
+        $this->assertSame(1, $user->workouts()->count());
+
+        $sets = WorkoutSet::whereHas(
+            'workoutExercise.workout', fn ($q) => $q->where('user_id', $user->id),
+        )->orderBy('index')->get();
+
+        $this->assertCount(2, $sets);
+        $this->assertEqualsWithDelta(85.0, (float) $sets[1]->weight_kg, 0.01);
+    }
+
+    public function test_the_matching_screen_expires_gracefully(): void
+    {
+        Storage::fake('local');
+        $user = $this->athlete();
+
+        $this->actingAs($user)->post('/import/map', [
+            'map' => ['start_time' => 0, 'exercise_title' => 1],
+        ])->assertRedirect(route('import'))->assertSessionHas('error');
     }
 
     /** Spot checks on the classifier, including the traps in the rule order. */

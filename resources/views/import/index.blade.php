@@ -2,16 +2,38 @@
     <x-flash />
 
     <x-ui.card :title="__('app.import.how_title')">
-        <ol class="list-inside list-decimal space-y-2 text-sm text-body">
-            <li>{{ __('app.import.step_export') }}</li>
-            <li>{{ __('app.import.step_email') }}</li>
-            <li>{{ __('app.import.step_upload') }}</li>
-        </ol>
+        <p class="text-sm text-body">{{ __('app.import.formats_body') }}</p>
 
-        <form method="POST" action="{{ route('import.store') }}" enctype="multipart/form-data" class="mt-6 flex flex-wrap items-center gap-3">
+        {{-- Per-app export paths, folded: most people only need their own. --}}
+        <div class="mt-3 space-y-1">
+            @foreach (['hevy', 'strong', 'fitnotes', 'jefit'] as $app)
+                <details class="group rounded-lg border border-subtle">
+                    <summary class="flex min-h-11 cursor-pointer list-none items-center gap-2 px-3 text-sm font-medium text-ink marker:content-none">
+                        <span class="inline-block text-muted transition group-open:rotate-90" aria-hidden="true">›</span>
+                        {{ __('app.import.source_'.$app) }}
+                    </summary>
+                    <p class="px-3 pb-3 text-sm text-body">{{ __('app.import.instructions.'.$app) }}</p>
+                </details>
+            @endforeach
+        </div>
+
+        <form method="POST" action="{{ route('import.store') }}" enctype="multipart/form-data" class="mt-6 space-y-4">
             @csrf
-            <input type="file" name="file" accept=".csv,text/csv" required
-                   class="text-sm text-body file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-lg file:border-0 file:bg-surface-sunk file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink hover:file:bg-strong/40">
+            <div class="flex flex-wrap items-center gap-3">
+                <input type="file" name="file" accept=".csv,text/csv" required
+                       class="text-sm text-body file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-lg file:border-0 file:bg-surface-sunk file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink hover:file:bg-strong/40">
+            </div>
+
+            <div>
+                <label class="text-xs text-body block">{{ __('app.import.unit_label') }}
+                    <select name="unit" class="mt-1 block w-40 rounded-md border-line text-sm">
+                        <option value="kg" @selected($defaultUnit === 'kg')>kg</option>
+                        <option value="lbs" @selected($defaultUnit === 'lbs')>lb</option>
+                    </select>
+                </label>
+                <p class="mt-1 text-xs text-muted">{{ __('app.import.unit_help') }}</p>
+            </div>
+
             <x-ui.button type="submit">{{ __('app.import.submit') }}</x-ui.button>
         </form>
         <x-input-error class="mt-2" :messages="$errors->get('file')" />

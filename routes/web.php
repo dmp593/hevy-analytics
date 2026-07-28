@@ -85,6 +85,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/import', [ImportController::class, 'index'])->name('import');
     Route::post('/import', [ImportController::class, 'store'])
         ->middleware('throttle:10,10')->name('import.store');
+    // The column-matching screen for files no signature recognised.
+    Route::post('/import/map', [ImportController::class, 'map'])
+        ->middleware('throttle:10,10')->name('import.map');
 
     // Write-back (external Hevy mutations — throttled to prevent abuse/duplication)
     Route::get('/write-operations', [WriteBackController::class, 'index'])->name('write.index');

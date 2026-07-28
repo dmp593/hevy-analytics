@@ -9,14 +9,20 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
- * Imports the CSV that Hevy's own "Export data" produces.
+ * Imports workout CSVs — Hevy's own export and the other apps' dialects.
  *
- * This is the door for people the API cannot serve: Hevy issues API keys to
- * Pro subscribers only, but the CSV export is available to every account. It
- * is also the template for every future source (Strong, Jefit — see
- * docs/DATA-SOURCES.md), which is why parsing is deliberately tolerant:
+ * This is the door for people no API can serve: Hevy issues API keys to Pro
+ * subscribers only, and no other lifting app (Strong, FitNotes, Jefit…) has a
+ * public API at all. Their CSV exports are therefore not a fallback but the
+ * only road in, and each app writes a different file. The engine is one
+ * pipeline with per-source knowledge:
  *
- *  - weight_kg or weight_lbs, whichever the account's units produced
+ *  - named sources are recognised by their header signature (SOURCES); a file
+ *    nobody recognises raises UnknownCsvFormat so the controller can offer a
+ *    column-matching screen instead of a rejection
+ *  - weight columns in kg, lbs, unit-less with a unit column beside them, or
+ *    unit-less with nothing at all — the last case falls back to the unit the
+ *    athlete picked on the form ($options['unit'])
  *  - several date shapes, interpreted in the ATHLETE'S timezone — a CSV has
  *    no offset, and parsing "18:30" as UTC would shift evening workouts into
  *    the next day and quietly skew every per-week figure
@@ -26,10 +32,16 @@ use Illuminate\Support\Str;
  * time and title, so re-importing the same file (or a fresh export that
  * overlaps the last one) updates instead of duplicating.
  */
-class HevyCsvImport
+class CsvImport
 {
     /** More rows than any human log; fewer than a mistake (a server log, a genome). */
     public const MAX_ROWS = 100_000;
+
+    /** The fields the column-matching screen lets a person point at, in form order. */
+    public const MAPPABLE = [
+        'start_time', 'exercise_title', 'title', 'set_index', 'set_type',
+        'weight', 'reps', 'distance', 'duration_seconds', 'rpe', 'exercise_notes',
+    ];
 
     private const HEADER_ALIASES = [
         'title' => ['title', 'workout_name', 'workout'],
@@ -40,7 +52,8 @@ class HevyCsvImport
         'set_type' => ['set_type', 'type'],
         'weight_kg' => ['weight_kg'],
         'weight_lbs' => ['weight_lbs', 'weight_lb'],
-        // Strong's shape: a unit-less "Weight" column with its unit beside it.
+        // Strong's shape: a unit-less "Weight" column, its unit beside it
+        // (Android) or nowhere in the file at all (iPhone).
         'weight' => ['weight'],
         'weight_unit' => ['weight_unit'],
         'reps' => ['reps', 'repetitions'],
@@ -55,15 +68,54 @@ class HevyCsvImport
         'description' => ['description'],
     ];
 
+    /**
+     * Named sources, matched by header signature, checked in order. Each may
+     * carry extra aliases that would be wrong to honour globally — FitNotes'
+     * "Time" is a duration, but on other files a column called Time is a
+     * clock time, so the alias only applies once the signature matched.
+     */
+    private const SOURCES = [
+        'hevy' => [
+            'signature' => ['exercise_title', 'start_time'],
+            'aliases' => [],
+        ],
+        'strong' => [
+            'signature' => ['workout_name', 'exercise_name', 'set_order'],
+            'aliases' => [],
+        ],
+        'jefit' => [
+            'signature' => ['mydate', 'ename', 'logs'],
+            'aliases' => [
+                'start_time' => ['mydate'],
+                'exercise_title' => ['ename'],
+                'jefit_logs' => ['logs'],
+            ],
+        ],
+        'fitnotes' => [
+            'signature' => ['date', 'exercise', 'category'],
+            'aliases' => [
+                'weight_kg' => ['weight_(kg)'],
+                'weight_lbs' => ['weight_(lbs)', 'weight_(lb)'],
+                'duration_seconds' => ['time'],
+            ],
+        ],
+    ];
+
+    private string $unitFallback = 'kg';
+
     public function __construct(private readonly User $user) {}
 
     /**
-     * @return array{workouts: int, sets: int, skipped: int, errors: array<int, string>}
+     * @param  array{unit?: ?string, map?: array<string, int>}  $options
+     * @return array{workouts: int, sets: int, skipped: int, errors: array<int, string>, source: string}
      *
      * @throws ImportException when the file as a whole cannot be understood.
+     * @throws UnknownCsvFormat when it is a real CSV whose columns match nothing.
      */
-    public function run(string $path): array
+    public function run(string $path, array $options = []): array
     {
+        $this->unitFallback = ($options['unit'] ?? null) === 'lbs' ? 'lbs' : 'kg';
+
         $handle = fopen($path, 'rb');
 
         if ($handle === false) {
@@ -71,14 +123,37 @@ class HevyCsvImport
         }
 
         try {
-            return $this->parse($handle);
+            return $this->parse($handle, $options['map'] ?? null);
         } finally {
             fclose($handle);
         }
     }
 
-    /** @param resource $handle */
-    private function parse($handle): array
+    /**
+     * Best-guess mapping for the column-matching screen: canonical field =>
+     * column index, using everything the engine knows about every source.
+     *
+     * @param  array<int, string>  $headers
+     * @return array<string, int>
+     */
+    public static function guess(array $headers): array
+    {
+        $aliases = self::HEADER_ALIASES;
+
+        foreach (self::SOURCES as $source) {
+            foreach ($source['aliases'] as $canonical => $extra) {
+                $aliases[$canonical] = array_merge($aliases[$canonical] ?? [], $extra);
+            }
+        }
+
+        return self::mapHeader($headers, $aliases);
+    }
+
+    /**
+     * @param  resource  $handle
+     * @param  ?array<string, int>  $map
+     */
+    private function parse($handle, ?array $map): array
     {
         $firstLine = fgets($handle);
 
@@ -101,16 +176,42 @@ class HevyCsvImport
             throw new ImportException(__('app.import.errors.not_csv'));
         }
 
-        $columns = $this->mapHeader($header);
+        $source = 'generic';
 
-        if (! isset($columns['title'], $columns['start_time'], $columns['exercise_title'])) {
-            throw new ImportException(__('app.import.errors.missing_columns', [
-                'columns' => 'title, start_time, exercise_title',
-            ]));
+        if ($map !== null) {
+            $source = 'mapped';
+            $columns = $map;
+        } else {
+            $normalized = array_map(fn ($h) => self::normalize((string) $h), $header);
+            $aliases = self::HEADER_ALIASES;
+
+            foreach (self::SOURCES as $name => $spec) {
+                if (array_diff($spec['signature'], $normalized) === []) {
+                    $source = $name;
+
+                    foreach ($spec['aliases'] as $canonical => $extra) {
+                        $aliases[$canonical] = array_merge($extra, $aliases[$canonical] ?? []);
+                    }
+
+                    break;
+                }
+            }
+
+            $columns = self::mapHeader($header, $aliases);
         }
 
-        // First pass: group rows into workouts in memory. Hevy exports one row
-        // per SET, newest workout first; grouping must not assume any order.
+        if (! isset($columns['start_time'], $columns['exercise_title'])) {
+            // A real CSV that matches nothing is not a dead end: hand the
+            // controller what it needs to offer the column-matching screen.
+            throw new UnknownCsvFormat(
+                headers: array_map(fn ($h) => trim((string) $h), $header),
+                preview: $this->previewRows($handle, $delimiter),
+                delimiter: $delimiter,
+            );
+        }
+
+        // First pass: group rows into workouts in memory. Exports are one row
+        // per SET, often newest first; grouping must not assume any order.
         $workouts = [];
         $errors = [];
         $skipped = 0;
@@ -172,6 +273,33 @@ class HevyCsvImport
                 'sets' => [],
             ];
 
+            $bucket = &$workouts[$key]['exercises'][$exercise]['sets'];
+
+            // Jefit packs a whole exercise into one row: logs = "50x10,55x8".
+            if ($source === 'jefit') {
+                if (! preg_match_all('/([\d.]+)\s*x\s*(\d+)/i', $get('jefit_logs'), $pairs, PREG_SET_ORDER)) {
+                    $skipped++;
+
+                    continue;
+                }
+
+                foreach ($pairs as $pair) {
+                    $bucket[] = [
+                        'index' => count($bucket),
+                        'type' => 'normal',
+                        'weight_kg' => $this->toKg((float) $pair[1]),
+                        'reps' => (int) $pair[2],
+                        'distance_meters' => null,
+                        'duration_seconds' => null,
+                        'rpe' => null,
+                    ];
+                }
+
+                unset($bucket);
+
+                continue;
+            }
+
             $weight = $this->weightKg($get);
             $distance = $this->distanceMeters($get);
 
@@ -183,19 +311,21 @@ class HevyCsvImport
                 ? $this->setType($get('set_type'))
                 : (str_starts_with(mb_strtolower($rawIndex), 'w') ? 'warmup' : 'normal');
 
-            $workouts[$key]['exercises'][$exercise]['sets'][] = [
+            $bucket[] = [
                 // The file's own row order is the index. Trusting the set
                 // column instead invites collisions — Strong numbers warmups
                 // as "W1" alongside a working set "1" — and both apps write
                 // rows in the order the sets were done anyway.
-                'index' => count($workouts[$key]['exercises'][$exercise]['sets']),
+                'index' => count($bucket),
                 'type' => $type,
                 'weight_kg' => $weight,
                 'reps' => $get('reps') !== '' ? (int) $get('reps') : null,
                 'distance_meters' => $distance !== null ? (int) round($distance) : null,
-                'duration_seconds' => $get('duration_seconds') !== '' ? (int) $get('duration_seconds') : null,
+                'duration_seconds' => $this->durationSeconds($get('duration_seconds')),
                 'rpe' => $get('rpe') !== '' ? (float) $get('rpe') : null,
             ];
+
+            unset($bucket);
         }
 
         if ($workouts === []) {
@@ -217,7 +347,29 @@ class HevyCsvImport
             'sets' => $setCount,
             'skipped' => $skipped,
             'errors' => $errors,
+            'source' => $source,
         ];
+    }
+
+    /**
+     * Up to three raw data rows, for the column-matching screen's preview.
+     *
+     * @param  resource  $handle
+     * @return array<int, array<int, string>>
+     */
+    private function previewRows($handle, string $delimiter): array
+    {
+        $rows = [];
+
+        while (count($rows) < 3 && ($row = fgetcsv($handle, null, $delimiter)) !== false) {
+            if ($row === [null]) {
+                continue;
+            }
+
+            $rows[] = array_map(fn ($v) => Str::limit(trim((string) $v), 40), $row);
+        }
+
+        return $rows;
     }
 
     /** @param array<string, string> $templates */
@@ -313,24 +465,32 @@ class HevyCsvImport
             ->all();
     }
 
-    /** @return array<string, int> canonical name => column index */
-    private function mapHeader(array $header): array
+    /**
+     * @param  array<int, string>  $header
+     * @param  array<string, array<int, string>>  $aliases
+     * @return array<string, int> canonical name => column index
+     */
+    private static function mapHeader(array $header, array $aliases): array
     {
         $map = [];
 
         foreach ($header as $i => $name) {
-            // "Workout Name" and "workout_name" are the same header wearing
-            // different apps' clothes.
-            $name = str_replace(' ', '_', mb_strtolower(trim((string) $name)));
+            $name = self::normalize((string) $name);
 
-            foreach (self::HEADER_ALIASES as $canonical => $aliases) {
-                if (in_array($name, $aliases, true) && ! isset($map[$canonical])) {
+            foreach ($aliases as $canonical => $names) {
+                if (in_array($name, $names, true) && ! isset($map[$canonical])) {
                     $map[$canonical] = $i;
                 }
             }
         }
 
         return $map;
+    }
+
+    /** "Workout Name" and "workout_name" are the same header wearing different apps' clothes. */
+    private static function normalize(string $name): string
+    {
+        return str_replace(' ', '_', mb_strtolower(trim($name)));
     }
 
     private function parseDate(string $value): ?Carbon
@@ -372,15 +532,43 @@ class HevyCsvImport
         if ($get('weight') !== '') {
             $value = (float) $get('weight');
 
-            // A unit column decides; absent one, kg — the app's own unit, and
-            // the wrong guess is at least visible (numbers 2.2× off), where a
-            // silent lbs guess would flatter everyone using kg.
-            return str_starts_with(mb_strtolower($get('weight_unit')), 'lb')
+            // A unit column decides. Absent one, the unit the athlete picked
+            // on the form — Strong's iPhone export carries no unit at all,
+            // and guessing would corrupt every number by 2.2× for someone.
+            $unit = $get('weight_unit') !== '' ? $get('weight_unit') : $this->unitFallback;
+
+            return str_starts_with(mb_strtolower($unit), 'lb')
                 ? round($value * 0.45359237, 2)
                 : $value;
         }
 
         return null;
+    }
+
+    /** File-unit weight -> kg, honouring the form's unit choice. */
+    private function toKg(float $value): float
+    {
+        return $this->unitFallback === 'lbs' ? round($value * 0.45359237, 2) : $value;
+    }
+
+    /** Accepts plain seconds and FitNotes' "0:30:00" clock shape. */
+    private function durationSeconds(string $raw): ?int
+    {
+        if ($raw === '') {
+            return null;
+        }
+
+        if (! str_contains($raw, ':')) {
+            return (int) $raw;
+        }
+
+        $parts = array_map(intval(...), explode(':', $raw));
+
+        return match (count($parts)) {
+            2 => $parts[0] * 60 + $parts[1],
+            3 => $parts[0] * 3600 + $parts[1] * 60 + $parts[2],
+            default => null,
+        };
     }
 
     /** @param  callable(string): string  $get */
