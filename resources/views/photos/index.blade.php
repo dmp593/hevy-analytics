@@ -19,18 +19,22 @@
                 <label class="text-xs text-body block">{{ __('app.photos.date') }}
                     <input type="date" name="date" value="{{ now()->toDateString() }}" class="mt-1 w-full rounded-md border-line text-sm" required>
                 </label>
-                <label class="text-xs text-body block">{{ __('app.photos.angle') }}
-                    <select name="angle" class="mt-1 w-full rounded-md border-line text-sm">
-                        @foreach (['front', 'side', 'back'] as $angle)
-                            <option value="{{ $angle }}">{{ __('app.photos.angle_'.$angle) }}</option>
-                        @endforeach
-                    </select>
-                </label>
-                <label class="text-xs text-body block">{{ __('app.photos.file') }}
-                    <input type="file" name="photo" accept="image/*" class="mt-1 w-full text-sm" required>
-                </label>
+
+                {{-- One slot per pose. Filling all four is what makes the
+                     comparison page able to line up like with like — but any
+                     one of them is enough to save the check-in. --}}
+                @foreach (\App\Http\Controllers\ProgressPhotoController::POSES as $pose)
+                    <label class="text-xs text-body block">{{ __('app.photos.angle_'.$pose) }}
+                        <input type="file" name="photos[{{ $pose }}]" accept="image/*" class="mt-1 w-full text-sm file:mr-2 file:min-h-11 file:cursor-pointer file:rounded-lg file:border-0 file:bg-surface-sunk file:px-3 file:py-2 file:text-xs file:font-semibold file:text-ink">
+                    </label>
+                @endforeach
+                <p class="text-xs text-faint">{{ __('app.photos.poses_hint') }}</p>
+
                 <label class="text-xs text-body block">{{ __('app.photos.weight', ['unit' => units()->weightUnit()]) }}
                     <input type="number" step="0.1" name="weight" class="mt-1 w-full rounded-md border-line text-sm">
+                </label>
+                <label class="text-xs text-body block">{{ __('app.photos.notes') }}
+                    <textarea name="notes" rows="2" maxlength="500" class="mt-1 w-full rounded-md border-line text-sm"></textarea>
                 </label>
                 <x-input-error :messages="$errors->all()" class="mt-1" />
                 <button class="w-full rounded-md bg-brand px-4 py-2 text-sm font-semibold text-on-fill hover:bg-brand-hover">{{ __('app.photos.upload') }}</button>

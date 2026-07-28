@@ -56,6 +56,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/muscle/data', [MuscleController::class, 'data'])->name('muscle.data');
 
     Route::get('/body', [BodyCompositionController::class, 'index'])->name('body');
+    // Manual measurements: the body-data door for accounts without an API key.
+    Route::post('/body/measurements', [BodyCompositionController::class, 'storeMeasurement'])
+        ->middleware('throttle:30,1')->name('body.measurements');
 
     Route::get('/photos', [ProgressPhotoController::class, 'index'])->name('photos');
     Route::post('/photos', [ProgressPhotoController::class, 'store'])->middleware('throttle:30,1')->name('photos.store');

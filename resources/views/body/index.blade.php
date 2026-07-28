@@ -45,6 +45,51 @@
         <x-ui.stat :label="__('app.body.fat_mass')" :value="units()->weight($status['fat_mass_kg'] ?? null) ?? '—'" :unit="units()->weightUnit()" />
     </div>
 
+    {{-- Manual entry: the body-data door for accounts without an API key.
+         Open by default only while the account has nothing — after that it
+         folds away and the page leads with the analysis again. --}}
+    <details class="group mb-8 rounded-xl border border-line bg-surface" @if (! ($hasMeasurements ?? true)) open @endif>
+        <summary class="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-ink marker:content-none">
+            <span class="inline-flex items-center gap-2">
+                <svg class="h-4 w-4 text-muted transition-transform group-open:rotate-90" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path d="M7.5 5.5 12 10l-4.5 4.5V5.5z" />
+                </svg>
+                {{ __('app.body.measure.title') }}
+            </span>
+        </summary>
+
+        <form method="POST" action="{{ route('body.measurements') }}" class="space-y-4 border-t border-line px-5 py-5">
+            @csrf
+            <p class="text-xs text-muted">{{ __('app.body.measure.hint') }}</p>
+
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                <label class="text-xs text-body block">{{ __('app.body.measure.date') }}
+                    <input type="date" name="date" value="{{ now(auth()->user()->resolvedTimezone())->toDateString() }}" max="{{ now(auth()->user()->resolvedTimezone())->toDateString() }}" class="mt-1 w-full rounded-md border-line text-sm" required>
+                </label>
+                <label class="text-xs text-body block">{{ __('app.body.measure.weight') }} ({{ units()->weightUnit() }})
+                    <input type="number" step="0.1" min="0" name="weight" class="mt-1 w-full rounded-md border-line text-sm">
+                </label>
+                <label class="text-xs text-body block">{{ __('app.body.measure.fat_percent') }}
+                    <input type="number" step="0.1" min="0" max="70" name="fat_percent" class="mt-1 w-full rounded-md border-line text-sm">
+                </label>
+            </div>
+
+            <div>
+                <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-faint">{{ __('app.body.measure.girths') }} ({{ units()->girthUnit() }})</p>
+                <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                    @foreach (['neck', 'shoulders', 'chest', 'abdomen', 'waist', 'hips', 'left_bicep', 'right_bicep', 'left_forearm', 'right_forearm', 'left_thigh', 'right_thigh', 'left_calf', 'right_calf'] as $girth)
+                        <label class="text-xs text-body block">{{ __('app.body.measure.'.$girth) }}
+                            <input type="number" step="0.1" min="0" name="{{ $girth }}" class="mt-1 w-full rounded-md border-line text-sm">
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            <x-input-error :messages="$errors->all()" class="mt-1" />
+            <x-ui.button type="submit">{{ __('app.body.measure.save') }}</x-ui.button>
+        </form>
+    </details>
+
     <h2 class="mb-3 text-xs font-semibold uppercase tracking-wide text-faint">{{ __('app.dashboard.trends') }}</h2>
     <div class="mb-8 grid gap-6 lg:grid-cols-2">
         <x-ui.card :title="__('app.body.weight_lean')">

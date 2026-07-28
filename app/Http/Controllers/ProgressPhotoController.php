@@ -10,13 +10,20 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProgressPhotoController extends Controller
 {
+    /** The four poses of a check-in, in the order every gallery and comparison shows them. */
+    public const POSES = ['front', 'back', 'left', 'right'];
+
     public function index(Request $request)
     {
         $photos = $request->user()->progressPhotos()->orderByDesc('date')->get();
+        $rank = array_flip(self::POSES);
 
         return view('photos.index', [
             'photos' => $photos,
-            'byDate' => $photos->groupBy(fn ($p) => $p->date->toDateString()),
+            // Within a date, always pose order — front, back, left, right — so
+            // two check-ins line up when read side by side.
+            'byDate' => $photos->groupBy(fn ($p) => $p->date->toDateString())
+                ->map(fn ($group) => $group->sortBy(fn ($p) => $rank[$p->angle] ?? 9)->values()),
         ]);
     }
 
@@ -29,42 +36,64 @@ class ProgressPhotoController extends Controller
      */
     private const MAX_PHOTOS_PER_USER = 500;
 
+    /**
+     * A check-in, not a single upload: one date, up to four poses, one shared
+     * weight and note. Photos are usually taken as a set — front, back, both
+     * sides — and inserting them as a set is what lets the comparison page
+     * line the same pose up across dates.
+     */
     public function store(Request $request)
     {
         $units = Units::for($request->user());
 
         $data = $request->validate([
             'date' => ['required', 'date'],
-            'angle' => ['required', 'in:front,side,back'],
-            'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp,heic', 'max:8192'],
+            'photos' => ['required', 'array'],
+            'photos.front' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,heic', 'max:8192'],
+            'photos.back' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,heic', 'max:8192'],
+            'photos.left' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,heic', 'max:8192'],
+            'photos.right' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,heic', 'max:8192'],
             // Typed in the user's unit; stored metric.
             'weight' => ['nullable', 'numeric', 'min:0', 'max:'.($units->imperial() ? 1102 : 500)],
             'notes' => ['nullable', 'string', 'max:500'],
         ]);
 
-        if ($request->user()->progressPhotos()->count() >= self::MAX_PHOTOS_PER_USER) {
+        $files = collect(self::POSES)
+            ->mapWithKeys(fn ($pose) => [$pose => $request->file("photos.$pose")])
+            ->filter();
+
+        if ($files->isEmpty()) {
+            return back()->with('error', __('app.photos.at_least_one'));
+        }
+
+        if ($request->user()->progressPhotos()->count() + $files->count() > self::MAX_PHOTOS_PER_USER) {
             return back()->with('error', __('app.photos.limit_reached', [
                 'limit' => self::MAX_PHOTOS_PER_USER,
             ]));
         }
 
-        // config('filesystems.photos'), never a literal: on a container host
-        // the local disk is wiped on every deploy, and these are the files
-        // nobody can re-create.
-        $path = $request->file('photo')->store(
-            "progress-photos/{$request->user()->id}",
-            ProgressPhoto::disk(),
-        );
+        $weightKg = $units->weightToKg($data['weight'] ?? null);
 
-        $request->user()->progressPhotos()->create([
-            'date' => $data['date'],
-            'angle' => $data['angle'],
-            'path' => $path,
-            'weight_kg' => $units->weightToKg($data['weight'] ?? null),
-            'notes' => $data['notes'] ?? null,
-        ]);
+        foreach ($files as $pose => $file) {
+            // config('filesystems.photos'), never a literal: on a container
+            // host the local disk is wiped on every deploy, and these are the
+            // files nobody can re-create.
+            $path = $file->store(
+                "progress-photos/{$request->user()->id}",
+                ProgressPhoto::disk(),
+            );
 
-        return redirect()->route('photos')->with('status', 'Photo added.');
+            $request->user()->progressPhotos()->create([
+                'date' => $data['date'],
+                'angle' => $pose,
+                'path' => $path,
+                'weight_kg' => $weightKg,
+                'notes' => $data['notes'] ?? null,
+            ]);
+        }
+
+        return redirect()->route('photos')
+            ->with('status', trans_choice('app.photos.added', $files->count(), ['count' => $files->count()]));
     }
 
     public function show(Request $request, ProgressPhoto $photo): StreamedResponse

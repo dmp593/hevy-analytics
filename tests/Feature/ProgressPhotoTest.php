@@ -19,8 +19,7 @@ class ProgressPhotoTest extends TestCase
 
         $this->actingAs($user)->post('/photos', [
             'date' => now()->toDateString(),
-            'angle' => 'front',
-            'photo' => UploadedFile::fake()->image('progress.jpg', 300, 400),
+            'photos' => ['front' => UploadedFile::fake()->image('progress.jpg', 300, 400)],
             'weight' => 70,
         ])->assertRedirect();
 
@@ -38,8 +37,7 @@ class ProgressPhotoTest extends TestCase
 
         $this->actingAs($owner)->post('/photos', [
             'date' => now()->toDateString(),
-            'angle' => 'side',
-            'photo' => UploadedFile::fake()->image('p.jpg'),
+            'photos' => ['left' => UploadedFile::fake()->image('p.jpg')],
         ]);
 
         $photo = $owner->progressPhotos()->firstOrFail();
@@ -54,8 +52,7 @@ class ProgressPhotoTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user)->post('/photos', [
             'date' => now()->toDateString(),
-            'angle' => 'back',
-            'photo' => UploadedFile::fake()->image('p.jpg'),
+            'photos' => ['back' => UploadedFile::fake()->image('p.jpg')],
         ]);
 
         $photo = $user->progressPhotos()->firstOrFail();
@@ -82,8 +79,7 @@ class ProgressPhotoTest extends TestCase
 
         $this->actingAs($user)->post('/photos', [
             'date' => now()->toDateString(),
-            'angle' => 'front',
-            'photo' => UploadedFile::fake()->image('p.jpg'),
+            'photos' => ['front' => UploadedFile::fake()->image('p.jpg')],
         ])->assertRedirect();
 
         $photo = $user->progressPhotos()->firstOrFail();
@@ -110,8 +106,7 @@ class ProgressPhotoTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user)->post('/photos', [
             'date' => now()->toDateString(),
-            'angle' => 'front',
-            'photo' => UploadedFile::fake()->image('p.jpg'),
+            'photos' => ['front' => UploadedFile::fake()->image('p.jpg')],
         ]);
 
         $path = $user->progressPhotos()->firstOrFail()->path;

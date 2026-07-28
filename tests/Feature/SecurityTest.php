@@ -107,8 +107,7 @@ class SecurityTest extends TestCase
 
         $this->actingAs($user)->post('/photos', [
             'date' => now()->toDateString(),
-            'angle' => 'front',
-            'photo' => UploadedFile::fake()->image('one-too-many.jpg'),
+            'photos' => ['front' => UploadedFile::fake()->image('one-too-many.jpg')],
         ])->assertSessionHas('error');
 
         $this->assertSame($limit, $user->progressPhotos()->count());

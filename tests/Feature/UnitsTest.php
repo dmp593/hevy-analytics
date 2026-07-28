@@ -103,8 +103,7 @@ class UnitsTest extends TestCase
 
         $this->actingAs($user)->post('/photos', [
             'date' => now()->toDateString(),
-            'angle' => 'front',
-            'photo' => UploadedFile::fake()->image('p.jpg'),
+            'photos' => ['front' => UploadedFile::fake()->image('p.jpg')],
             'weight' => 180,
         ]);
 
