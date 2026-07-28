@@ -73,6 +73,57 @@ real export of each is worth a validation pass.**
 prefix is the only marker, deliberately — every analytics query treats sources
 identically, which is the entire point of importing.
 
+## Converting between platforms (planned — a paid feature)
+
+The importer already normalises every dialect into one model, which makes the
+reverse direction cheap: per-target WRITERS over the same model, so someone
+switching apps can carry their history along — in either direction, including
+files we only understood through the column-matching screen.
+
+Two modes share the writers:
+
+1. **Convert a file**: upload any supported CSV, download it in the target
+   dialect. Touches no account data.
+2. **Export my history**: the account's workouts, in the chosen dialect, with
+   a date range.
+
+### What survives each direction
+
+| Field | → Hevy | → Strong | → FitNotes | → Jefit |
+|---|---|---|---|---|
+| Date | ✓ | ✓ | ✓ | ✓ |
+| Time of day | ✓ | ✓ | ✗ | ✗ |
+| Workout title | ✓ | ✓ | ✗ | ✗ |
+| Exercise, sets, weight, reps | ✓ | ✓ | ✓ | ✓ (packed "50x10,55x8") |
+| Set types (warmup/failure/drop) | ✓ | warmup only ("W" order) | ✗ | ✗ |
+| RPE | ✓ | ✓ | ✗ | ✗ |
+| Distance / duration | ✓ | ✓ | ✓ | ✗ |
+| Notes | ✓ | ✓ | ✗ | ✗ |
+| Supersets | ✓ | ✗ | ✗ | ✗ |
+| Muscle/category | n/a (Hevy has own) | n/a | ✓ Category from ExerciseMuscles | bodypart from ExerciseMuscles |
+
+Fidelity ranking: **Hevy > Strong > FitNotes > Jefit.** Every conversion shows
+a **loss manifest first**, computed from the person's actual rows — "converting
+to FitNotes drops workout times, titles, RPE and set types (214 sets
+affected)" — never a generic disclaimer.
+
+### The honest risks
+
+- **Destination import acceptance** is the half we cannot test ourselves:
+  exact headers, date shapes and value formats each app's importer tolerates.
+  Hevy has an official import (and imports Strong's file directly — for that
+  one pair people do not need us). Strong imports only its own format.
+  FitNotes imports its own CSV. Jefit's CSV import is the least documented —
+  treat that target as beta until a real device confirms it. Round-trips
+  through OUR parser are covered by golden-file tests; per-app acceptance
+  needs a human with the app installed.
+- **Exercise names**: each app has its own catalogue. v1 passes names through
+  unchanged — the destination creates custom exercises, history intact but
+  unlinked from its native charts. v2 (optional): a curated mapping table for
+  the ~100 most common exercises per app pair.
+
+Paid gate at the download, through the existing entitlements chokepoint.
+
 ## Nutrition APIs — evaluated, deferred
 
 The question was whether to integrate a food database (Open Food Facts, USDA
