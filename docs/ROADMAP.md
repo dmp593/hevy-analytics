@@ -38,7 +38,11 @@ discutidas: Lift Insight, Setwise, SetSense, TrainSight — decisão adiada).
 
 ## Lotes futuros já discutidos (por ordem do dono)
 
-### 1. Conversor entre plataformas (feature paga) — PLANEADO, aguarda "avança"
+### 1. Conversor entre plataformas (feature paga) — PLANO DETALHADO ENTREGUE, aguarda "avança"
+
+Decisões do dono (2026-07-28): validação com beta testers dele (já existe um
+para FitNotes; erros serão reportados); Jefit lança como beta; o risco dos
+nomes de exercícios é aceite (v1 passa nomes tal-e-qual).
 
 Converter dados entre Hevy ↔ Strong ↔ FitNotes ↔ Jefit ↔ CSV mapeado, para
 quem muda de app não perder o histórico. O plano completo está em
