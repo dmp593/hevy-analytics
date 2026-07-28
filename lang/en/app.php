@@ -33,7 +33,7 @@ return [
         'cta' => 'Try it free for :days days',
         'demo_cta' => 'Look inside first — live demo',
         'cta_note' => 'No card. :price/month afterwards, if you want it.',
-        'requirement' => 'You need a :hevy account — that is where training gets logged. Getting the data here works two ways: an API key (Hevy Pro) syncs automatically, and the CSV export every free Hevy account can produce imports in one upload.',
+        'requirement' => 'You need a :hevy account — that is where training gets logged. Getting the data here works two ways: an API key (Hevy Pro) syncs automatically, and the CSV export every free Hevy account can produce imports in one upload. Coming from Strong, FitNotes or Jefit? Their exports import the same way.',
 
         'compare_log' => 'Your log, Tuesday',
         'compare_log_note' => 'Accurate, complete, and silent about what it means.',
@@ -648,7 +648,7 @@ return [
         'chest' => 'Chest (:unit)',
         'waist' => 'Waist (:unit)',
         'bicep' => 'Right bicep (:unit)',
-        'top_lift' => ':exercise e1RM (kg)',
+        'top_lift' => ':exercise e1RM (:unit)',
         'method' => 'A straight line fitted through your last 12 months, extended forward. These are estimates, not promises — the R² badge says how well the line actually fits your data, and a low one means the projection is a guess dressed as a number.',
         'not_enough' => 'Not enough data to fit a trend yet.',
         'quality_strong' => 'strong fit',
@@ -662,7 +662,7 @@ return [
     'levels' => [
         'assumed_sex' => 'These percentiles assume you are male',
         'assumed_sex_body' => 'Strength standards differ substantially between men and women, and your profile does not say which to use — so this page fell back to male standards. If that is wrong, every percentile below is wrong. Set your sex in :profile to fix it.',
-        'compared_against' => 'Compared against :sex lifters at :bodyweight kg bodyweight.',
+        'compared_against' => 'Compared against :sex lifters at :bodyweight :unit bodyweight.',
         'sex_male' => 'male',
         'sex_female' => 'female',
         'aged' => 'Age :age is taken into account where the data source supports it.',
@@ -990,13 +990,13 @@ return [
     'series' => [
         'weight' => 'Weight (:unit)',
         'lean_mass' => 'Lean mass (:unit)',
-        'tonnage' => 'Tonnage (kg)',
+        'tonnage' => 'Tonnage (:unit)',
         'body_fat' => 'Body fat %',
         'ffmi' => 'FFMI',
         'chest' => 'Chest',
         'waist' => 'Waist',
         'bicep' => 'Bicep (R)',
-        'e1rm' => 'e1RM (kg)',
+        'e1rm' => 'e1RM (:unit)',
     ],
 
     'alerts' => [

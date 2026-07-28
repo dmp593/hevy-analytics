@@ -152,6 +152,43 @@ class UnitsTest extends TestCase
         $this->actingAs($user)->get('/body')->assertSee('15.7');
     }
 
+    /** Seeds a 100 kg × 5 bench via the CSV door — the public path in. */
+    private function seedBench(User $user): void
+    {
+        $csv = implode("\n", [
+            'title,start_time,exercise_title,set_index,set_type,weight_kg,reps',
+            '"Push","2026-07-20 18:30","Bench Press (Barbell)",0,normal,100,5',
+        ]);
+
+        $this->actingAs($user)->post('/import', [
+            'file' => UploadedFile::fake()->createWithContent('w.csv', $csv),
+        ]);
+    }
+
+    public function test_performance_page_shows_training_loads_in_pounds(): void
+    {
+        $user = $this->imperialUser();
+        $this->seedBench($user);
+
+        // Top weight 100 kg → 220.5 lb in the records table.
+        $this->actingAs($user)->get('/performance')
+            ->assertOk()
+            ->assertSee('220.5')
+            ->assertSee('Tonnage (lb)');
+    }
+
+    public function test_strength_levels_speak_pounds_too(): void
+    {
+        $user = $this->imperialUser();
+        $user->bodyMeasurements()->create(['date' => now()->toDateString(), 'weight_kg' => 80]);
+        $this->seedBench($user);
+
+        // The comparison sentence carries bodyweight: 80 kg → 176.4 lb.
+        $this->actingAs($user)->get('/strength-levels')
+            ->assertOk()
+            ->assertSee('176.4');
+    }
+
     public function test_welcome_card_offers_the_unit_switch_on_day_one(): void
     {
         $user = User::factory()->create();

@@ -34,7 +34,7 @@ return [
         'cta' => 'Experimenta :days dias grátis',
         'demo_cta' => 'Espreita primeiro — demo ao vivo',
         'cta_note' => 'Sem cartão. :price/mês depois, se quiseres.',
-        'requirement' => 'Precisas de uma conta :hevy — é lá que o treino fica registado. Trazer os dados para cá funciona de duas formas: uma chave de API (Hevy Pro) sincroniza sozinha, e a exportação CSV que qualquer conta Hevy gratuita produz importa-se num único envio.',
+        'requirement' => 'Precisas de uma conta :hevy — é lá que o treino fica registado. Trazer os dados para cá funciona de duas formas: uma chave de API (Hevy Pro) sincroniza sozinha, e a exportação CSV que qualquer conta Hevy gratuita produz importa-se num único envio. Vens do Strong, FitNotes ou Jefit? As exportações deles importam-se da mesma forma.',
 
         'compare_log' => 'O teu registo, terça-feira',
         'compare_log_note' => 'Exato, completo, e calado sobre o que significa.',
@@ -649,7 +649,7 @@ return [
         'chest' => 'Peito (:unit)',
         'waist' => 'Cintura (:unit)',
         'bicep' => 'Bíceps direito (:unit)',
-        'top_lift' => '1RM est. em :exercise (kg)',
+        'top_lift' => '1RM est. em :exercise (:unit)',
         'method' => 'Uma reta ajustada aos teus últimos 12 meses, prolongada para a frente. São estimativas, não promessas — o R² diz quão bem a reta se ajusta aos teus dados, e um valor baixo significa que a projeção é um palpite disfarçado de número.',
         'not_enough' => 'Ainda não há dados suficientes para ajustar uma tendência.',
         'quality_strong' => 'ajuste forte',
@@ -663,7 +663,7 @@ return [
     'levels' => [
         'assumed_sex' => 'Estes percentis assumem que és homem',
         'assumed_sex_body' => 'As referências de força diferem bastante entre homens e mulheres, e o teu perfil não diz qual usar — por isso esta página recorreu às referências masculinas. Se estiver errado, todos os percentis abaixo estão errados. Define o teu sexo em :profile para corrigir.',
-        'compared_against' => 'Comparado com atletas :sex a :bodyweight kg de peso corporal.',
+        'compared_against' => 'Comparado com atletas :sex a :bodyweight :unit de peso corporal.',
         'sex_male' => 'do sexo masculino',
         'sex_female' => 'do sexo feminino',
         'aged' => 'A idade :age é tida em conta onde a fonte de dados o permite.',
@@ -991,13 +991,13 @@ return [
     'series' => [
         'weight' => 'Peso (:unit)',
         'lean_mass' => 'Massa magra (:unit)',
-        'tonnage' => 'Tonelagem (kg)',
+        'tonnage' => 'Tonelagem (:unit)',
         'body_fat' => 'Massa gorda %',
         'ffmi' => 'FFMI',
         'chest' => 'Peito',
         'waist' => 'Cintura',
         'bicep' => 'Bíceps (D)',
-        'e1rm' => 'e1RM (kg)',
+        'e1rm' => 'e1RM (:unit)',
     ],
 
     'alerts' => [

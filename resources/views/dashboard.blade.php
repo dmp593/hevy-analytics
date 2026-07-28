@@ -141,7 +141,7 @@
             {{-- 4. Trends. Two charts, side by side, given room to breathe. --}}
             <section class="grid gap-6 lg:grid-cols-2" aria-label="{{ __('app.dashboard.trends') }}">
                 <x-ui.card :title="__('app.dashboard.training_volume')" :subtitle="__('app.dashboard.training_volume_sub')">
-                    <x-line-chart :series="$tonnageSeries" :label="__('app.series.tonnage')" :color="\App\Support\Chart::series(0)" />
+                    <x-line-chart :series="units()->weightSeries($tonnageSeries)" :label="__('app.series.tonnage', ['unit' => units()->weightUnit()])" :color="\App\Support\Chart::series(0)" />
                 </x-ui.card>
 
                 <x-ui.card :title="__('app.dashboard.body_composition')" :subtitle="__('app.dashboard.body_composition_sub')">

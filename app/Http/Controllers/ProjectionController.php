@@ -51,9 +51,9 @@ class ProjectionController extends Controller
             $liftFilter = new FilterCriteria(from: $from, to: Carbon::now(), exerciseTemplateHevyId: $topLift['template_id']);
             $e1rmSeries = (new StrengthAnalytics($user, $liftFilter))->e1rmSeries();
             $projections['top_lift'] = [
-                'label' => __('app.projections.top_lift', ['exercise' => $topLift['exercise'] ?? '']),
+                'label' => __('app.projections.top_lift', ['exercise' => $topLift['exercise'] ?? '', 'unit' => $units->weightUnit()]),
                 'rising' => 'good',
-                'data' => $projector->project($e1rmSeries, dampen: true),
+                'data' => $weight($projector->project($e1rmSeries, dampen: true)),
             ];
         }
 

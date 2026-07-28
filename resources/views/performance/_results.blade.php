@@ -37,7 +37,7 @@
                             'text-bad' => $mover['direction'] === 'down',
                             'text-muted' => $mover['direction'] === 'flat',
                         ])>
-                            {{ __('app.performance.verdict.per_year', ['value' => sprintf('%+.1f kg', $mover['per_week'] * 52)]) }}
+                            {{ __('app.performance.verdict.per_year', ['value' => sprintf('%+.1f %s', units()->weight($mover['per_week'] * 52, 1), units()->weightUnit())]) }}
                         </span>
                     </div>
                 @endforeach
@@ -46,7 +46,7 @@
     @endif
 
     <div class="grid gap-6 lg:grid-cols-2">
-        <x-ui.card :title="__('app.series.e1rm')"
+        <x-ui.card :title="__('app.series.e1rm', ['unit' => units()->weightUnit()])"
                    :subtitle="$filter->exerciseTemplateHevyId ? __('app.performance.e1rm_sub') : __('app.performance.pick_exercise')">
             {{-- Bound to the filter form by id rather than nested inside it.
 
@@ -66,12 +66,12 @@
                 </select>
             </x-slot:actions>
 
-            <x-line-chart :series="$e1rmSeries" :label="__('app.series.e1rm')" :color="\App\Support\Chart::series(2)"
+            <x-line-chart :series="units()->weightSeries($e1rmSeries)" :label="__('app.series.e1rm', ['unit' => units()->weightUnit()])" :color="\App\Support\Chart::series(2)"
                           :empty="__('app.performance.pick_exercise_empty')" />
         </x-ui.card>
 
         <x-ui.card :title="__('app.performance.verdict.volume')" :subtitle="__('app.performance.verdict.volume_sub')">
-            <x-line-chart :series="$tonnageSeries" :label="__('app.series.tonnage')" :color="\App\Support\Chart::series(0)"
+            <x-line-chart :series="units()->weightSeries($tonnageSeries)" :label="__('app.series.tonnage', ['unit' => units()->weightUnit()])" :color="\App\Support\Chart::series(0)"
                           :empty="__('app.chart.no_data')" />
             {{-- The newest bucket is almost always a period still in progress, so
                  it renders as a cliff. Saying so beats letting the athlete read a
@@ -81,7 +81,7 @@
     </div>
 
     <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <x-ui.stat :label="__('app.performance.tonnage')" :value="number_format($tonnage)" unit="kg" />
+        <x-ui.stat :label="__('app.performance.tonnage')" :value="number_format(units()->weight($tonnage, 0))" :unit="units()->weightUnit()" />
         <x-ui.stat :label="__('app.performance.working_sets')" :value="number_format($totalSets)" />
         <x-ui.stat :label="__('app.performance.total_reps')" :value="number_format($totalReps)" />
         @if ($strengthScores)
@@ -119,7 +119,7 @@
                                         'text-good' => $trend['direction'] === 'up',
                                         'text-bad' => $trend['direction'] === 'down',
                                         'text-muted' => $trend['direction'] === 'flat',
-                                    ])>{{ sprintf('%+.1f kg', $trend['per_week'] * 52) }}</span>
+                                    ])>{{ sprintf('%+.1f %s', units()->weight($trend['per_week'] * 52, 1), units()->weightUnit()) }}</span>
                                     <span class="text-xs text-faint">/yr</span>
                                 @elseif ($trend)
                                     <span class="text-xs text-muted" title="{{ __('app.performance.verdict.noisy_tip') }}">
@@ -129,9 +129,9 @@
                                     <span class="text-xs text-faint">{{ __('app.performance.verdict.not_enough') }}</span>
                                 @endif
                             </td>
-                            <td class="py-2 pr-4">{{ $p['best_e1rm'] ? round($p['best_e1rm'], 1).' kg' : '—' }}</td>
-                            <td class="py-2 pr-4">{{ $p['best_weight'] ? round($p['best_weight'], 1).' kg' : '—' }}</td>
-                            <td class="py-2 pr-5">{{ $p['best_volume_set'] ? number_format($p['best_volume_set']).' kg' : '—' }}</td>
+                            <td class="py-2 pr-4">{{ $p['best_e1rm'] ? units()->weight($p['best_e1rm']).' '.units()->weightUnit() : '—' }}</td>
+                            <td class="py-2 pr-4">{{ $p['best_weight'] ? units()->weight($p['best_weight']).' '.units()->weightUnit() : '—' }}</td>
+                            <td class="py-2 pr-5">{{ $p['best_volume_set'] ? number_format(units()->weight($p['best_volume_set'], 0)).' '.units()->weightUnit() : '—' }}</td>
                         </tr>
                     @empty
                         <tr><td colspan="5" class="px-5 py-3 text-muted">{{ __('app.performance.no_exercises') }}</td></tr>

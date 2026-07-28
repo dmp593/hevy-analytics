@@ -10,8 +10,8 @@
     <div class="grid lg:grid-cols-2 gap-6 mb-6">
         <x-panel :title="__('app.routines.session_tonnage')">
             <x-line-chart
-                :series="collect($sessionSeries)->map(fn($s) => ['label' => $s['date'], 'value' => $s['tonnage']])->all()"
-                :label="__('app.series.tonnage')" color="#4f46e5"
+                :series="units()->weightSeries(collect($sessionSeries)->map(fn($s) => ['label' => $s['date'], 'value' => $s['tonnage']])->all())"
+                :label="__('app.series.tonnage', ['unit' => units()->weightUnit()])" :color="\App\Support\Chart::series(0)"
                 :empty="__('app.routines.no_sessions')" />
         </x-panel>
 
@@ -25,7 +25,7 @@
                 </select>
             </form>
             <div id="ex-chart">
-                <x-line-chart :series="$e1rmSeries" label="e1RM (kg)" color="#16a34a" :fill="false"
+                <x-line-chart :series="units()->weightSeries($e1rmSeries)" :label="__('app.series.e1rm', ['unit' => units()->weightUnit()])" :color="\App\Support\Chart::series(2)" :fill="false"
                               :empty="__('app.routines.pick_exercise')" />
             </div>
         </x-panel>

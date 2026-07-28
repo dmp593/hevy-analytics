@@ -230,7 +230,7 @@ class BodyVerdict
 
         if ($lift !== null) {
             $out[] = [
-                'label' => $this->triangulation['lift']['exercise'] ?? __('app.series.e1rm'),
+                'label' => $this->triangulation['lift']['exercise'] ?? __('app.series.e1rm', ['unit' => $this->units->weightUnit()]),
                 'direction' => $lift === 'up' ? 'good' : 'bad',
                 'detail' => __($lift === 'up' ? 'app.body.verdict.strength_up' : 'app.body.verdict.strength_down'),
             ];

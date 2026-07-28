@@ -25,7 +25,7 @@
                     @foreach($ex->sets ?? [] as $set)
                         <span class="text-xs rounded-sm bg-surface-sunk px-2 py-1">
                             {{ $set['type'] ?? 'normal' }}:
-                            {{ $set['weight_kg'] ?? '—' }}kg × {{ $set['reps'] ?? ($set['rep_range']['start'] ?? '—') }}
+                            {{ isset($set['weight_kg']) ? units()->weight($set['weight_kg']).units()->weightUnit() : '—' }} × {{ $set['reps'] ?? ($set['rep_range']['start'] ?? '—') }}
                         </span>
                     @endforeach
                 </div>

@@ -50,9 +50,12 @@ the admin list and the app will drift apart.
 calculation are metric, always. Imperial exists only at the edges — a form
 field on its way in (`weightToKg`, `heightToCm`), a number or chart series on
 its way out (`weight`, `girth`, `weightSeries`) — via `Units::for($user)` or
-the `units()` Blade helper. Scope is body data (height, bodyweight, tape);
-training loads stay kg everywhere. An inline `* 2.2046` anywhere else will
-eventually run on a value that was already converted.
+the `units()` Blade helper. Body data AND training-load displays (e1RM,
+tonnage, strength thresholds) convert at the view edge. The one deliberate
+exception: values sent back to Hevy (write-back payloads) are kg always —
+Hevy's API speaks metric regardless of what the athlete reads on screen. An
+inline `* 2.2046` anywhere else will eventually run on a value that was
+already converted.
 
 **4. A claim written next to code that later moved.** The UI states things —
 "compared against male lifters", "dampened near natural ceilings". When the

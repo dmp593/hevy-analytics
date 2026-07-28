@@ -55,7 +55,7 @@
                 @if (count($volumePerMuscle))
                     <x-chart type="polarArea" :height="280"
                         :labels="array_map(fn ($x) => \App\Support\Labels::muscle($x['muscle']), $volumePerMuscle)"
-                        :datasets="[['label' => __('app.series.tonnage'), 'data' => array_column($volumePerMuscle, 'tonnage')]]" />
+                        :datasets="[['label' => __('app.series.tonnage', ['unit' => units()->weightUnit()]), 'data' => array_map(fn ($t) => units()->weight($t, 0), array_column($volumePerMuscle, 'tonnage'))]]" />
                 @else
                     <x-empty-chart :height="280">{{ __('app.chart.no_sets') }}</x-empty-chart>
                 @endif

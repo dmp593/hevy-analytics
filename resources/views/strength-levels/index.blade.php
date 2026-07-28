@@ -41,7 +41,8 @@
             <p class="text-sm text-body">
                 {{ __('app.levels.compared_against', [
                     'sex' => __('app.levels.sex_'.($sex ?? 'male')),
-                    'bodyweight' => $bodyweight,
+                    'bodyweight' => units()->weight($bodyweight),
+                    'unit' => units()->weightUnit(),
                 ]) }}
                 @if ($age)
                     {{ __('app.levels.aged', ['age' => $age]) }}

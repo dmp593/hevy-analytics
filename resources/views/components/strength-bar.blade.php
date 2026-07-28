@@ -71,7 +71,7 @@
             @foreach($levels as $i => $lvl)
                 <div class="rounded-sm bg-surface-sunk py-1">
                     <div class="text-faint">{{ __('app.levels.tier.'.$lvl) }}</div>
-                    <div class="font-semibold text-body">{{ $eval['thresholds_kg'][$i] }}kg</div>
+                    <div class="font-semibold text-body">{{ units()->weight($eval['thresholds_kg'][$i], 0) }}{{ units()->weightUnit() }}</div>
                 </div>
             @endforeach
         </div>
@@ -79,7 +79,7 @@
 
     <div class="mt-1 flex items-center justify-between text-[11px] text-faint">
         <span>
-            e1RM {{ $eval['e1rm'] }}kg @ {{ $eval['bodyweight'] }}kg · {{ $eval['ratio'] }}×BW
+            e1RM {{ units()->weight($eval['e1rm']) }}{{ units()->weightUnit() }} @ {{ units()->weight($eval['bodyweight']) }}{{ units()->weightUnit() }} · {{ $eval['ratio'] }}×BW
             @if(($eval['age_factor'] ?? 1) != 1) · {{ __('app.levels.age_factor', ['value' => $eval['age_factor']]) }}@endif
         </span>
         <span>

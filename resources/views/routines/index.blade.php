@@ -17,7 +17,7 @@
                     <tr class="border-b border-subtle">
                         <td class="py-2 pr-4 font-medium">{{ $o['routine'] }}</td>
                         <td class="py-2 pr-4">{{ $o['sessions'] }}</td>
-                        <td class="py-2 pr-4">{{ number_format($o['avg_tonnage']) }} kg</td>
+                        <td class="py-2 pr-4">{{ number_format(units()->weight($o['avg_tonnage'], 0)) }} {{ units()->weightUnit() }}</td>
                         <td class="py-2 pr-4 {{ ($o['progression_pct'] ?? 0) >= 0 ? 'text-good' : 'text-bad' }}">
                             {{ $o['progression_pct'] !== null ? ($o['progression_pct'] > 0 ? '+' : '').$o['progression_pct'].'%' : '—' }}
                             {{-- A trend can be real but scattered. Saying so beats implying precision we do not have. --}}
