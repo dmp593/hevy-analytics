@@ -14,6 +14,8 @@ return [
     'intro' => 'Sem jargão. Esta página explica cada número que a aplicação mostra, porque é que importa para <strong>ganhar músculo mantendo-te seco</strong>, e como é que "bom" se parece. Tudo assenta em investigação publicada de força e nutrição (fontes no fim).',
 
     'nav' => [
+        'data' => 'Trazer os dados',
+        'checkins' => 'Check-ins & comparação',
         'volume' => 'Séries semanais & volume',
         'strength' => 'Força & 1RM',
         'levels' => 'Níveis de força',
@@ -23,6 +25,26 @@ return [
         'nutrition' => 'Calorias & macros',
         'projections' => 'Projeções',
         'balance' => 'Equilíbrio muscular',
+    ],
+
+    'data' => [
+        'title' => 'Trazer os dados — sincronização, importações & unidades',
+        'lead' => 'Há duas portas de entrada na app, e ambas acabam exatamente no mesmo sítio:',
+        'api' => '<strong>Chave de API do Hevy (Hevy Pro):</strong> cola-a uma vez no Perfil e todos os treinos sincronizam sozinhos, medições corporais incluídas.',
+        'csv' => '<strong>Importação CSV (qualquer conta):</strong> envia a exportação que a tua app de treino produz na página :import. Ficheiros do <strong>Hevy, Strong, FitNotes e Jefit</strong> são reconhecidos automaticamente pelas colunas; qualquer outro CSV recebe um <strong>ecrã de correspondência de colunas</strong> — apontas cada campo (data, exercício, peso, repetições…) para a coluna certa e importas na mesma.',
+        'protections' => 'Detalhes que protegem os teus números:',
+        'idempotent' => '<strong>Reenviar é sempre seguro.</strong> A identidade de um treino é a sua data e nome, por isso o mesmo ficheiro — ou uma exportação mais recente que o sobreponha — funde-se em vez de duplicar.',
+        'units_ask' => '<strong>As unidades são perguntadas quando o ficheiro não as diz.</strong> A exportação do Strong no iPhone, por exemplo, não traz coluna de unidade; o formulário pergunta se os pesos estão em kg ou lb, pré-definido com a tua preferência.',
+        'units_pref' => '<strong>A tua preferência de unidades</strong> (Perfil → Unidades, ou o interruptor no cartão de boas-vindas) muda como escreves e lês tudo — altura em ft/in, peso corporal e cargas em lb, perímetros em polegadas. Internamente fica tudo em métrico, para os cálculos nunca misturarem unidades, e o que é escrito de volta no Hevy segue em métrico porque a API deles assim fala.',
+        'muscles' => '<strong>Os músculos são inferidos dos nomes dos exercícios</strong> nas importações CSV — os ficheiros não os trazem. Nomes padrão associam bem; se mais tarde adicionares uma chave de API, a atribuição do próprio Hevy assume.',
+    ],
+
+    'checkins' => [
+        'title' => 'Check-ins, fotografias & comparação',
+        'lead' => 'Um <strong>check-in</strong> é uma data com até quatro fotografias — <strong>frente, costas, lado esquerdo, lado direito</strong> — mais um peso corporal e uma nota. Uma única fotografia chega para guardar; tirar as quatro dos mesmos sítios, com a mesma luz, é o que torna as comparações honestas.',
+        'measurements' => '<strong>Medidas manuais</strong> (página Corpo → Registar medidas): peso, massa gorda e catorze perímetros, todos os campos opcionais. A <strong>data é editável</strong> — uma medição de sábado registada na segunda pertence a sábado — e voltar a guardar uma data completa ou corrige sem tocar nos campos que deixaste em branco.',
+        'compare' => '<strong>Comparar</strong> (:compare): escolhe 2–4 datas de check-in e elas alinham-se lado a lado — todas as fotografias de "frente" numa linha, todas as de "costas" na seguinte — com uma tabela de medidas por baixo a mostrar a variação de cada data face à mais antiga.',
+        'judgement' => '<strong>Só a variação de peso é julgada, e só contra o teu objetivo:</strong> ganhar lê-se verde num bulk e vermelho num cut, a manutenção julga as duas direções por igual, e uma variação abaixo de cerca de 1% do peso corporal conta como estável — isso é água e refeições. Os perímetros nunca são coloridos, e a seta e o sinal dizem sempre o mesmo que a cor.',
     ],
 
     'volume' => [

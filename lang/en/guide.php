@@ -20,6 +20,8 @@ return [
     'intro' => 'No jargon. This page explains every number the app shows, why it matters for <strong>building muscle while staying lean</strong>, and what "good" looks like. Everything is based on published strength and nutrition science (sources at the bottom).',
 
     'nav' => [
+        'data' => 'Getting data in',
+        'checkins' => 'Check-ins & compare',
         'volume' => 'Weekly sets & volume',
         'strength' => 'Strength & 1RM',
         'levels' => 'Strength levels',
@@ -29,6 +31,26 @@ return [
         'nutrition' => 'Calories & macros',
         'projections' => 'Projections',
         'balance' => 'Muscle balance',
+    ],
+
+    'data' => [
+        'title' => 'Getting data in — sync, imports & units',
+        'lead' => 'There are two doors into the app, and they end in exactly the same place:',
+        'api' => '<strong>Hevy API key (Hevy Pro):</strong> paste it once in your Profile and every workout syncs automatically, body measurements included.',
+        'csv' => '<strong>CSV import (any account):</strong> upload the export your training app produces on the :import page. <strong>Hevy, Strong, FitNotes and Jefit</strong> files are recognised automatically by their columns; any other CSV gets a <strong>column-matching screen</strong> — you point each field (date, exercise, weight, reps…) at the right column and import anyway.',
+        'protections' => 'Details that protect your numbers:',
+        'idempotent' => '<strong>Re-uploading is always safe.</strong> A workout\'s identity is its date and name, so the same file — or a newer export overlapping it — merges instead of duplicating.',
+        'units_ask' => '<strong>Units are asked when the file is silent.</strong> Strong\'s iPhone export, for example, carries no unit column; the import form asks whether its weights are kg or lb, pre-set to your own preference.',
+        'units_pref' => '<strong>Your unit preference</strong> (Profile → Units, or the toggle on the welcome card) changes how you type and read everything — height in ft/in, bodyweight and loads in lb, tape in inches. Internally everything is stored metric, so calculations never mix units, and anything written back to Hevy stays metric because Hevy\'s API is.',
+        'muscles' => '<strong>Muscles are inferred from exercise names</strong> on CSV imports — the files carry none. Standard names match well; if you later add an API key, Hevy\'s own attribution takes over.',
+    ],
+
+    'checkins' => [
+        'title' => 'Check-ins, photos & comparison',
+        'lead' => 'A <strong>check-in</strong> is one date with up to four photos — <strong>front, back, left side, right side</strong> — plus a bodyweight and a note. Any single photo is enough to save; taking all four from the same spots, in the same light, is what makes comparisons honest.',
+        'measurements' => '<strong>Manual measurements</strong> (Body page → Log measurements): weight, body fat and fourteen tape measurements, every field optional. The <strong>date is editable</strong> — a Saturday measurement logged on Monday belongs to Saturday — and re-saving a date fills in or corrects it without touching fields you left blank.',
+        'compare' => '<strong>Compare</strong> (:compare): pick 2–4 check-in dates and they line up side by side — every "front" photo on one row, every "back" on the next — with a measurements table underneath showing each date\'s change against the oldest one.',
+        'judgement' => '<strong>Only the weight change is judged, and only against your goal:</strong> gaining reads green on a bulk and red on a cut, maintenance judges both directions equally, and a change under about 1% of bodyweight counts as stable — that much is water and meal timing. Tape measurements are never coloured, and the arrow and sign always say what the colour says.',
     ],
 
     'volume' => [

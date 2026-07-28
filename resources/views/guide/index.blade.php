@@ -13,10 +13,44 @@
     <x-panel>
         <p class="text-sm text-body">{!! __('guide.intro') !!}</p>
         <nav class="mt-4 flex flex-wrap gap-2 text-xs">
-            @foreach (['volume', 'strength', 'levels', 'body', 'accuracy', 'leanbulk', 'nutrition', 'projections', 'balance'] as $id)
+            @foreach (['data', 'checkins', 'volume', 'strength', 'levels', 'body', 'accuracy', 'leanbulk', 'nutrition', 'projections', 'balance'] as $id)
                 <a href="#{{ $id }}" class="inline-flex min-h-10 items-center rounded-full bg-surface-sunk px-3 hover:bg-strong/40">{{ __('guide.nav.'.$id) }}</a>
             @endforeach
         </nav>
+    </x-panel>
+
+    {{-- DATA IN --}}
+    <x-panel id="data" :title="__('guide.data.title')">
+        <div class="prose prose-sm max-w-none text-body">
+            <p>{!! __('guide.data.lead') !!}</p>
+            <ul>
+                <li>{!! __('guide.data.api') !!}</li>
+                <li>{!! __('guide.data.csv', [
+                    'import' => '<a href="'.route('import').'" class="underline">'.__('app.import.title').'</a>',
+                ]) !!}</li>
+            </ul>
+            <p>{{ __('guide.data.protections') }}</p>
+            <ul>
+                <li>{!! __('guide.data.idempotent') !!}</li>
+                <li>{!! __('guide.data.units_ask') !!}</li>
+                <li>{!! __('guide.data.units_pref') !!}</li>
+                <li>{!! __('guide.data.muscles') !!}</li>
+            </ul>
+        </div>
+    </x-panel>
+
+    {{-- CHECK-INS --}}
+    <x-panel id="checkins" :title="__('guide.checkins.title')">
+        <div class="prose prose-sm max-w-none text-body">
+            <p>{!! __('guide.checkins.lead') !!}</p>
+            <ul>
+                <li>{!! __('guide.checkins.measurements') !!}</li>
+                <li>{!! __('guide.checkins.compare', [
+                    'compare' => '<a href="'.route('compare').'" class="underline">'.__('app.compare.title').'</a>',
+                ]) !!}</li>
+                <li>{!! __('guide.checkins.judgement') !!}</li>
+            </ul>
+        </div>
     </x-panel>
 
     {{-- VOLUME --}}
