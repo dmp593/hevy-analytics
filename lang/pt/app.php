@@ -1143,6 +1143,12 @@ return [
         'saved' => 'Preferências de email guardadas.',
     ],
 
+    'rhythm' => [
+        'line' => ':sessions sessões nos últimos 6 meses · mediana :duration · normalmente por volta das :hours, sobretudo :days.',
+        'sets' => ':count série|:count séries',
+        'heatmap_aria' => 'Calendário de treino: um quadrado sombreado por dia, mais escuro significa mais séries efetivas',
+    ],
+
     'consistency' => [
         'title' => 'Consistência',
         'sessions_week' => 'Sessões esta semana',

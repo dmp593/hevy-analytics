@@ -46,6 +46,7 @@ class SetQuery
                 'w.hevy_id as workout_hevy_id',
                 'w.title as workout_title',
                 'w.start_time',
+                'w.end_time',
                 'w.routine_hevy_id',
                 't.primary_muscle_group',
                 't.secondary_muscle_groups',

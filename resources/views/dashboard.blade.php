@@ -120,6 +120,20 @@
                     @if ($consistency['early_days'])
                         <p class="mt-3 text-xs text-muted">{{ __('app.consistency.early_days') }}</p>
                     @endif
+
+                    @if ($rhythm)
+                        <div class="mt-4 rounded-xl border border-line bg-surface px-5 py-4">
+                            <x-training-heatmap :rhythm="$rhythm" />
+                            <p class="mt-3 text-xs text-muted">
+                                {{ __('app.rhythm.line', [
+                                    'sessions' => $rhythm['sessions'],
+                                    'duration' => $rhythm['median_duration_min'] !== null ? $rhythm['median_duration_min'].' min' : '—',
+                                    'hours' => collect($rhythm['top_hours'])->map(fn ($h) => sprintf('%02dh', $h))->implode(' / '),
+                                    'days' => collect($rhythm['top_weekdays'])->map(fn ($d) => \Illuminate\Support\Carbon::now()->startOfWeek()->addDays($d - 1)->isoFormat('ddd'))->implode(' / '),
+                                ]) }}
+                            </p>
+                        </div>
+                    @endif
                 </section>
             @endif
 

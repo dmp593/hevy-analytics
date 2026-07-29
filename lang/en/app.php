@@ -1142,6 +1142,12 @@ return [
         'saved' => 'Email preferences saved.',
     ],
 
+    'rhythm' => [
+        'line' => ':sessions sessions in the last 6 months · median :duration · usually around :hours, mostly :days.',
+        'sets' => ':count set|:count sets',
+        'heatmap_aria' => 'Training calendar: one shaded square per day, darker means more hard sets',
+    ],
+
     'consistency' => [
         'title' => 'Consistency',
         'sessions_week' => 'Sessions this week',

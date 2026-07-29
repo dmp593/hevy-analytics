@@ -8,6 +8,7 @@ use App\Services\Analytics\FilterCriteria;
 use App\Services\Analytics\GoalAlerts;
 use App\Services\Analytics\MuscleBalance;
 use App\Services\Analytics\NutritionService;
+use App\Services\Analytics\TrainingRhythm;
 use App\Services\Analytics\VolumeAnalytics;
 use App\Services\Hevy\SyncStatus;
 use App\Support\DataConfidence;
@@ -46,6 +47,7 @@ class DashboardController extends Controller
             'partitioning' => $bc->partitioning(),
             'alerts' => (new GoalAlerts($user))->all(),
             'consistency' => (new ConsistencyAnalytics($user))->summary(),
+            'rhythm' => (new TrainingRhythm($user))->summary(),
             'goal' => $user->activeGoal(),
             'weekVolume' => $volume->tonnage(),
             'weekSets' => $volume->totalSets(),

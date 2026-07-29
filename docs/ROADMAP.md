@@ -4,7 +4,7 @@
 > sessões: estado real, pendentes de cada lado, e planos discutidos mas ainda
 > não executados. Em português porque o dono do produto lê em português.
 
-## Em produção (tudo verde, 1019 testes)
+## Em produção (tudo verde, 1027 testes)
 
 | Área | Estado |
 |---|---|
@@ -148,6 +148,19 @@ implementado. caso não esteja, implementa". A análise exaustiva encontrou:
 
 Apagar treinos importados (limpa o "Prod Probe" de 2026-07-20 na conta do
 dono); validação fina dos dialetos com ficheiros reais.
+
+### 5. "Melhor que a concorrência" — EM CURSO (2026-07-29)
+
+Pedido: usar o CSV real do dono (137 treinos, 18 meses, RPE em 16% das
+séries) + estudar os projetos GitHub concorrentes (Hevy Insights,
+HevyWorkoutAnalyzer, Data Visualiser) e o Loadline, e construir o que falta
+ou está pior, com interface mais apelativa. Entregue já: **heatmap de
+calendário** (26 semanas, estilo GitHub, server-rendered) + **ritmo de
+treino** (mediana de duração, horas e dias típicos) no dashboard, secção
+Consistência. Aguarda a lista de lacunas do agente de investigação para o
+lote 2 (candidatos: timeline de PRs, índice de sobrecarga por músculo tipo
+Loadline/POI, análise de splits). CSV do dono em scratchpad/hevy.csv (não
+comitar!).
 
 ## Dívida de legibilidade conhecida (auditoria 2026-07-29, passe 2 pendente)
 
