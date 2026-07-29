@@ -426,6 +426,23 @@ return [
         'target' => 'Alvo',
         'weight' => 'Peso (:unit)',
         'body_fat_optional' => 'Massa gorda (%, opcional)',
+        'import' => [
+            'title' => 'Importar de uma app de dieta',
+            'help' => 'Envia o CSV que a tua app de dieta exporta e os totais de cada dia — calorias, proteína, gordura, hidratos — entram no registo acima. Linhas por refeição ou por alimento são somadas em totais diários automaticamente.',
+            'sources_hint' => 'Reconhecidos: MyFitnessPal (a exportação deles exige o Premium), Cronometer, Lose It!, ou qualquer CSV com uma coluna de data e uma de calorias. Nenhuma app de dieta tem API pública utilizável — o ficheiro é o caminho.',
+            'submit' => 'Importar o ficheiro',
+            'idempotent' => 'Reenviar é seguro: um registo por dia, completado ou corrigido, nunca duplicado. Pesos e massa gorda que registaste nunca são tocados por uma importação de nutrição.',
+            'done' => '{1}Importados os totais de 1 dia (:source).|[2,*]Importados os totais de :days dias (:source).',
+            'source_mfp' => 'MyFitnessPal',
+            'source_cronometer' => 'Cronometer',
+            'source_loseit' => 'Lose It!',
+            'source_generic' => 'CSV',
+            'errors' => [
+                'not_nutrition' => 'Este ficheiro não tem colunas de data e calorias — não parece a exportação de uma app de dieta.',
+                'nothing_found' => 'Não foi possível ler totais diários desse ficheiro.',
+                'absurd_day' => 'Os totais de :date somam além de qualquer ingestão humana — esse dia foi ignorado; verifica o ficheiro.',
+            ],
+        ],
         'manual_estimate' => 'estimativa manual',
         'log_intake' => 'Registar',
         'recent' => 'Consumo recente vs alvo',
@@ -1005,6 +1022,26 @@ return [
         'kg_note' => 'Os pesos são escritos em kg, declarados dentro do ficheiro onde o formato o permite. O formato do Jefit não declara unidades — configura essa app em kg antes de importar.',
         'jefit_beta' => 'A saída para Jefit é beta: o importador dele é o menos documentado dos quatro, e ainda está a ser validado num dispositivo real.',
         'unknown_file' => 'Este ficheiro não corresponde a nenhuma app que reconheçamos. Importa-o primeiro — a página de importação sabe mapear as colunas — e depois converte a partir da conta.',
+    ],
+
+    /*
+     | Ligação de conta FatSecret (sincronização do diário alimentar).
+     */
+    'fatsecret' => [
+        'title' => 'FatSecret',
+        'subtitle' => 'O teu diário alimentar, sincronizado todas as noites',
+        'pitch' => 'Regista as refeições na app FatSecret como sempre; os teus totais diários de calorias e macros chegam cá todas as noites, a alimentar a medição adaptativa de manutenção. A ligação é só de leitura e é feita em fatsecret.com — a tua password nunca toca nesta app.',
+        'connect' => 'Ligar conta FatSecret',
+        'privacy' => 'Os tokens de acesso ficam guardados encriptados, só os últimos dias de totais do diário são lidos, e podes desligar aqui a qualquer momento.',
+        'linked' => 'Conta FatSecret ligada — a primeira sincronização já correu.',
+        'linked_since' => 'Ligada desde :date.',
+        'last_sync' => 'última sincronização :when',
+        'sync_now' => 'Sincronizar agora',
+        'disconnect' => 'Desligar',
+        'unlinked' => 'Conta FatSecret desligada; nada mais será lido.',
+        'synced' => '{0}Sincronizado — sem registos no diário nos últimos dias.|{1}Sincronizados os totais de 1 dia.|[2,*]Sincronizados os totais de :days dias.',
+        'failed' => 'O FatSecret não aceitou a ligação. Tenta outra vez daqui a um momento.',
+        'sync_failed' => 'A sincronização falhou — a ligação pode ter sido revogada em fatsecret.com. Desliga e volta a ligar.',
     ],
 
     /*

@@ -98,3 +98,24 @@ after the next deploy. Nothing else moves — the database keeps the rows.
 - **Supabase Storage** gives 1 GB against R2's 10 GB.
 - **Backblaze B2** is a fair second choice: 10 GB free, S3-compatible. Its free
   egress is capped daily rather than unlimited, so R2 wins on the same axis.
+
+---
+
+## FatSecret (nutrition diary sync)
+
+OAuth 1.0 consumer credentials from platform.fatsecret.com (Account &
+Settings). OAuth 2.0 exists but requires an IP whitelist with 24 h
+propagation — unusable behind shared egress, which is why the app prefers
+the 1.0 pair when both are configured.
+
+| Variable | Value |
+|---|---|
+| `FATSECRET_CONSUMER_KEY` | REST API OAuth 1.0 credentials |
+| `FATSECRET_CONSUMER_SECRET` | idem |
+| `FATSECRET_CLIENT_ID` / `FATSECRET_CLIENT_SECRET` | OAuth 2.0 pair, parked for a future need |
+| `FATSECRET_*_URL` | endpoint overrides; defaults follow the official docs |
+
+Users link on their profile (three-legged OAuth — their password never
+touches the app); `fatsecret:sync` re-reads each linked account's last 7
+days nightly at 03:30. Tokens are stored with the rotation-tolerant
+encrypted cast.

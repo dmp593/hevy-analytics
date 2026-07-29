@@ -73,4 +73,21 @@ return [
         'csv_url' => env('OPL_CSV_URL', 'https://openpowerlifting.gitlab.io/opl-csv/files/openpowerlifting-latest.zip'),
     ],
 
+    /*
+     | FatSecret Platform. OAuth 1.0 (consumer pair) is what the app uses —
+     | their OAuth 2.0 requires an IP whitelist a shared-egress host cannot
+     | promise. The endpoint URLs are env-overridable because the official
+     | docs and the ecosystem's libraries disagree on the hosts.
+     */
+    'fatsecret' => [
+        'consumer_key' => env('FATSECRET_CONSUMER_KEY'),
+        'consumer_secret' => env('FATSECRET_CONSUMER_SECRET'),
+        'client_id' => env('FATSECRET_CLIENT_ID'),
+        'client_secret' => env('FATSECRET_CLIENT_SECRET'),
+        'request_token_url' => env('FATSECRET_REQUEST_TOKEN_URL', 'https://authentication.fatsecret.com/oauth/request_token'),
+        'authorize_url' => env('FATSECRET_AUTHORIZE_URL', 'https://authentication.fatsecret.com/oauth/authorize'),
+        'access_token_url' => env('FATSECRET_ACCESS_TOKEN_URL', 'https://authentication.fatsecret.com/oauth/access_token'),
+        'api_url' => env('FATSECRET_API_URL', 'https://platform.fatsecret.com/rest/server.api'),
+    ],
+
 ];

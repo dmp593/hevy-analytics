@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Services\Analytics\NutritionService;
 use App\Services\Analytics\NutritionVerdict;
+use App\Services\Import\ImportException;
+use App\Services\Import\NutritionCsvImport;
 use App\Support\Units;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -71,5 +73,35 @@ class NutritionController extends Controller
         $log->fill($data)->save();
 
         return redirect()->route('nutrition')->with('status', 'Intake logged.');
+    }
+
+    /**
+     * Daily totals from another diet app's CSV. Inline like the workout
+     * import — the person is on the page waiting to hear if their file
+     * was any good, and the row cap bounds the worst case.
+     */
+    public function importCsv(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:csv,txt', 'max:20480'],
+        ]);
+
+        try {
+            $result = (new NutritionCsvImport($request->user()))
+                ->run($request->file('file')->getRealPath());
+        } catch (ImportException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        $message = trans_choice('app.nutrition.import.done', $result['days'], [
+            'days' => number_format($result['days']),
+            'source' => __('app.nutrition.import.source_'.$result['source']),
+        ]);
+
+        if ($result['skipped'] > 0) {
+            $message .= ' '.__('app.import.done_skipped', ['count' => number_format($result['skipped'])]);
+        }
+
+        return redirect()->route('nutrition')->with('status', $message);
     }
 }

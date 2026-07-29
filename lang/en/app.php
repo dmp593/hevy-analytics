@@ -426,6 +426,23 @@ return [
         'target' => 'Target',
         'weight' => 'Weight (:unit)',
         'body_fat_optional' => 'Body fat (%, optional)',
+        'import' => [
+            'title' => 'Import from a diet app',
+            'help' => 'Upload the CSV your diet app exports and every day\'s totals — calories, protein, fat, carbs — land in the log above. Per-meal and per-food rows are summed into daily totals automatically.',
+            'sources_hint' => 'Recognised: MyFitnessPal (its export needs their Premium), Cronometer, Lose It!, or any CSV with a date and a calories column. No diet app has a usable public API — the file is the road.',
+            'submit' => 'Import the file',
+            'idempotent' => 'Re-uploading is safe: one entry per day, filled in or corrected, never duplicated. Weights and body fat you logged are never touched by a nutrition import.',
+            'done' => '{1}Imported totals for 1 day (:source).|[2,*]Imported totals for :days days (:source).',
+            'source_mfp' => 'MyFitnessPal',
+            'source_cronometer' => 'Cronometer',
+            'source_loseit' => 'Lose It!',
+            'source_generic' => 'CSV',
+            'errors' => [
+                'not_nutrition' => 'This file has no date and calories columns — it does not look like a diet app\'s export.',
+                'nothing_found' => 'No daily totals could be read from that file.',
+                'absurd_day' => 'The totals for :date add up beyond any human intake — that day was skipped; check the file.',
+            ],
+        ],
         'manual_estimate' => 'manual estimate',
         'log_intake' => 'Log intake',
         'recent' => 'Recent intake vs target',
@@ -1004,6 +1021,26 @@ return [
         'kg_note' => 'Weights are written in kg, stated inside the file wherever the format allows. Jefit’s format cannot state units — set that app to kg before importing.',
         'jefit_beta' => 'Jefit output is beta: its importer is the least documented of the four, and a real device is still validating it.',
         'unknown_file' => 'This file matches no app we recognise. Import it first — the import page can map its columns — then convert from your account.',
+    ],
+
+    /*
+     | FatSecret account linking (nutrition diary sync).
+     */
+    'fatsecret' => [
+        'title' => 'FatSecret',
+        'subtitle' => 'Your food diary, synced in nightly',
+        'pitch' => 'Log meals in the FatSecret app as usual; your daily calorie and macro totals arrive here every night, feeding the adaptive maintenance measurement. The connection is read-only and made on fatsecret.com — your password never touches this app.',
+        'connect' => 'Link FatSecret account',
+        'privacy' => 'The access tokens are stored encrypted, only your last days of diary totals are read, and you can unlink here at any time.',
+        'linked' => 'FatSecret account linked — the first sync just ran.',
+        'linked_since' => 'Linked since :date.',
+        'last_sync' => 'last sync :when',
+        'sync_now' => 'Sync now',
+        'disconnect' => 'Unlink',
+        'unlinked' => 'FatSecret account unlinked; nothing more will be read.',
+        'synced' => '{0}Synced — no diary entries in the last days.|{1}Synced totals for 1 day.|[2,*]Synced totals for :days days.',
+        'failed' => 'FatSecret did not accept the connection. Try again in a moment.',
+        'sync_failed' => 'The sync failed — the link may have been revoked on fatsecret.com. Unlink and link again.',
     ],
 
     /*

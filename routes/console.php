@@ -12,6 +12,10 @@ Artisan::command('inspire', function () {
 // one job per user so a single slow account cannot stall everyone else's sync.
 Schedule::command('hevy:sync --queue')->hourly()->withoutOverlapping();
 
+// Diet diaries change less than training logs, and people back-edit
+// yesterday's meals — one nightly pass re-reading a week covers both.
+Schedule::command('fatsecret:sync')->dailyAt('03:30')->withoutOverlapping();
+
 // Trial-ending warnings. Idempotent (watermarked per user), so daily is a
 // cadence choice, not a correctness requirement.
 Schedule::command('app:send-trial-emails')->dailyAt('09:00');

@@ -7,6 +7,8 @@
 
     @include('profile.partials.ai-provider-form')
 
+    @include('profile.partials.fatsecret-form')
+
     @include('profile.partials.data-privacy')
 
     @include('profile.partials.update-password-form')

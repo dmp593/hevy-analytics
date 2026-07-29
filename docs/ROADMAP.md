@@ -66,9 +66,16 @@ via entitlements). Plano original em docs/DATA-SOURCES.md. Resumo:
   exercícios mais comuns por par de apps.
 - Gate de pagamento no download, pelo chokepoint de entitlements existente.
 
-### 2. Importação de nutrição por CSV (MyFitnessPal / Cronometer)
+### 2. Nutrição — ✓ EM PRODUÇÃO (CSV + FatSecret)
 
-Totais diários → intake_logs. Adiado pelo dono como menos importante.
+CSV de totais diários (MyFitnessPal premium export, Cronometer, Lose It!,
+genérico) na página de Nutrição — linhas por refeição/alimento somadas por
+dia, idempotente, nunca toca em pesos registados. E ligação FatSecret por
+OAuth 1.0 (a 2.0 exige whitelist de IP): ligar no Perfil, sync noturno dos
+últimos 7 dias via fatsecret:sync agendado. Assinatura validada contra o
+vetor publicado do OAuth 1.0a E contra o endpoint real (request_token 200).
+PENDENTE DE VALIDAÇÃO REAL: o dono ligar a conta dele em produção (o passo
+authorize/access só se prova com um browser).
 
 ### 3. Ideias sem compromisso
 

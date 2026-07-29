@@ -9,6 +9,7 @@ use App\Http\Controllers\ConvertController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataExportController;
 use App\Http\Controllers\DemoController;
+use App\Http\Controllers\FatSecretController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\LocaleController;
@@ -73,6 +74,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/nutrition', [NutritionController::class, 'index'])->name('nutrition');
     Route::post('/nutrition/recompute', [NutritionController::class, 'recompute'])->name('nutrition.recompute');
     Route::post('/nutrition/intake', [NutritionController::class, 'storeIntake'])->name('nutrition.intake');
+    // Daily totals from another diet app's export (MFP, Cronometer, Lose It).
+    Route::post('/nutrition/import', [NutritionController::class, 'importCsv'])
+        ->middleware('throttle:10,10')->name('nutrition.import');
 
     Route::get('/projections', [ProjectionController::class, 'index'])->name('projections');
 
@@ -119,6 +123,15 @@ Route::middleware('auth')->group(function () {
     // One-tap unit switching for the dashboard welcome card; the profile form
     // sets the same column at full length.
     Route::post('/settings/units/{system}', UnitSystemController::class)->name('settings.units');
+
+    // FatSecret linking: OAuth 1.0 three-legged, so a fatsecret.com member can
+    // let the app read their food diary without sharing their password.
+    Route::post('/integrations/fatsecret/connect', [FatSecretController::class, 'connect'])
+        ->middleware('throttle:6,1')->name('fatsecret.connect');
+    Route::get('/integrations/fatsecret/callback', [FatSecretController::class, 'callback'])->name('fatsecret.callback');
+    Route::post('/integrations/fatsecret/sync', [FatSecretController::class, 'sync'])
+        ->middleware('throttle:6,1')->name('fatsecret.sync');
+    Route::post('/integrations/fatsecret/disconnect', [FatSecretController::class, 'disconnect'])->name('fatsecret.disconnect');
 
     // AI provider settings. Separate from the profile form because the two are
     // saved independently: changing a training preference should not require

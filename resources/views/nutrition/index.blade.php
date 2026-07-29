@@ -163,4 +163,22 @@
             </div>
         </details>
     @endif
+
+    {{-- Outside the target gate on purpose: someone arriving with months of
+         MyFitnessPal history should be able to bring it before anything else
+         is configured — the history is what makes the measurements real. --}}
+    <x-ui.card :title="__('app.nutrition.import.title')" class="mt-6">
+        <p class="text-sm text-body">{{ __('app.nutrition.import.help') }}</p>
+        <p class="mt-1 text-xs text-muted">{{ __('app.nutrition.import.sources_hint') }}</p>
+
+        <form method="POST" action="{{ route('nutrition.import') }}" enctype="multipart/form-data" class="mt-4 flex flex-wrap items-center gap-3">
+            @csrf
+            <input type="file" name="file" accept=".csv,text/csv" required
+                   class="text-sm text-body file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-lg file:border-0 file:bg-surface-sunk file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink hover:file:bg-strong/40">
+            <x-ui.button type="submit">{{ __('app.nutrition.import.submit') }}</x-ui.button>
+        </form>
+        <x-input-error class="mt-2" :messages="$errors->get('file')" />
+
+        <p class="mt-3 text-xs text-faint">{{ __('app.nutrition.import.idempotent') }}</p>
+    </x-ui.card>
 </x-ui.page>
