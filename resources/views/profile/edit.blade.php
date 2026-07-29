@@ -11,6 +11,8 @@
 
     @include('profile.partials.emails-form')
 
+    @include('profile.partials.calendar-style-form')
+
     @include('profile.partials.data-privacy')
 
     @include('profile.partials.update-password-form')

@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AiController;
 use App\Http\Controllers\AiSettingsController;
 use App\Http\Controllers\BodyCompositionController;
+use App\Http\Controllers\CalendarStyleController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\ConvertController;
 use App\Http\Controllers\DashboardController;
@@ -126,6 +127,7 @@ Route::middleware('auth')->group(function () {
     // One-tap unit switching for the dashboard welcome card; the profile form
     // sets the same column at full length.
     Route::post('/settings/units/{system}', UnitSystemController::class)->name('settings.units');
+    Route::post('/settings/calendar/{style}', CalendarStyleController::class)->name('settings.calendar');
 
     // FatSecret linking: OAuth 1.0 three-legged, so a fatsecret.com member can
     // let the app read their food diary without sharing their password.

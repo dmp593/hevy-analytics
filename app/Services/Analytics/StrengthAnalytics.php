@@ -196,6 +196,9 @@ class StrengthAnalytics
                     default => 'flat',
                 },
                 'per_week' => round($perWeek, 2),
+                // The slope as a share of the lift's own size, so a squat and
+                // a lateral raise read on the same scale.
+                'pct_per_week' => round($perWeek / $mean * 100, 2),
                 'sessions' => count($perDay),
                 'r2' => round($fit->r2, 3),
                 'reliable' => $fit->r2 >= self::RELIABLE_R2,
@@ -203,6 +206,45 @@ class StrengthAnalytics
         }
 
         return $out;
+    }
+
+    /**
+     * Every exercise with a fitted trend, merged with its name, muscle and
+     * set count, sorted worst-first (down, then flat, then up) so the page
+     * reads as triage. The thresholds are exerciseTrends()'s own — this is
+     * presentation over the same regression, never a second opinion.
+     *
+     * @return array<int, array{exercise: string, muscle: ?string, sets: int,
+     *                          direction: string, per_week: float, pct_per_week: float,
+     *                          sessions: int, reliable: bool}>
+     */
+    public function exerciseStatusBoard(?Collection $rows = null): array
+    {
+        $rows ??= $this->rows();
+        $trends = $this->exerciseTrends($rows);
+
+        $meta = [];
+        foreach ($rows as $r) {
+            $key = $r->exercise_template_hevy_id ?? $r->exercise_title;
+            $meta[$key]['exercise'] = $r->exercise_title;
+            $meta[$key]['muscle'] ??= $r->primary_muscle_group;
+            $meta[$key]['sets'] = ($meta[$key]['sets'] ?? 0) + 1;
+        }
+
+        $board = [];
+        foreach ($trends as $key => $trend) {
+            $board[] = [
+                'exercise' => $meta[$key]['exercise'] ?? (string) $key,
+                'muscle' => $meta[$key]['muscle'] ?? null,
+                'sets' => $meta[$key]['sets'] ?? 0,
+                ...$trend,
+            ];
+        }
+
+        $rank = ['down' => 0, 'flat' => 1, 'up' => 2];
+        usort($board, fn ($a, $b) => [$rank[$a['direction']], -$a['sets']] <=> [$rank[$b['direction']], -$b['sets']]);
+
+        return $board;
     }
 
     /**

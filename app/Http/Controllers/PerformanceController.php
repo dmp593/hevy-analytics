@@ -9,6 +9,7 @@ use App\Services\Analytics\StrengthAnalytics;
 use App\Services\Analytics\StrengthVerdict;
 use App\Services\Analytics\VolumeAnalytics;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class PerformanceController extends Controller
 {
@@ -16,11 +17,15 @@ class PerformanceController extends Controller
     {
         $user = $request->user();
 
+        $boardFilter = new FilterCriteria(from: Carbon::now()->subWeeks(8), to: Carbon::now());
+        $statusBoard = (new StrengthAnalytics($user, $boardFilter))->exerciseStatusBoard();
+
         return view('performance.index', array_merge(
             $this->payload($request),
             [
                 'routines' => $user->routines()->orderBy('title')->get(),
                 'muscles' => MuscleLandmarks::GROUPS,
+                'statusBoard' => $statusBoard,
             ]
         ));
     }

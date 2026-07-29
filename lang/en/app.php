@@ -1142,6 +1142,34 @@ return [
         'saved' => 'Email preferences saved.',
     ],
 
+    'calendar' => [
+        'title' => 'Training calendar style',
+        'subtitle' => 'Same data, two readings — pick the one your eyes already speak',
+        'heatmap' => 'Contribution grid (GitHub-style)',
+        'classic' => 'Classic month calendar',
+        'saved' => 'Calendar style saved.',
+    ],
+
+    'board' => [
+        'title' => 'Exercise status board',
+        'sub' => 'Every lift with a fitted 8-week e1RM trend, worst first',
+        'exercise' => 'Exercise',
+        'trend' => 'Trend',
+        'rate' => 'Rate',
+        'sessions' => 'Sessions',
+        'up' => 'climbing',
+        'flat' => 'flat',
+        'down' => 'declining',
+        'explain' => 'Each row is a linear regression over that lift\'s best reliable e1RM per session (Epley/Brzycki, RPE-adjusted). "Flat" means the slope is inside ±0.35% of the lift\'s own e1RM per week — the same band the dashboard\'s stall alert uses.',
+    ],
+
+    'overload' => [
+        'title' => 'Progressive overload by muscle',
+        'sub' => 'Set-weighted mean of each lift\'s e1RM slope — 8 weeks',
+        'lifts' => ':count lift|:count lifts',
+        'explain' => 'For each muscle: the average of its lifts\' e1RM slopes (% of each lift\'s own e1RM per week), weighted by hard sets. No opaque index — this is the same regression the status board shows per lift, aggregated with stated weights.',
+    ],
+
     'rhythm' => [
         'line' => ':sessions sessions in the last 6 months · median :duration · usually around :hours, mostly :days.',
         'sets' => ':count set|:count sets',

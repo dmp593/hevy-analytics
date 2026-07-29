@@ -1143,6 +1143,34 @@ return [
         'saved' => 'Preferências de email guardadas.',
     ],
 
+    'calendar' => [
+        'title' => 'Estilo do calendário de treino',
+        'subtitle' => 'Os mesmos dados, duas leituras — escolhe a que os teus olhos já falam',
+        'heatmap' => 'Grelha de contribuições (estilo GitHub)',
+        'classic' => 'Calendário mensal clássico',
+        'saved' => 'Estilo do calendário guardado.',
+    ],
+
+    'board' => [
+        'title' => 'Estado dos exercícios',
+        'sub' => 'Cada levantamento com tendência de e1RM ajustada a 8 semanas, pior primeiro',
+        'exercise' => 'Exercício',
+        'trend' => 'Tendência',
+        'rate' => 'Ritmo',
+        'sessions' => 'Sessões',
+        'up' => 'a subir',
+        'flat' => 'estável',
+        'down' => 'a descer',
+        'explain' => 'Cada linha é uma regressão linear sobre o melhor e1RM fiável por sessão desse levantamento (Epley/Brzycki, ajustado a RPE). "Estável" significa declive dentro de ±0,35% do e1RM do próprio levantamento por semana — a mesma banda do alerta de estagnação do dashboard.',
+    ],
+
+    'overload' => [
+        'title' => 'Sobrecarga progressiva por músculo',
+        'sub' => 'Média ponderada por séries dos declives de e1RM — 8 semanas',
+        'lifts' => ':count levantamento|:count levantamentos',
+        'explain' => 'Para cada músculo: a média dos declives de e1RM dos seus levantamentos (% do e1RM do próprio levantamento por semana), ponderada pelas séries efetivas. Sem índice opaco — é a mesma regressão que o quadro de estado mostra por levantamento, agregada com pesos declarados.',
+    ],
+
     'rhythm' => [
         'line' => ':sessions sessões nos últimos 6 meses · mediana :duration · normalmente por volta das :hours, sobretudo :days.',
         'sets' => ':count série|:count séries',

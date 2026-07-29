@@ -51,4 +51,45 @@
             <x-ui.button type="submit">{{ __('app.common.apply') }}</x-ui.button>
         </form>
     </details>
+
+    {{-- Triage over the same eight-week regressions the alerts use: every
+         lift with a fitted trend, worst first. No second opinion — the
+         thresholds are exerciseTrends()'s own, stated in the guide. --}}
+    @if (count($statusBoard))
+        <x-ui.card :title="__('app.board.title')" :subtitle="__('app.board.sub')" flush class="mt-6">
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead>
+                        <tr class="table-head">
+                            <th class="py-2 pl-5 pr-4 text-left">{{ __('app.board.exercise') }}</th>
+                            <th class="py-2 pr-4 text-left">{{ __('app.board.trend') }}</th>
+                            <th class="py-2 pr-4 text-right">{{ __('app.board.rate') }}</th>
+                            <th class="py-2 pr-5 text-right">{{ __('app.board.sessions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($statusBoard as $row)
+                            <tr class="table-row">
+                                <td class="py-2 pl-5 pr-4">{{ $row['exercise'] }}</td>
+                                <td class="py-2 pr-4">
+                                    <span @class([
+                                        'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold',
+                                        'bg-good/10 text-good' => $row['direction'] === 'up',
+                                        'bg-warn/10 text-warn' => $row['direction'] === 'flat',
+                                        'bg-bad/10 text-bad' => $row['direction'] === 'down',
+                                    ])>
+                                        {{ ['up' => '↑', 'flat' => '→', 'down' => '↓'][$row['direction']] }}
+                                        {{ __('app.board.'.$row['direction']) }}
+                                    </span>
+                                </td>
+                                <td class="py-2 pr-4 text-right tabular-nums">{{ sprintf('%+.2f', $row['pct_per_week']) }}%/{{ __('app.mail.weekly.week_abbr') }}</td>
+                                <td class="py-2 pr-5 text-right tabular-nums">{{ $row['sessions'] }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <p class="px-5 py-3 text-xs text-muted">{{ __('app.board.explain') }}</p>
+        </x-ui.card>
+    @endif
 </x-ui.page>

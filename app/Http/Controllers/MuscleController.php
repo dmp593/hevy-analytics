@@ -6,6 +6,7 @@ use App\Science\Volume\MuscleLandmarks;
 use App\Services\Analytics\EffortAnalysis;
 use App\Services\Analytics\FilterCriteria;
 use App\Services\Analytics\MuscleBalance;
+use App\Services\Analytics\MuscleOverload;
 use App\Services\Analytics\MuscleVerdict;
 use App\Services\Analytics\VolumeAnalytics;
 use Illuminate\Http\Request;
@@ -21,6 +22,7 @@ class MuscleController extends Controller
             // Fixed 28-day window on purpose: effort is a recent habit, not a
             // property of whatever range the filter above happens to show.
             'effort' => (new EffortAnalysis($user))->summary(),
+            'overload' => (new MuscleOverload($user))->perMuscle(),
         ]));
     }
 

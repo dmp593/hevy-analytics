@@ -64,4 +64,28 @@
             @endif
         </x-ui.card>
     @endif
+
+    {{-- Progressive overload per muscle: the set-weighted mean of each
+         lift's e1RM slope over eight weeks — the transparent version of a
+         "progressive overload index". The formula is in the tooltip. --}}
+    @if (count($overload))
+        <x-ui.card :title="__('app.overload.title')" :subtitle="__('app.overload.sub')" class="mt-6">
+            <ul class="space-y-2">
+                @foreach ($overload as $m)
+                    <li class="flex items-center justify-between gap-4 text-sm">
+                        <span class="text-ink">{{ \App\Support\Labels::muscle($m['muscle']) }}
+                            <span class="text-xs text-faint">· {{ trans_choice('app.overload.lifts', $m['lifts'], ['count' => $m['lifts']]) }}</span>
+                        </span>
+                        <span @class([
+                            'tabular-nums font-semibold',
+                            'text-good' => $m['direction'] === 'up',
+                            'text-muted' => $m['direction'] === 'flat',
+                            'text-bad' => $m['direction'] === 'down',
+                        ])>{{ sprintf('%+.2f', $m['pct_per_week']) }}%/{{ __('app.mail.weekly.week_abbr') }}</span>
+                    </li>
+                @endforeach
+            </ul>
+            <p class="mt-3 text-xs text-muted">{{ __('app.overload.explain') }}</p>
+        </x-ui.card>
+    @endif
 </x-ui.page>

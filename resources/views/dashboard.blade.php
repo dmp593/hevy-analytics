@@ -123,7 +123,11 @@
 
                     @if ($rhythm)
                         <div class="mt-4 rounded-xl border border-line bg-surface px-5 py-4">
-                            <x-training-heatmap :rhythm="$rhythm" />
+                            @if (auth()->user()->calendar_style === 'classic')
+                                <x-training-calendar :rhythm="$rhythm" />
+                            @else
+                                <x-training-heatmap :rhythm="$rhythm" />
+                            @endif
                             <p class="mt-3 text-xs text-muted">
                                 {{ __('app.rhythm.line', [
                                     'sessions' => $rhythm['sessions'],
