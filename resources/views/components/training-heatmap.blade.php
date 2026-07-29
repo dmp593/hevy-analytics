@@ -8,20 +8,14 @@
     $today = \Illuminate\Support\Carbon::now(auth()->user()->resolvedTimezone())->toDateString();
     $max = max(1, $rhythm['max']);
 
-    // Quartile shading relative to the athlete's own densest day, so a
-    // 10-set lifter and a 30-set lifter both get a full-range map.
-    $shade = function (int $sets) use ($max): string {
-        if ($sets === 0) {
-            return 'bg-surface-sunk';
-        }
-        $q = $sets / $max;
-
-        return match (true) {
-            $q > 0.75 => 'bg-brand',
-            $q > 0.5 => 'bg-brand/70',
-            $q > 0.25 => 'bg-brand/45',
-            default => 'bg-brand/25',
-        };
+    // Bucketing lives on TrainingRhythm so both calendar styles agree on
+    // what "dark" means; this component only maps buckets to classes.
+    $shade = fn (int $sets): string => match (\App\Services\Analytics\TrainingRhythm::bucket($sets, $max)) {
+        'q4' => 'bg-brand',
+        'q3' => 'bg-brand/70',
+        'q2' => 'bg-brand/45',
+        'q1' => 'bg-brand/25',
+        default => 'bg-surface-sunk',
     };
 @endphp
 

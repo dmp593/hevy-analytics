@@ -20,6 +20,26 @@ class TrainingRhythm
     public function __construct(private readonly User $user) {}
 
     /**
+     * Which intensity bucket a day falls in, relative to the athlete's own
+     * densest day — the ONE place the quartile thresholds live, so the two
+     * calendar renderings can never disagree about what "dark" means.
+     */
+    public static function bucket(int $sets, int $max): string
+    {
+        if ($sets === 0 || $max <= 0) {
+            return 'none';
+        }
+        $q = $sets / $max;
+
+        return match (true) {
+            $q > 0.75 => 'q4',
+            $q > 0.5 => 'q3',
+            $q > 0.25 => 'q2',
+            default => 'q1',
+        };
+    }
+
+    /**
      * @return array{
      *     days: array<string, int>,
      *     max: int,

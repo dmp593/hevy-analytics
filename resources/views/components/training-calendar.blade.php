@@ -8,18 +8,14 @@
     $today = \Illuminate\Support\Carbon::now($tz);
     $max = max(1, $rhythm['max']);
 
-    $shade = function (int $sets) use ($max): string {
-        if ($sets === 0) {
-            return '';
-        }
-        $q = $sets / $max;
-
-        return match (true) {
-            $q > 0.75 => 'bg-brand text-on-fill',
-            $q > 0.5 => 'bg-brand/70 text-on-fill',
-            $q > 0.25 => 'bg-brand/45 text-ink',
-            default => 'bg-brand/25 text-ink',
-        };
+    // Same buckets as the contribution grid — TrainingRhythm::bucket() is
+    // the single source; only the class mapping differs.
+    $shade = fn (int $sets): string => match (\App\Services\Analytics\TrainingRhythm::bucket($sets, $max)) {
+        'q4' => 'bg-brand text-on-fill',
+        'q3' => 'bg-brand/70 text-on-fill',
+        'q2' => 'bg-brand/45 text-ink',
+        'q1' => 'bg-brand/25 text-ink',
+        default => '',
     };
 @endphp
 

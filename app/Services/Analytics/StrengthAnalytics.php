@@ -116,7 +116,7 @@ class StrengthAnalytics
      * Relative rather than absolute, because 2kg/year is a stall on a squat and
      * respectable on a lateral raise.
      */
-    private const FLAT_SLOPE_FRACTION = 0.0005;
+    public const FLAT_SLOPE_FRACTION = 0.0005;
 
     /**
      * Below this R², the points are scattered enough that the direction is a

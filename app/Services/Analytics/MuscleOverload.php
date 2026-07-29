@@ -19,8 +19,6 @@ class MuscleOverload
 {
     private const WEEKS = 8;
 
-    private const FLAT_PCT_PER_WEEK = 0.35;
-
     public function __construct(private readonly User $user) {}
 
     /**
@@ -47,6 +45,8 @@ class MuscleOverload
             $byMuscle[$muscle]['lifts'] = ($byMuscle[$muscle]['lifts'] ?? 0) + 1;
         }
 
+        $flatBand = StrengthAnalytics::FLAT_SLOPE_FRACTION * 7 * 100;
+
         $out = [];
         foreach ($byMuscle as $muscle => $m) {
             if ($m['sets'] === 0) {
@@ -56,9 +56,11 @@ class MuscleOverload
             $out[] = [
                 'muscle' => $muscle,
                 'pct_per_week' => $pct,
+                // The flat band is StrengthAnalytics's own (±0.35%/week),
+                // derived rather than restated so the two can never drift.
                 'direction' => match (true) {
-                    $pct > self::FLAT_PCT_PER_WEEK => 'up',
-                    $pct < -self::FLAT_PCT_PER_WEEK => 'down',
+                    $pct > $flatBand => 'up',
+                    $pct < -$flatBand => 'down',
                     default => 'flat',
                 },
                 'lifts' => $m['lifts'],
