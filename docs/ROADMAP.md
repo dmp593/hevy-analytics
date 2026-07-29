@@ -175,6 +175,16 @@ Fica para um passe 2 (médio, sem urgência): extrair um CsvReader comum aos
 (fat-source e sítio Navy duplicados internamente); partir GoalAlerts::all()
 em famílias; 4 botões feitos à mão → x-ui.button.
 
+## Princípio de produto (dono, 2026-07-29, permanente)
+
+"O meu ponto forte será sempre sustentar toda a informação gráfica e textual
+com base na ciência e fórmulas matemáticas comprovadas." Critério de
+aceitação para QUALQUER métrica/gráfico/frase novos: fórmula com nome +
+fonte citável (paper/guideline), incerteza declarada quando existe, e recusa
+explícita de números mágicos ou compósitos opacos — mesmo que a concorrência
+os tenha e sejam vistosos. Já recusados ao abrigo disto: idade metabólica,
+BRI, score único, "frescura muscular" tipo Fitbod.
+
 ## Regras operacionais que já custaram caro (não repetir)
 
 - O ambiente das sessões renasce em snapshots antigos: **começar QUALQUER
