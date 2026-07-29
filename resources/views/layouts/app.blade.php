@@ -71,9 +71,13 @@
             @endisset
 
             <!-- Page Content -->
-            <main id="main" tabindex="-1">
+            {{-- The bottom padding keeps the last card reachable above the
+                 fixed mobile tab bar; at lg the bar is gone and so is it. --}}
+            <main id="main" tabindex="-1" class="pb-20 lg:pb-0">
                 {{ $slot }}
             </main>
+
+            @include('layouts.bottom-nav')
         </div>
     </body>
 </html>

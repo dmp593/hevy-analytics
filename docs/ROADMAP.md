@@ -4,7 +4,7 @@
 > sessões: estado real, pendentes de cada lado, e planos discutidos mas ainda
 > não executados. Em português porque o dono do produto lê em português.
 
-## Em produção (tudo verde, 1011 testes)
+## Em produção (tudo verde, 1019 testes)
 
 | Área | Estado |
 |---|---|
@@ -136,6 +136,11 @@ implementado. caso não esteja, implementa". A análise exaustiva encontrou:
   lift estagnado (8 sem) + última sessão a RPE 9,5+ → recuar ~7,5% (arredondado
   a 2,5 kg) para reconstruir com 1-2 reps na reserva (Refalo 2024). É o
   "desce 10 kg no deadlift" do DeepSeek, sistematizado.
+- **Navegação reorganizada (2026-07-29, "avança" do dono)**: 4 secções — Hoje /
+  Treino / Corpo (agora com Projeções) / **Nutrição promovida a secção** —,
+  grupo "Os meus dados" no menu do avatar (Importar, Converter, Escritas no
+  Hevy, Exportar) para as portas de dados deixarem de estar invisíveis, e
+  barra de separadores fixa em baixo no telemóvel (as 4 secções, com ícones).
 - **Recusado/adiado**: "frescura muscular" tipo Fitbod (heurística vestida de
   fisiologia — só com pedido explícito).
 

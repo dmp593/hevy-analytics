@@ -49,7 +49,17 @@
                             <x-dropdown-link :href="route('admin.users')">{{ __('app.nav.admin') }}</x-dropdown-link>
                         @endif
                         <x-dropdown-link :href="route('guide')">{{ __('app.nav.guide') }}</x-dropdown-link>
+
+                        {{-- The data doors, gathered: import, convert, write-back
+                             and export were scattered behind page-level links, and
+                             a paid feature nobody can find is not a feature. --}}
+                        <div class="border-t border-subtle px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-faint">{{ __('app.nav.my_data') }}</div>
+                        <x-dropdown-link :href="route('import')">{{ __('app.nav.import') }}</x-dropdown-link>
+                        <x-dropdown-link :href="route('convert')">{{ __('app.nav.convert') }}</x-dropdown-link>
                         <x-dropdown-link :href="route('write.index')">{{ __('app.nav.write_operations') }}</x-dropdown-link>
+                        <x-dropdown-link :href="route('settings.export')">{{ __('app.nav.export') }}</x-dropdown-link>
+
+                        <div class="border-t border-subtle"></div>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">{{ __('app.nav.log_out') }}</x-dropdown-link>
@@ -113,7 +123,11 @@
             <x-responsive-nav-link :href="route('profile.edit')">{{ __('app.nav.profile') }}</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('billing')">{{ __('app.nav.billing') }}</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('guide')">{{ __('app.nav.guide') }}</x-responsive-nav-link>
+            <p class="px-4 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-faint">{{ __('app.nav.my_data') }}</p>
+            <x-responsive-nav-link :href="route('import')">{{ __('app.nav.import') }}</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('convert')">{{ __('app.nav.convert') }}</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('write.index')">{{ __('app.nav.write_operations') }}</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('settings.export')">{{ __('app.nav.export') }}</x-responsive-nav-link>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">{{ __('app.nav.log_out') }}</x-responsive-nav-link>

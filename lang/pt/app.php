@@ -374,6 +374,10 @@ return [
         'sync' => 'Sincronizar',
         'profile' => 'Perfil e definições',
         'write_operations' => 'Operações de escrita',
+        'my_data' => 'Os meus dados',
+        'import' => 'Importar (CSV)',
+        'convert' => 'Converter para outra app',
+        'export' => 'Exportar tudo (ZIP)',
         'log_out' => 'Terminar sessão',
         'toggle' => 'Alternar navegação',
         'primary' => 'Principal',
@@ -1215,8 +1219,8 @@ return [
         'training_question' => 'Estou a ficar mais forte?',
         'body' => 'Corpo',
         'body_question' => 'O meu corpo está a mudar como quero?',
-        'outlook' => 'Perspetiva',
-        'outlook_question' => 'Onde é que isto vai dar?',
+        'nutrition' => 'Nutrição',
+        'nutrition_question' => 'Estou a comer para o objetivo que defini?',
     ],
 
     'pages' => [

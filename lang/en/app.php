@@ -374,6 +374,10 @@ return [
         'sync' => 'Sync Hevy',
         'profile' => 'Profile & Settings',
         'write_operations' => 'Write Operations',
+        'my_data' => 'My data',
+        'import' => 'Import (CSV)',
+        'convert' => 'Convert to another app',
+        'export' => 'Export everything (ZIP)',
         'log_out' => 'Log Out',
         'toggle' => 'Toggle navigation',
         'primary' => 'Primary',
@@ -1214,8 +1218,8 @@ return [
         'training_question' => 'Am I getting stronger?',
         'body' => 'Body',
         'body_question' => 'Is my body changing the way I want?',
-        'outlook' => 'Outlook',
-        'outlook_question' => 'Where does this end up?',
+        'nutrition' => 'Nutrition',
+        'nutrition_question' => 'Am I eating for the goal I set?',
     ],
 
     /*

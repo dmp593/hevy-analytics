@@ -54,18 +54,21 @@ class Navigation
                 'route' => 'body',
                 'children' => [
                     self::item('body', __('app.nav.body'), 'body'),
-                    self::item('nutrition', __('app.nav.nutrition'), 'nutrition'),
                     self::item('photos', __('app.nav.photos'), 'photos'),
                     self::item('compare', __('app.nav.compare'), 'compare'),
+                    self::item('projections', __('app.nav.projections'), 'projections'),
                 ],
             ],
+            // Nutrition earned its own tab the day it stopped being one page's
+            // worth of content: targets, the food diary, diet-app imports,
+            // FatSecret and steps/sleep all live behind this one route.
             [
-                'key' => 'outlook',
-                'label' => __('app.sections.outlook'),
-                'question' => __('app.sections.outlook_question'),
-                'route' => 'projections',
+                'key' => 'nutrition',
+                'label' => __('app.sections.nutrition'),
+                'question' => __('app.sections.nutrition_question'),
+                'route' => 'nutrition',
                 'children' => [
-                    self::item('projections', __('app.nav.projections'), 'projections'),
+                    self::item('nutrition', __('app.nav.nutrition'), 'nutrition'),
                 ],
             ],
         ];
