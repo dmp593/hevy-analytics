@@ -1036,6 +1036,7 @@ return [
         'linked_since' => 'Linked since :date.',
         'last_sync' => 'last sync :when',
         'sync_now' => 'Sync now',
+        'already_syncing' => 'A sync is already running — give it a moment.',
         'disconnect' => 'Unlink',
         'unlinked' => 'FatSecret account unlinked; nothing more will be read.',
         'synced' => '{0}Synced — no diary entries in the last days.|{1}Synced totals for 1 day.|[2,*]Synced totals for :days days.',

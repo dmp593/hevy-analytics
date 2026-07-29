@@ -1037,6 +1037,7 @@ return [
         'linked_since' => 'Ligada desde :date.',
         'last_sync' => 'última sincronização :when',
         'sync_now' => 'Sincronizar agora',
+        'already_syncing' => 'Já há uma sincronização a correr — dá-lhe um momento.',
         'disconnect' => 'Desligar',
         'unlinked' => 'Conta FatSecret desligada; nada mais será lido.',
         'synced' => '{0}Sincronizado — sem registos no diário nos últimos dias.|{1}Sincronizados os totais de 1 dia.|[2,*]Sincronizados os totais de :days dias.',

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\FatSecret\FatSecretSync;
 use App\Services\FatSecret\OAuth1;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
@@ -137,6 +138,37 @@ class FatSecretTest extends TestCase
         $log = $user->intakeLogs()->whereDate('date', $today)->firstOrFail();
         $this->assertEqualsWithDelta(82.5, (float) $log->weight_kg, 0.01);
         $this->assertSame(900, (int) $log->calories);
+    }
+
+    /** A double-click must not read a second week from the API. */
+    public function test_a_concurrent_sync_click_is_told_one_is_running(): void
+    {
+        $user = $this->linked();
+        Http::fake();
+
+        // Simulate the first click still holding the per-user lock.
+        Cache::lock('fatsecret-sync:'.$user->id, 120)->get();
+
+        $this->actingAs($user)->post('/integrations/fatsecret/sync')
+            ->assertRedirect()
+            ->assertSessionHas('status', __('app.fatsecret.already_syncing'));
+
+        Http::assertNothingSent();
+    }
+
+    /** Past the honest double-click, raw abuse meets the route throttle. */
+    public function test_hammering_the_sync_button_earns_a_429(): void
+    {
+        $user = $this->linked();
+        Http::fake([
+            'platform.fatsecret.com/*' => Http::response(['food_entries' => null]),
+        ]);
+
+        foreach (range(1, 6) as $i) {
+            $this->actingAs($user)->post('/integrations/fatsecret/sync')->assertRedirect();
+        }
+
+        $this->actingAs($user)->post('/integrations/fatsecret/sync')->assertStatus(429);
     }
 
     public function test_disconnect_clears_the_link(): void

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\FatSecret\FatSecretClient;
 use App\Services\FatSecret\FatSecretSync;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Linking a fatsecret.com account: the classic OAuth 1.0 three-legged dance.
@@ -63,12 +64,23 @@ class FatSecretController extends Controller
     {
         abort_unless($request->user()->fatsecret_linked_at !== null, 404);
 
+        // The route throttle answers raw abuse with 429s; this answers the
+        // honest double-click. The sync runs inline, so without a lock two
+        // tabs would each read a week from the API for nothing.
+        $lock = Cache::lock('fatsecret-sync:'.$request->user()->id, 120);
+
+        if (! $lock->get()) {
+            return back()->with('status', __('app.fatsecret.already_syncing'));
+        }
+
         try {
             $days = (new FatSecretSync)->run($request->user());
         } catch (\Throwable $e) {
             report($e);
 
             return back()->with('error', __('app.fatsecret.sync_failed'));
+        } finally {
+            $lock->release();
         }
 
         return back()->with('status', trans_choice('app.fatsecret.synced', $days, ['days' => $days]));
