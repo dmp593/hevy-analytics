@@ -4,7 +4,7 @@
 > sessões: estado real, pendentes de cada lado, e planos discutidos mas ainda
 > não executados. Em português porque o dono do produto lê em português.
 
-## Em produção (tudo verde, 1027 testes)
+## Em produção (tudo verde, 1041 testes)
 
 | Área | Estado |
 |---|---|
@@ -157,10 +157,17 @@ HevyWorkoutAnalyzer, Data Visualiser) e o Loadline, e construir o que falta
 ou está pior, com interface mais apelativa. Entregue já: **heatmap de
 calendário** (26 semanas, estilo GitHub, server-rendered) + **ritmo de
 treino** (mediana de duração, horas e dias típicos) no dashboard, secção
-Consistência. Aguarda a lista de lacunas do agente de investigação para o
-lote 2 (candidatos: timeline de PRs, índice de sobrecarga por músculo tipo
-Loadline/POI, análise de splits). CSV do dono em scratchpad/hevy.csv (não
-comitar!).
+Consistência. Lote 2 entregue (2026-07-29): **calendário clássico** em alternativa ao
+heatmap (escolha no Perfil, users.calendar_style — pedido do dono a meio),
+**quadro de estado dos exercícios** na Performance (triagem a
+subir/estável/a descer sobre as mesmas regressões dos alertas, pior
+primeiro) e **sobrecarga progressiva por músculo** (média dos declives de
+e1RM ponderada por séries — o "POI" do Loadline em versão transparente).
+Da lista do agente ficam por fazer, todos ciência-compatíveis e só-CSV:
+cartões partilháveis/"Year Wrapped", delta semanal por músculo, scatter
+peso×reps, timeline de PRs por mês, analytics por equipamento. Recusado:
+dashboard de widgets drag-and-drop (build pesado, zero ciência). CSV do
+dono em scratchpad/hevy.csv (não comitar!).
 
 ## Dívida de legibilidade conhecida (auditoria 2026-07-29, passe 2 pendente)
 
