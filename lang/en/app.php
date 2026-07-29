@@ -1108,8 +1108,47 @@ return [
         'volume_spike_body' => ':recent hard sets in the last 7 days against a ~:baseline/week average over the month before. Evidence tying load spikes to injury is mixed, but a ramp this sharp is worth making deliberate rather than accidental.',
         'stalled_lifts' => 'Top lifts not progressing',
         'stalled_lifts_body' => 'No upward e1RM trend over the last 8 weeks for: :lifts. Worth reviewing progression, sleep and calories — or planning a deliberate overload block.',
+        'stalled_deload' => 'Effort is also climbing at the same load (top-set RPE +:delta) — the classic accumulated-fatigue picture. A deload week costs no muscle (Coleman 2024); it buys recovery.',
         'no_data' => 'Not enough data yet',
         'no_data_body' => 'Log a few more body measurements over time to unlock trend-based alerts.',
+    ],
+
+    'consistency' => [
+        'title' => 'Consistency',
+        'sessions_week' => 'Sessions this week',
+        'avg_week' => '4-week average: :avg/wk',
+        'streak' => 'Week streak',
+        'weeks' => 'week|weeks',
+        'muscle_frequency' => 'Muscles at ~2×/week',
+        'early_days' => 'Your first four weeks are the ones that predict whether training sticks — right now, showing up matters more than any programming choice.',
+    ],
+
+    'effort' => [
+        'title' => 'Effort (RPE)',
+        'sub' => 'How close your sets get to failure — last 28 days, from logged RPE',
+        'low_coverage' => 'Only :pct% of your recent sets carry an RPE — too few to read honestly. Log RPE in Hevy and this section fills in.',
+        'all_close' => 'Your logged sets train close to failure — that is where the growth stimulus lives.',
+        'far_share' => ':pct% of :sets sets at 4+ reps in reserve',
+        'explain' => 'Muscle grows more as sets approach failure (Robinson et al. 2024, 55-study meta-regression). Sets at RPE 6.5 or below leave roughly four or more reps in reserve — fine for technique work and warm-up waves, but a muscle trained mostly there gets less growth stimulus per set than its volume suggests.',
+        'strength_caveat' => 'For pure strength, proximity to failure matters far less — with a strength goal, read this as information, not instruction.',
+    ],
+
+    'health' => [
+        'title' => 'Steps & sleep',
+        'sub' => 'Daily context from your phone or watch — averages over the last 14 days',
+        'avg_steps' => 'Avg. steps/day',
+        'avg_sleep' => 'Avg. sleep/night',
+        'activity_mismatch' => 'Activity level check',
+        'sedentary_but_set_high' => 'Your step count reads sedentary, but the activity level in your profile is set high — the formula TDEE may be overestimating what you burn. The adaptive measurement corrects this over weeks of logging; adjusting the level in your profile corrects it today.',
+        'active_but_set_low' => 'Your step count reads very active, but the activity level in your profile is set low — the formula TDEE may be underestimating what you burn. Adjusting the level in your profile fixes it today.',
+        'help' => 'Upload a CSV with a date column plus steps and/or sleep. Apple Health exports via apps like Health Auto Export; Fitbit and Garmin export CSVs directly.',
+        'sources_hint' => 'Hourly rows are summed per day. Sleep can be in hours or minutes — the column header decides.',
+        'done' => 'Imported health data for :days day.|Imported health data for :days days.',
+        'errors' => [
+            'not_health' => 'This file does not look like health data: it needs a date column plus a steps or sleep column.',
+            'nothing_found' => 'No usable rows found in this file.',
+            'absurd_day' => 'The totals on :date are beyond anything human — skipped (check the file units).',
+        ],
     ],
 
     'goals' => [
@@ -1214,6 +1253,8 @@ return [
         'body_fat' => 'Percent of your weight that is fat. Navy = an independent tape-measure estimate used as a cross-check.',
         'lean_mass' => "Everything that isn't fat (mostly muscle). FFMI = muscularity adjusted for height; ~25 is near the natural ceiling for men.",
         'hard_sets' => 'Total working sets (warm-ups excluded) in the last 4 weeks — the main driver of muscle growth.',
+        'consistency' => 'Distinct training days this calendar week, with your four-week average beside it. The 2026 ACSM guidelines rank consistent sessions above every programming detail.',
+        'muscle_frequency' => 'Of the muscles you trained in the last four weeks, how many got about two sessions a week — the frequency the guidelines ask for. Counted by the days a muscle received hard sets, allowing one missed session a month.',
         'landmarks' => "Hard working sets per muscle each week. MEV = minimum to grow, MAV = best-return zone. Aim between them. 'Below maintenance' means too few sets to grow.",
     ],
 

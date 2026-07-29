@@ -130,4 +130,42 @@ class GoalAlertsTest extends TestCase
 
         $this->assertNotContains(__('app.alerts.stalled_lifts'), $this->titles($user));
     }
+
+    public function test_a_stall_with_rising_rpe_at_the_same_load_suggests_a_deload(): void
+    {
+        $user = $this->makeAthlete();
+        $this->seedExerciseTemplates($user, ['bp' => ['Bench Press', 'chest', []]]);
+
+        // Same load for eight weeks while the effort climbs: RPE 7 in the
+        // first month, 8.5 in the second — the accumulated-fatigue picture.
+        foreach (range(1, 8) as $week) {
+            $rpe = $week <= 4 ? 8.5 : 7.0; // week 1 = most recent
+            $this->seedWorkout($user, Carbon::now()->subWeeks($week)->addDay(), ['bp'], 3, 100.0, 5, rpe: $rpe);
+        }
+
+        $alerts = (new GoalAlerts($user))->all();
+        $stall = collect($alerts)->firstWhere('title', __('app.alerts.stalled_lifts'));
+
+        $this->assertNotNull($stall);
+        $this->assertStringContainsString(
+            __('app.alerts.stalled_deload', ['delta' => '1.5']),
+            $stall['message'],
+        );
+    }
+
+    public function test_a_stall_at_steady_effort_makes_no_deload_claim(): void
+    {
+        $user = $this->makeAthlete();
+        $this->seedExerciseTemplates($user, ['bp' => ['Bench Press', 'chest', []]]);
+
+        foreach (range(1, 8) as $week) {
+            $this->seedWorkout($user, Carbon::now()->subWeeks($week)->addDay(), ['bp'], 3, 100.0, 5, rpe: 8.0);
+        }
+
+        $stall = collect((new GoalAlerts($user))->all())
+            ->firstWhere('title', __('app.alerts.stalled_lifts'));
+
+        $this->assertNotNull($stall);
+        $this->assertStringNotContainsString('Coleman', $stall['message']);
+    }
 }

@@ -232,14 +232,19 @@ class GoalAlerts
         $trends = $sa->exerciseTrends($rows);
 
         $stalled = [];
+        $creep = null;
         foreach (array_slice($prs, 0, 3) as $p) {
-            $t = $trends[$p['template_id'] ?? $p['exercise']] ?? null;
+            $key = $p['template_id'] ?? $p['exercise'];
+            $t = $trends[$key] ?? null;
 
             // Reliability (r²) is deliberately not required here: a genuinely
             // flat line explains no variance, so its r² is near zero and the
             // flag would exclude exactly the lifts this alert exists to catch.
             if ($t !== null && $t['sessions'] >= self::STALL_MIN_SESSIONS && $t['direction'] !== 'up') {
                 $stalled[] = $p['exercise'];
+                if (($rise = $this->rpeCreep($rows, $key)) !== null) {
+                    $creep = max($creep ?? 0.0, $rise);
+                }
             }
         }
 
@@ -247,8 +252,63 @@ class GoalAlerts
             return null;
         }
 
-        return $this->alert('info', __('app.alerts.stalled_lifts'),
-            __('app.alerts.stalled_lifts_body', ['lifts' => implode(', ', $stalled)]));
+        $body = __('app.alerts.stalled_lifts_body', ['lifts' => implode(', ', $stalled)]);
+
+        // Flat bar + rising effort at the same load is the classic accumulated-
+        // fatigue picture, and the honest deload pitch: the one direct study
+        // (Coleman 2024) found a week off cost no muscle — it buys recovery,
+        // not growth.
+        if ($creep !== null) {
+            $body .= ' '.__('app.alerts.stalled_deload', ['delta' => number_format($creep, 1)]);
+        }
+
+        return $this->alert('info', __('app.alerts.stalled_lifts'), $body);
+    }
+
+    /**
+     * Rising effort at an unchanged load: mean top-set RPE across the later
+     * half of matched-load sessions minus the earlier half. Returns the rise
+     * when it clears 0.8 RPE with at least four matched sessions, else null —
+     * lifts without logged RPE simply cannot creep.
+     */
+    private function rpeCreep(Collection $rows, string $key): ?float
+    {
+        $byDay = [];
+        foreach ($rows as $r) {
+            $rowKey = $r->exercise_template_hevy_id ?? $r->exercise_title;
+            if ($rowKey !== $key || ! $r->start_time || $r->rpe === null || ! $r->weight_kg) {
+                continue;
+            }
+            $day = PeriodService::localDate(Carbon::parse($r->start_time), $this->user->resolvedTimezone());
+            $current = $byDay[$day] ?? null;
+            if ($current === null || (float) $r->weight_kg > (float) $current->weight_kg) {
+                $byDay[$day] = $r;
+            }
+        }
+
+        if (count($byDay) < 4) {
+            return null;
+        }
+
+        ksort($byDay);
+        $sets = array_values($byDay);
+        $latestLoad = (float) end($sets)->weight_kg;
+
+        $matched = array_values(array_filter(
+            $sets,
+            fn ($s) => abs((float) $s->weight_kg - $latestLoad) <= $latestLoad * 0.025
+        ));
+
+        if (count($matched) < 4) {
+            return null;
+        }
+
+        $half = intdiv(count($matched), 2);
+        $mean = fn (array $chunk) => array_sum(array_map(fn ($s) => (float) $s->rpe, $chunk)) / count($chunk);
+
+        $delta = $mean(array_slice($matched, -$half)) - $mean(array_slice($matched, 0, $half));
+
+        return $delta >= 0.8 ? round($delta, 1) : null;
     }
 
     private function alert(string $level, string $title, string $message): array

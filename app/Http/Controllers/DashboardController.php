@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\Analytics\BodyCompAnalytics;
+use App\Services\Analytics\ConsistencyAnalytics;
 use App\Services\Analytics\FilterCriteria;
 use App\Services\Analytics\GoalAlerts;
 use App\Services\Analytics\MuscleBalance;
@@ -45,6 +46,7 @@ class DashboardController extends Controller
             'rate' => $bc->weightRateKgPerWeek(),
             'partitioning' => $bc->partitioning(),
             'alerts' => (new GoalAlerts($user))->all(),
+            'consistency' => (new ConsistencyAnalytics($user))->summary(),
             'goal' => $user->activeGoal(),
             'weekVolume' => $volume->tonnage(),
             'weekSets' => $volume->totalSets(),

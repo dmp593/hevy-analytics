@@ -1109,8 +1109,47 @@ return [
         'volume_spike_body' => ':recent séries efetivas nos últimos 7 dias contra uma média de ~:baseline/semana no mês anterior. A evidência que liga picos de carga a lesões é mista, mas uma subida assim tão acentuada merece ser deliberada e não acidental.',
         'stalled_lifts' => 'Levantamentos principais sem progresso',
         'stalled_lifts_body' => 'Sem tendência de subida no e1RM nas últimas 8 semanas em: :lifts. Vale a pena rever a progressão, o sono e as calorias — ou planear um bloco deliberado de sobrecarga.',
+        'stalled_deload' => 'O esforço também está a subir com a mesma carga (RPE da série principal +:delta) — o retrato clássico de fadiga acumulada. Uma semana de deload não custa músculo (Coleman 2024); compra recuperação.',
         'no_data' => 'Ainda sem dados suficientes',
         'no_data_body' => 'Registe mais algumas medições corporais ao longo do tempo para desbloquear alertas baseados em tendências.',
+    ],
+
+    'consistency' => [
+        'title' => 'Consistência',
+        'sessions_week' => 'Sessões esta semana',
+        'avg_week' => 'Média de 4 semanas: :avg/sem',
+        'streak' => 'Semanas seguidas',
+        'weeks' => 'semana|semanas',
+        'muscle_frequency' => 'Músculos a ~2×/semana',
+        'early_days' => 'As primeiras quatro semanas são as que preveem se o treino pega — neste momento, aparecer vale mais do que qualquer escolha de programação.',
+    ],
+
+    'effort' => [
+        'title' => 'Esforço (RPE)',
+        'sub' => 'Quão perto da falha ficam as tuas séries — últimos 28 dias, a partir do RPE registado',
+        'low_coverage' => 'Só :pct% das tuas séries recentes têm RPE — poucas de mais para uma leitura honesta. Regista o RPE no Hevy e esta secção preenche-se.',
+        'all_close' => 'As tuas séries registadas treinam perto da falha — é aí que vive o estímulo de crescimento.',
+        'far_share' => ':pct% de :sets séries a 4+ reps da falha',
+        'explain' => 'O músculo cresce mais quando as séries se aproximam da falha (Robinson et al. 2024, meta-regressão de 55 estudos). Séries a RPE 6,5 ou menos ficam a cerca de quatro ou mais repetições da falha — bom para técnica e aproximações, mas um músculo treinado sobretudo aí recebe menos estímulo por série do que o volume sugere.',
+        'strength_caveat' => 'Para força pura, a proximidade da falha importa muito menos — com objetivo de força, lê isto como informação, não como instrução.',
+    ],
+
+    'health' => [
+        'title' => 'Passos e sono',
+        'sub' => 'Contexto diário do teu telemóvel ou relógio — médias dos últimos 14 dias',
+        'avg_steps' => 'Passos/dia (média)',
+        'avg_sleep' => 'Sono/noite (média)',
+        'activity_mismatch' => 'Verificação do nível de atividade',
+        'sedentary_but_set_high' => 'Os teus passos indicam um dia a dia sedentário, mas o nível de atividade no perfil está alto — o TDEE de fórmula pode estar a sobrestimar o que gastas. A medição adaptativa corrige isto ao longo de semanas de registos; ajustar o nível no perfil corrige-o hoje.',
+        'active_but_set_low' => 'Os teus passos indicam um dia a dia muito ativo, mas o nível de atividade no perfil está baixo — o TDEE de fórmula pode estar a subestimar o que gastas. Ajustar o nível no perfil resolve-o hoje.',
+        'help' => 'Envia um CSV com uma coluna de data mais passos e/ou sono. O Apple Health exporta através de apps como o Health Auto Export; Fitbit e Garmin exportam CSV diretamente.',
+        'sources_hint' => 'Linhas horárias são somadas por dia. O sono pode vir em horas ou minutos — o cabeçalho da coluna decide.',
+        'done' => 'Dados de saúde importados para :days dia.|Dados de saúde importados para :days dias.',
+        'errors' => [
+            'not_health' => 'Este ficheiro não parece conter dados de saúde: precisa de uma coluna de data mais uma de passos ou sono.',
+            'nothing_found' => 'Nenhuma linha utilizável encontrada neste ficheiro.',
+            'absurd_day' => 'Os totais de :date estão além de qualquer humano — ignorados (verifica as unidades do ficheiro).',
+        ],
     ],
 
     'goals' => [
@@ -1209,6 +1248,8 @@ return [
         'body_fat' => 'Percentagem do seu peso que é gordura. Navy = uma estimativa independente com fita métrica, usada como verificação cruzada.',
         'lean_mass' => 'Tudo o que não é gordura (sobretudo músculo). FFMI = musculatura ajustada à altura; ~25 é perto do limite natural nos homens.',
         'hard_sets' => 'Total de séries efetivas (sem aquecimentos) nas últimas 4 semanas — o principal motor do crescimento muscular.',
+        'consistency' => 'Dias distintos de treino nesta semana de calendário, com a média de quatro semanas ao lado. As guidelines ACSM de 2026 põem a consistência acima de qualquer detalhe de programação.',
+        'muscle_frequency' => 'Dos músculos que treinaste nas últimas quatro semanas, quantos tiveram cerca de duas sessões por semana — a frequência que as guidelines pedem. Contado pelos dias em que o músculo recebeu séries efetivas, perdoando uma sessão falhada por mês.',
         'landmarks' => 'Séries efetivas por músculo em cada semana. MEV = mínimo para crescer, MAV = zona de melhor retorno. Fique entre os dois. "Abaixo da manutenção" significa séries a menos para crescer.',
     ],
 

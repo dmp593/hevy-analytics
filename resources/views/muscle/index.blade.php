@@ -37,4 +37,35 @@
             <x-ui.button type="submit">{{ __('app.common.apply') }}</x-ui.button>
         </form>
     </details>
+
+    {{-- Effort, from logged RPE — always the last 28 days, unaffected by the
+         filter above. Silent unless enough sets carry an RPE: guessing what
+         unlogged effort felt like would be invention, not analysis. --}}
+    @if ($effort['total_sets'] > 0)
+        <x-ui.card :title="__('app.effort.title')" :subtitle="__('app.effort.sub')" class="mt-6">
+            @if (! $effort['enough'])
+                <p class="text-sm text-muted">{{ __('app.effort.low_coverage', ['pct' => $effort['coverage_pct']]) }}</p>
+            @elseif (empty($effort['flagged']))
+                <p class="text-sm text-body">{{ __('app.effort.all_close') }}</p>
+                <p class="mt-2 text-xs text-muted">{{ __('app.effort.explain') }}</p>
+            @else
+                <ul class="space-y-2">
+                    @foreach ($effort['flagged'] as $f)
+                        @php
+                            $muscleName = __('app.muscles.'.$f['muscle']);
+                            $muscleName = str_contains($muscleName, 'app.muscles.') ? ucfirst($f['muscle']) : $muscleName;
+                        @endphp
+                        <li class="flex items-center justify-between gap-4 text-sm">
+                            <span class="text-ink">{{ $muscleName }}</span>
+                            <span class="text-muted">{{ __('app.effort.far_share', ['pct' => $f['far_pct'], 'sets' => $f['sets']]) }}</span>
+                        </li>
+                    @endforeach
+                </ul>
+                <p class="mt-3 text-xs text-muted">{{ __('app.effort.explain') }}</p>
+                @if (auth()->user()->activeGoal()?->type === 'strength')
+                    <p class="mt-1 text-xs text-faint">{{ __('app.effort.strength_caveat') }}</p>
+                @endif
+            @endif
+        </x-ui.card>
+    @endif
 </x-ui.page>

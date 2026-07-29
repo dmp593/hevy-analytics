@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Science\Volume\MuscleLandmarks;
+use App\Services\Analytics\EffortAnalysis;
 use App\Services\Analytics\FilterCriteria;
 use App\Services\Analytics\MuscleBalance;
 use App\Services\Analytics\MuscleVerdict;
@@ -17,6 +18,9 @@ class MuscleController extends Controller
 
         return view('muscle.index', array_merge($this->payload($request), [
             'routines' => $user->routines()->orderBy('title')->get(),
+            // Fixed 28-day window on purpose: effort is a recent habit, not a
+            // property of whatever range the filter above happens to show.
+            'effort' => (new EffortAnalysis($user))->summary(),
         ]));
     }
 

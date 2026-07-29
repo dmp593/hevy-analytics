@@ -4,7 +4,7 @@
 > sessões: estado real, pendentes de cada lado, e planos discutidos mas ainda
 > não executados. Em português porque o dono do produto lê em português.
 
-## Em produção (tudo verde, 971 testes)
+## Em produção (tudo verde, 994 testes)
 
 | Área | Estado |
 |---|---|
@@ -103,6 +103,33 @@ O dono pediu "avança com todas as tuas recomendações". As 7 entregues:
 
 Recusadas com fundamento (não reabrir sem pedido): idade metabólica, BRI,
 score compósito único.
+
+### 3b. Investigação de funcionalidades — ✓ EM PRODUÇÃO (2026-07-29)
+
+Pedido: "faz investigações nesta área e vê que funcionalidades adicionavas",
+seguido de "analisa exaustivamente o projeto para validar se já está
+implementado. caso não esteja, implementa". A análise exaustiva encontrou:
+
+- **Já existia**: balanço push/pull + quad/posterior + superior/inferior
+  (MuscleBalance); motor de progressão com dupla progressão e write-back
+  confirmado para o Hevy (RoutineProgression + write.progression).
+- **Implementado agora**:
+  1. Progressão consciente do desempenho: a sugestão só sobe quando a última
+     sessão registada cumpriu a prescrição; falhou → repete; cumpriu a
+     RPE ≥ 9,5 → consolida; sem registo → progride como antes.
+  2. Cartão de consistência no dashboard (sessões da semana, média 4 sem,
+     semanas seguidas, músculos a ~2×/sem; nota para contas nas primeiras
+     4 semanas). Base: guidelines ACSM 2026 + coorte de adesão 2025.
+  3. Esforço (RPE) na página de músculos: % de séries a 4+ reps da falha
+     por músculo (Robinson 2024); silencioso com cobertura de RPE < 50%.
+  4. Deteção de RPE a subir com carga igual num lift estagnado → sugestão
+     honesta de deload no alerta (enquadramento Coleman 2024).
+  5. Import CSV de passos/sono (Health Auto Export, Fitbit, genérico) para
+     o intake log + médias de 14 dias na página de Nutrição + verificação
+     do nível de atividade vs. passos observados.
+- **Adiado com fundamento**: check-in semanal por email (sem Resend ativo não
+  há canal; o in-app já recalcula a cada visita); "frescura muscular" tipo
+  Fitbod (heurística vestida de fisiologia — só com pedido explícito).
 
 ### 4. Ideias sem compromisso
 

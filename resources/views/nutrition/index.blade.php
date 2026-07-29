@@ -181,4 +181,36 @@
 
         <p class="mt-3 text-xs text-faint">{{ __('app.nutrition.import.idempotent') }}</p>
     </x-ui.card>
+
+    {{-- Steps & sleep: context for the numbers above, never prescriptions.
+         Steps sanity-check the stated activity level the formula TDEE rests
+         on; sleep is shown because recovery is where growth happens. --}}
+    <x-ui.card :title="__('app.health.title')" :subtitle="__('app.health.sub')" class="mt-6">
+        @if ($health['avg_steps'] !== null || $health['avg_sleep_minutes'] !== null)
+            <div class="mb-4 grid grid-cols-2 gap-4">
+                <x-ui.stat :label="__('app.health.avg_steps')"
+                           :value="$health['avg_steps'] !== null ? number_format($health['avg_steps']) : '—'" />
+                <x-ui.stat :label="__('app.health.avg_sleep')"
+                           :value="$health['avg_sleep_minutes'] !== null ? sprintf('%dh%02d', intdiv($health['avg_sleep_minutes'], 60), $health['avg_sleep_minutes'] % 60) : '—'" />
+            </div>
+
+            @if ($health['activity_hint'])
+                <x-ui.insight tone="info" :title="__('app.health.activity_mismatch')" class="mb-4">
+                    {{ __('app.health.'.$health['activity_hint']) }}
+                </x-ui.insight>
+            @endif
+        @endif
+
+        <p class="text-sm text-body">{{ __('app.health.help') }}</p>
+        <p class="mt-1 text-xs text-muted">{{ __('app.health.sources_hint') }}</p>
+
+        <form method="POST" action="{{ route('nutrition.health') }}" enctype="multipart/form-data" class="mt-4 flex flex-wrap items-center gap-3">
+            @csrf
+            <input type="file" name="file" accept=".csv,text/csv" required
+                   class="text-sm text-body file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-lg file:border-0 file:bg-surface-sunk file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink hover:file:bg-strong/40">
+            <x-ui.button type="submit">{{ __('app.nutrition.import.submit') }}</x-ui.button>
+        </form>
+
+        <p class="mt-3 text-xs text-faint">{{ __('app.nutrition.import.idempotent') }}</p>
+    </x-ui.card>
 </x-ui.page>

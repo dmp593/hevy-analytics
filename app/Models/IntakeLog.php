@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class IntakeLog extends Model
 {
     protected $fillable = [
-        'date', 'calories', 'protein_g', 'fat_g', 'carb_g', 'weight_kg', 'fat_percent', 'notes',
+        'date', 'calories', 'protein_g', 'fat_g', 'carb_g', 'steps', 'sleep_minutes', 'weight_kg', 'fat_percent', 'notes',
     ];
 
     protected $casts = [
@@ -17,6 +17,8 @@ class IntakeLog extends Model
         'protein_g' => 'float',
         'fat_g' => 'float',
         'carb_g' => 'float',
+        'steps' => 'integer',
+        'sleep_minutes' => 'integer',
         'weight_kg' => 'float',
         'fat_percent' => 'float',
     ];

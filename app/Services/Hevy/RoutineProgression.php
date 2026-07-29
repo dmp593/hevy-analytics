@@ -7,15 +7,25 @@ use App\Models\Routine;
 use App\Models\User;
 use App\Science\Strength\OneRepMax;
 use App\Services\Analytics\FilterCriteria;
+use App\Services\Analytics\PeriodService;
+use App\Services\Analytics\SetQuery;
 use App\Services\Analytics\StrengthAnalytics;
 use Illuminate\Support\Carbon;
 
 /**
  * Builds an evidence-based "next session" progression for a routine using
- * double progression, informed by each exercise's recent best e1RM.
+ * double progression, informed by each exercise's recent best e1RM and by
+ * what the athlete actually did in their last logged session.
  *
  * Rules per working set:
- *  - Fixed weight×reps: add a rep until 12, then +2.5 kg and reset to 8 reps.
+ *  - Fixed weight×reps: add a rep until 12, then +2.5 kg and reset to 8 reps —
+ *    but only when the last logged session earned it. A prescription the
+ *    athlete missed, or only met at RPE 9.5+, is repeated rather than raised:
+ *    progressing a number the body did not deliver just widens the gap
+ *    between the routine and reality.
+ *  - No logged session for the exercise → progress on faith (the old
+ *    behaviour), because refusing to progress an unlogged exercise would
+ *    punish people who only just connected their account.
  *  - Rep-range only (no load): prescribe a load from recent e1RM at the top of
  *    the range with a small (+2%) progressive-overload bump.
  *  - Warm-ups are left untouched.
@@ -33,6 +43,15 @@ class RoutineProgression
 
     private const OVERLOAD_FACTOR = 1.02;
 
+    /** How far back a logged session still counts as "recent performance". */
+    private const PERFORMANCE_WINDOW_DAYS = 45;
+
+    /** Meeting the prescription at or above this RPE earns a repeat, not a raise. */
+    private const MAXED_RPE = 9.5;
+
+    /** Sets within 1% of the prescribed load count as "at the prescribed load". */
+    private const WEIGHT_TOLERANCE = 0.99;
+
     public function __construct(private readonly User $user) {}
 
     /**
@@ -43,12 +62,16 @@ class RoutineProgression
         $changes = [];
         $exercises = [];
 
-        foreach ($routine->load('exercises')->exercises as $exercise) {
+        $routine->load('exercises');
+        $performance = $this->recentPerformance($routine);
+
+        foreach ($routine->exercises as $exercise) {
             $e1rm = $this->recentBestE1rm($exercise->exercise_template_hevy_id);
+            $actual = $performance[$exercise->exercise_template_hevy_id] ?? null;
 
             $sets = [];
             foreach ($exercise->sets ?? [] as $set) {
-                $sets[] = $this->progressSet($set, $exercise->title, $e1rm, $changes);
+                $sets[] = $this->progressSet($set, $exercise->title, $e1rm, $actual, $changes);
             }
 
             $exercises[] = [
@@ -73,6 +96,90 @@ class RoutineProgression
         ];
     }
 
+    /**
+     * Working sets from the most recent logged session inside the window,
+     * per exercise template in this routine. One query serves the whole
+     * routine; an exercise never logged returns nothing.
+     *
+     * @return array<string, array<int, object>>
+     */
+    private function recentPerformance(Routine $routine): array
+    {
+        $templateIds = array_values(array_filter(
+            $routine->exercises->pluck('exercise_template_hevy_id')->all()
+        ));
+
+        if ($templateIds === []) {
+            return [];
+        }
+
+        $rows = (new SetQuery($this->user, new FilterCriteria(
+            from: Carbon::now()->subDays(self::PERFORMANCE_WINDOW_DAYS),
+            to: Carbon::now(),
+        )))->rows();
+
+        $byTemplate = [];
+        foreach ($rows as $r) {
+            if (! $r->start_time || ! in_array($r->exercise_template_hevy_id, $templateIds, true)) {
+                continue;
+            }
+            $day = PeriodService::localDate(Carbon::parse($r->start_time), $this->user->resolvedTimezone());
+            $byTemplate[$r->exercise_template_hevy_id][$day][] = $r;
+        }
+
+        $latest = [];
+        foreach ($byTemplate as $template => $days) {
+            krsort($days);
+            $latest[$template] = reset($days);
+        }
+
+        return $latest;
+    }
+
+    /**
+     * Did the last session earn a raise on this prescription?
+     *
+     *  - 'unknown': nothing logged recently — progress on faith.
+     *  - 'missed': the prescribed load was never reached, or reached for
+     *    fewer reps than prescribed.
+     *  - 'maxed': prescription met, but at RPE 9.5+ — consolidate first.
+     *  - 'met': prescription genuinely beaten or comfortably met.
+     *
+     * @param  array<int, object>|null  $actual
+     */
+    private function performanceVerdict(?array $actual, float $weight, int $reps): string
+    {
+        if (! $actual) {
+            return 'unknown';
+        }
+
+        $atLoad = array_filter(
+            $actual,
+            fn ($s) => $s->weight_kg !== null && (float) $s->weight_kg >= $weight * self::WEIGHT_TOLERANCE
+        );
+
+        if ($atLoad === []) {
+            return 'missed';
+        }
+
+        $best = null;
+        foreach ($atLoad as $s) {
+            if ($best === null || (int) $s->reps > (int) $best->reps) {
+                $best = $s;
+            }
+        }
+
+        if ((int) $best->reps < $reps) {
+            return 'missed';
+        }
+
+        if ($best->rpe !== null && (float) $best->rpe >= self::MAXED_RPE) {
+            return 'maxed';
+        }
+
+        return 'met';
+    }
+
     private function recentBestE1rm(?string $templateHevyId): ?float
     {
         if (! $templateHevyId) {
@@ -89,9 +196,10 @@ class RoutineProgression
     }
 
     /**
+     * @param  array<int, object>|null  $actual  last logged session's sets for this exercise
      * @param  array<int, string>  $changes  (mutated by reference)
      */
-    private function progressSet(array $set, ?string $title, ?float $e1rm, array &$changes): array
+    private function progressSet(array $set, ?string $title, ?float $e1rm, ?array $actual, array &$changes): array
     {
         $type = SetType::fromRaw($set['type'] ?? null);
 
@@ -103,8 +211,23 @@ class RoutineProgression
         $reps = $set['reps'] ?? null;
         $range = $set['rep_range'] ?? null;
 
-        // Fixed weight × reps → double progression.
+        // Fixed weight × reps → double progression, gated on what the last
+        // logged session actually delivered.
         if ($weight && $reps) {
+            $verdict = $this->performanceVerdict($actual, (float) $weight, (int) $reps);
+
+            if ($verdict === 'missed') {
+                $changes[] = "{$title}: keep {$weight}kg×{$reps} (last session came up short)";
+
+                return $this->normalizeSet($set);
+            }
+
+            if ($verdict === 'maxed') {
+                $changes[] = "{$title}: keep {$weight}kg×{$reps} (met at RPE 9.5+ — consolidate before adding)";
+
+                return $this->normalizeSet($set);
+            }
+
             if ($reps >= self::REP_CAP) {
                 $newWeight = $this->roundToPlate($weight + self::LOAD_STEP_KG);
                 $changes[] = "{$title}: {$weight}kg×{$reps} → {$newWeight}kg×".self::REP_RESET;

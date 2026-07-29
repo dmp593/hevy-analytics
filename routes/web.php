@@ -77,6 +77,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Daily totals from another diet app's export (MFP, Cronometer, Lose It).
     Route::post('/nutrition/import', [NutritionController::class, 'importCsv'])
         ->middleware('throttle:10,10')->name('nutrition.import');
+    Route::post('/nutrition/health-import', [NutritionController::class, 'importHealthCsv'])
+        ->middleware('throttle:10,10')->name('nutrition.health');
 
     Route::get('/projections', [ProjectionController::class, 'index'])->name('projections');
 

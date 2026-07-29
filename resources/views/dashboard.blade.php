@@ -100,6 +100,29 @@
                 </section>
             @endif
 
+            {{-- 1b. Consistency. The strongest evidence in this app is also
+                 the simplest: every muscle about twice a week, in sessions
+                 that keep happening. Descriptive on purpose — no invented
+                 targets, no guilt mechanics. --}}
+            @if ($consistency)
+                <section aria-label="{{ __('app.consistency.title') }}">
+                    <h2 class="mb-3 text-xs font-semibold uppercase tracking-wide text-faint">{{ __('app.consistency.title') }}</h2>
+                    <div class="grid grid-cols-2 gap-4 lg:grid-cols-3">
+                        <x-ui.stat :label="__('app.consistency.sessions_week')" :value="$consistency['sessions_this_week']"
+                                   :sub="__('app.consistency.avg_week', ['avg' => $consistency['avg_per_week']])"
+                                   :tip="__('app.tips.consistency')" />
+                        <x-ui.stat :label="__('app.consistency.streak')" :value="$consistency['streak_weeks']"
+                                   :unit="trans_choice('app.consistency.weeks', $consistency['streak_weeks'])" />
+                        <x-ui.stat :label="__('app.consistency.muscle_frequency')"
+                                   :value="$consistency['muscles_at_frequency'].' / '.$consistency['muscles_trained']"
+                                   :tip="__('app.tips.muscle_frequency')" />
+                    </div>
+                    @if ($consistency['early_days'])
+                        <p class="mt-3 text-xs text-muted">{{ __('app.consistency.early_days') }}</p>
+                    @endif
+                </section>
+            @endif
+
             {{-- 2. Where am I? Four tiles, not six: the two dropped (goal and
                  tonnage) are a label rather than a measurement, and a number that
                  rewards high-rep light work. --}}
