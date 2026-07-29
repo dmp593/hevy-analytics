@@ -23,21 +23,14 @@ class BodyCompositionController extends Controller
         $topLift = (new StrengthAnalytics(
             $user,
             new FilterCriteria(from: Carbon::now()->subMonths(4), to: Carbon::now())
-        ))->exercisePrs();
+        ))->topLiftE1rmSeries();
         $liftE1rm = null;
-        if (! empty($topLift) && ($topLift[0]['template_id'] ?? null)) {
-            $liftFilter = new FilterCriteria(
-                from: Carbon::now()->subMonths(4), to: Carbon::now(),
-                exerciseTemplateHevyId: $topLift[0]['template_id'],
-            );
-            $series = (new StrengthAnalytics($user, $liftFilter))->e1rmSeries();
-            if (count($series) >= 2) {
-                $slope = LinearRegression::fit(
-                    array_map(fn ($p, $i) => (float) $i, $series, array_keys($series)),
-                    array_column($series, 'value'),
-                )->slope;
-                $liftE1rm = ['exercise' => $topLift[0]['exercise'], 'trend' => $slope >= 0 ? 'up' : 'down'];
-            }
+        if ($topLift && count($topLift['series']) >= 2) {
+            $slope = LinearRegression::fit(
+                range(0, count($topLift['series']) - 1),
+                array_column($topLift['series'], 'value'),
+            )->slope;
+            $liftE1rm = ['exercise' => $topLift['exercise'], 'trend' => $slope >= 0 ? 'up' : 'down'];
         }
 
         $rate = $bc->weightRateKgPerWeek();

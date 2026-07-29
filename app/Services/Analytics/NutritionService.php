@@ -28,13 +28,16 @@ class NutritionService
         $profile = $goal->profile();
 
         $bc = new BodyCompAnalytics($this->user);
-        $weight = $bc->status()['weight_kg'];
+        // One snapshot: status() runs a batch of queries per call, and three
+        // calls here were three identical batches.
+        $status = $bc->status();
+        $weight = $status['weight_kg'];
         if (! $weight || ! $this->user->height_cm || ! $this->user->age) {
             return null;
         }
 
-        $fat = $bc->status()['fat_percent'];
-        $lean = $bc->status()['lean_mass_kg']
+        $fat = $status['fat_percent'];
+        $lean = $status['lean_mass_kg']
             ?? BodyComposition::boerLbm($weight, $this->user->height_cm, $this->user->sex ?? 'male');
 
         // Prefer Katch-McArdle when body-fat is known (better for lean trainees).
@@ -164,6 +167,7 @@ class NutritionService
                 'target_calories' => $t?->target_calories,
                 'protein_g' => $log->protein_g,
                 'target_protein_g' => $t?->protein_g,
+                'weight_kg' => $log->weight_kg,
             ];
         })->all();
     }

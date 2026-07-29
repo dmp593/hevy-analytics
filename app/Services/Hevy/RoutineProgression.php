@@ -60,8 +60,6 @@ class RoutineProgression
      */
     private const BACKOFF_FACTOR = 0.925;
 
-    private const STALL_MIN_SESSIONS = 6;
-
     public function __construct(private readonly User $user) {}
 
     /**
@@ -80,12 +78,9 @@ class RoutineProgression
             $e1rm = $this->recentBestE1rm($exercise->exercise_template_hevy_id);
             $actual = $performance[$exercise->exercise_template_hevy_id] ?? null;
 
-            // Stalled means the same thing here as on the dashboard alert:
-            // enough sessions, and an e1RM trend that is not going up.
-            $trend = $trends[$exercise->exercise_template_hevy_id ?? $exercise->title] ?? null;
-            $stalled = $trend !== null
-                && $trend['sessions'] >= self::STALL_MIN_SESSIONS
-                && $trend['direction'] !== 'up';
+            $stalled = StrengthAnalytics::isStalled(
+                $trends[$exercise->exercise_template_hevy_id ?? $exercise->title] ?? null
+            );
 
             $sets = [];
             foreach ($exercise->sets ?? [] as $set) {

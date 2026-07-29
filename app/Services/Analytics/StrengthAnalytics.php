@@ -91,6 +91,22 @@ class StrengthAnalytics
     private const MIN_SESSIONS_FOR_TREND = 4;
 
     /**
+     * Sessions before a flat trend may be called a stall — fewer and a
+     * deload plus a holiday reads as one. The dashboard alert and the
+     * progression engine both judge through here, so they can never
+     * disagree about what "stalled" means.
+     */
+    public const STALL_MIN_SESSIONS = 6;
+
+    /** Whether an exerciseTrends() row describes a stalled lift. */
+    public static function isStalled(?array $trend): bool
+    {
+        return $trend !== null
+            && $trend['sessions'] >= self::STALL_MIN_SESSIONS
+            && $trend['direction'] !== 'up';
+    }
+
+    /**
      * Slope, as a fraction of the lift's own mean e1RM per week, below which the
      * lift is called flat. 0.0005 is ~2.6%/year: enough that a 160kg squat has to
      * be moving more than about 4kg a year to count as progressing, which is a
@@ -187,6 +203,34 @@ class StrengthAnalytics
         }
 
         return $out;
+    }
+
+    /**
+     * The top lift of the window (best e1RM) with its per-session series.
+     * Two pages triangulate on "is the strongest lift moving" — this is the
+     * one place that answers it.
+     *
+     * @return array{exercise: string, template_id: string, series: array}|null
+     */
+    public function topLiftE1rmSeries(): ?array
+    {
+        $top = $this->exercisePrs()[0] ?? null;
+
+        if (! $top || ! $top['template_id']) {
+            return null;
+        }
+
+        $filter = new FilterCriteria(
+            from: $this->filter->from,
+            to: $this->filter->to,
+            exerciseTemplateHevyId: $top['template_id'],
+        );
+
+        return [
+            'exercise' => $top['exercise'],
+            'template_id' => $top['template_id'],
+            'series' => (new self($this->user, $filter))->e1rmSeries(),
+        ];
     }
 
     /** Current best e1RM (single number) for the filtered set. */

@@ -409,6 +409,12 @@
         @apply focus:border-brand focus:ring-brand;
     }
 
+    /* File inputs: one definition, four upload forms — the 190-character
+       utility string was copy-pasted and starting to drift. */
+    .form-file {
+        @apply text-sm text-body file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-lg file:border-0 file:bg-surface-sunk file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink hover:file:bg-strong/40;
+    }
+
     .table-head {
         @apply border-b border-line text-left text-xs font-medium uppercase tracking-wide text-muted;
     }

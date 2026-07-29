@@ -26,7 +26,7 @@
             @csrf
             <div class="flex flex-wrap items-center gap-3">
                 <input type="file" name="file" accept=".csv,text/csv" required
-                       class="text-sm text-body file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-lg file:border-0 file:bg-surface-sunk file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink hover:file:bg-strong/40">
+                       class="form-file">
             </div>
 
             <div>

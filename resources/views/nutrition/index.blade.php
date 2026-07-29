@@ -119,7 +119,7 @@
                                 <td class="py-2 pr-4">{{ $row['calories'] ? number_format($row['calories']) : '—' }}</td>
                                 <td class="py-2 pr-4 text-muted">{{ $row['target_calories'] ? number_format($row['target_calories']) : '—' }}</td>
                                 <td class="py-2 pr-4">{{ $row['protein_g'] ? $row['protein_g'].'g' : '—' }}</td>
-                                <td class="py-2 pr-5">{{ units()->weight(collect($recentLogs)->firstWhere('date', \Illuminate\Support\Carbon::parse($row['date']))?->weight_kg) ?? '—' }}</td>
+                                <td class="py-2 pr-5">{{ units()->weight($row['weight_kg']) ?? '—' }}</td>
                             </tr>
                         @empty
                             <tr><td colspan="5" class="px-5 py-3 text-muted">{{ __('app.nutrition.no_intake') }}</td></tr>
@@ -174,7 +174,7 @@
         <form method="POST" action="{{ route('nutrition.import') }}" enctype="multipart/form-data" class="mt-4 flex flex-wrap items-center gap-3">
             @csrf
             <input type="file" name="file" accept=".csv,text/csv" required
-                   class="text-sm text-body file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-lg file:border-0 file:bg-surface-sunk file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink hover:file:bg-strong/40">
+                   class="form-file">
             <x-ui.button type="submit">{{ __('app.nutrition.import.submit') }}</x-ui.button>
         </form>
         <x-input-error class="mt-2" :messages="$errors->get('file')" />
@@ -207,7 +207,7 @@
         <form method="POST" action="{{ route('nutrition.health') }}" enctype="multipart/form-data" class="mt-4 flex flex-wrap items-center gap-3">
             @csrf
             <input type="file" name="file" accept=".csv,text/csv" required
-                   class="text-sm text-body file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-lg file:border-0 file:bg-surface-sunk file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink hover:file:bg-strong/40">
+                   class="form-file">
             <x-ui.button type="submit">{{ __('app.nutrition.import.submit') }}</x-ui.button>
         </form>
 

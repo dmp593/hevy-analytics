@@ -109,14 +109,4 @@ class OneRepMax
 
         return round($oneRepMax / (1 + $reps / 30), 2);
     }
-
-    /** Percentage of 1RM expected for a given rep count (Epley-derived). */
-    public static function percentOfMax(float $reps): float
-    {
-        if ($reps <= 1) {
-            return 1.0;
-        }
-
-        return round(1 / (1 + $reps / 30), 4);
-    }
 }

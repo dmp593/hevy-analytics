@@ -35,7 +35,7 @@
                 <div class="space-y-3">
                     <p class="text-xs text-muted">{{ __('app.convert.file_help') }}</p>
                     <input type="file" name="file" accept=".csv,text/csv"
-                           class="text-sm text-body file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-lg file:border-0 file:bg-surface-sunk file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink hover:file:bg-strong/40">
+                           class="form-file">
                     <div>
                         <label class="text-xs text-body block">{{ __('app.import.unit_label') }}
                             <select name="unit" class="mt-1 block w-40 rounded-md border-line text-sm">

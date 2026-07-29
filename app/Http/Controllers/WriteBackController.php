@@ -44,6 +44,6 @@ class WriteBackController extends Controller
             ->update(['revert_info' => ['changes' => $progression['changes']]]);
 
         return redirect()->route('write.index')
-            ->with('status', 'Progression staged for "'.$routine->title.'". Review and confirm to push to Hevy.');
+            ->with('status', __('app.write.staged', ['routine' => $routine->title]));
     }
 }

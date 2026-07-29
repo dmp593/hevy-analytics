@@ -2,6 +2,7 @@
 
 namespace App\Services\StrengthStandards;
 
+use App\Science\BodyComp\BodyComposition;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
@@ -55,7 +56,7 @@ class FitnessVoltClient
             return null;
         }
 
-        $sex = in_array(strtolower($sex), ['female', 'f', 'woman'], true) ? 'female' : 'male';
+        $sex = BodyComposition::normalizeSex($sex);
         $key = 'fv:rank:'.md5(implode('|', [$slug, $sex, round($bodyweightKg, 1), round($e1rmKg, 1), $age]));
 
         return Cache::remember($key, now()->addHours(12), function () use ($slug, $sex, $bodyweightKg, $e1rmKg, $age) {

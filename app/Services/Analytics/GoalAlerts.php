@@ -22,12 +22,6 @@ class GoalAlerts
      */
     private const SPIKE_MIN_BASE_SETS = 8;
 
-    /**
-     * Sessions before a flat trend is called a stall. Fewer and a deload
-     * plus a holiday reads as one.
-     */
-    private const STALL_MIN_SESSIONS = 6;
-
     public function __construct(private readonly User $user) {}
 
     /**
@@ -240,7 +234,7 @@ class GoalAlerts
             // Reliability (r²) is deliberately not required here: a genuinely
             // flat line explains no variance, so its r² is near zero and the
             // flag would exclude exactly the lifts this alert exists to catch.
-            if ($t !== null && $t['sessions'] >= self::STALL_MIN_SESSIONS && $t['direction'] !== 'up') {
+            if (StrengthAnalytics::isStalled($t)) {
                 $stalled[] = $p['exercise'];
                 if (($rise = $this->rpeCreep($rows, $key)) !== null) {
                     $creep = max($creep ?? 0.0, $rise);

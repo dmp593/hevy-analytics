@@ -33,7 +33,6 @@ class DashboardController extends Controller
 
         $filter = new FilterCriteria(from: Carbon::now()->subDays(28), to: Carbon::now());
         $volume = new VolumeAnalytics($user, $filter);
-        $rows = null;
         $bc = new BodyCompAnalytics($user);
 
         $tonnageFilter = new FilterCriteria(from: Carbon::now()->subMonths(6), to: Carbon::now(), period: 'week');

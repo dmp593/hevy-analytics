@@ -130,10 +130,21 @@ class BodyComposition
         return self::navyBodyFatMen($neckCm, $abdomenCm, $heightCm);
     }
 
-    /** Whether a stored sex value denotes female. */
+    /**
+     * Whether a stored sex value denotes female — the ONE place the accepted
+     * spellings live. Every formula that branches on sex delegates here, so
+     * adding a spelling cannot silently grade a woman against men's numbers
+     * in whichever file was missed.
+     */
     public static function isFemale(?string $sex): bool
     {
         return in_array(strtolower((string) $sex), ['female', 'f', 'woman'], true);
+    }
+
+    /** The same rule as a canonical token, for lookups keyed 'male'/'female'. */
+    public static function normalizeSex(?string $sex): string
+    {
+        return self::isFemale($sex) ? 'female' : 'male';
     }
 
     /**

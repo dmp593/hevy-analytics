@@ -2,6 +2,7 @@
 
 namespace App\Services\StrengthStandards;
 
+use App\Science\BodyComp\BodyComposition;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -57,7 +58,7 @@ class OpenPowerliftingStandards
         }
 
         $data = $this->load();
-        $sex = in_array(strtolower($sex), ['female', 'f', 'woman'], true) ? 'female' : 'male';
+        $sex = BodyComposition::normalizeSex($sex);
         $buckets = $data['lifts'][$lift][$sex] ?? null;
         if (! $buckets) {
             return null;

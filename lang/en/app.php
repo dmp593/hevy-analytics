@@ -427,6 +427,8 @@ return [
     ],
 
     'nutrition' => [
+        'recomputed' => 'Targets recomputed from your latest body data.',
+        'intake_logged' => 'Intake logged.',
         'setup' => 'Add your :profile, set a :goal, and log a body weight in Hevy — then your targets appear here.',
         'setup_profile' => 'height, age and sex',
         'setup_goal' => 'goal',
@@ -924,6 +926,9 @@ return [
     ],
 
     'write' => [
+        'pushed' => 'Change pushed to Hevy and re-synced.',
+        'push_failed' => 'The push to Hevy failed — nothing was changed there. Try again in a minute.',
+        'staged' => 'Progression staged for ":routine". Review and confirm to push to Hevy.',
         'confirm' => 'Confirm & push',
         'retry' => 'Retry',
         'stalled' => 'stalled',
@@ -933,6 +938,7 @@ return [
     ],
 
     'photos' => [
+        'deleted' => 'Photo deleted.',
         'limit_reached' => 'You have reached the limit of :limit progress photos. Delete some older ones to add more.',
         'add' => 'Add a photo',
         'add_sub' => 'The mirror is the most honest metric',
@@ -1175,6 +1181,7 @@ return [
     ],
 
     'goals' => [
+        'saved' => 'Goal updated and nutrition targets recomputed.',
         'lean_bulk' => 'Lean bulk',
         'hypertrophy' => 'Hypertrophy / maingain',
         'aggressive_bulk' => 'Aggressive bulk',

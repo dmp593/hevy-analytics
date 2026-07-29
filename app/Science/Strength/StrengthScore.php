@@ -2,6 +2,8 @@
 
 namespace App\Science\Strength;
 
+use App\Science\BodyComp\BodyComposition;
+
 /**
  * Bodyweight-adjusted strength scores so progress is comparable as weight
  * changes during a bulk or cut.
@@ -66,6 +68,6 @@ class StrengthScore
 
     private static function normalizeSex(string $sex): string
     {
-        return in_array(strtolower($sex), ['female', 'f', 'woman'], true) ? 'female' : 'male';
+        return BodyComposition::normalizeSex($sex);
     }
 }

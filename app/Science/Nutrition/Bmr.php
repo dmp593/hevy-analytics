@@ -2,6 +2,8 @@
 
 namespace App\Science\Nutrition;
 
+use App\Science\BodyComp\BodyComposition;
+
 class Bmr
 {
     /**
@@ -24,18 +26,8 @@ class Bmr
         return round(370 + 21.6 * $leanMassKg, 1);
     }
 
-    /**
-     * Revised Harris-Benedict (1984).
-     */
-    public static function harrisBenedict(float $weightKg, float $heightCm, int $age, string $sex): float
-    {
-        return self::isFemale($sex)
-            ? round(9.247 * $weightKg + 3.098 * $heightCm - 4.330 * $age + 447.593, 1)
-            : round(13.397 * $weightKg + 4.799 * $heightCm - 5.677 * $age + 88.362, 1);
-    }
-
     private static function isFemale(string $sex): bool
     {
-        return in_array(strtolower($sex), ['female', 'f', 'woman'], true);
+        return BodyComposition::isFemale($sex);
     }
 }

@@ -113,8 +113,8 @@ class MuscleVerdictTest extends TestCase
     {
         $sets = [$this->row('chest', 12, 10)];
 
-        $heavyPush = (new MuscleVerdict($sets, ['push_pull' => ['ratio' => 2.0, 'verdict' => 'skewed']]))->verdict();
-        $heavyPull = (new MuscleVerdict($sets, ['push_pull' => ['ratio' => 0.5, 'verdict' => 'skewed']]))->verdict();
+        $heavyPush = (new MuscleVerdict($sets, ['push_pull' => ['ratio' => 2.0, 'label_a' => 'push', 'label_b' => 'pull']]))->verdict();
+        $heavyPull = (new MuscleVerdict($sets, ['push_pull' => ['ratio' => 0.5, 'label_a' => 'push', 'label_b' => 'pull']]))->verdict();
 
         $this->assertNotNull($heavyPush['imbalance']);
         $this->assertNotNull($heavyPull['imbalance']);
@@ -128,7 +128,7 @@ class MuscleVerdictTest extends TestCase
     {
         $v = (new MuscleVerdict(
             [$this->row('chest', 12, 10)],
-            ['push_pull' => ['ratio' => 1.1, 'verdict' => 'balanced']],
+            ['push_pull' => ['ratio' => 1.1, 'label_a' => 'push', 'label_b' => 'pull']],
         ))->verdict();
 
         $this->assertNull($v['imbalance']);
@@ -137,8 +137,8 @@ class MuscleVerdictTest extends TestCase
     public function test_only_the_worst_imbalance_is_reported(): void
     {
         $v = (new MuscleVerdict([$this->row('chest', 12, 10)], [
-            'push_pull' => ['ratio' => 1.6, 'verdict' => 'skewed'],
-            'upper_lower' => ['ratio' => 3.2, 'verdict' => 'skewed'],
+            'push_pull' => ['ratio' => 1.6, 'label_a' => 'push', 'label_b' => 'pull'],
+            'upper_lower' => ['ratio' => 3.2, 'label_a' => 'upper', 'label_b' => 'lower'],
         ]))->verdict();
 
         // 3.2 is further from balanced than 1.6, so upper/lower is the one named.
@@ -167,7 +167,7 @@ class MuscleVerdictTest extends TestCase
             [$this->row('chest', 26, 10, 22)],
             [$this->row('chest', 12, 10)],
         ] as $i => $sets) {
-            $v = (new MuscleVerdict($sets, ['push_pull' => ['ratio' => 2.0, 'verdict' => 'skewed']]))->verdict();
+            $v = (new MuscleVerdict($sets, ['push_pull' => ['ratio' => 2.0, 'label_a' => 'push', 'label_b' => 'pull']]))->verdict();
 
             $this->assertDoesNotMatchRegularExpression('/:[a-z_]+/', $v['headline'], "case {$i} headline");
             $this->assertDoesNotMatchRegularExpression('/:[a-z_]+/', $v['body'], "case {$i} body");

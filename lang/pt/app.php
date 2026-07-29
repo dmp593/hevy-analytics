@@ -427,6 +427,8 @@ return [
     ],
 
     'nutrition' => [
+        'recomputed' => 'Alvos recalculados a partir dos teus dados corporais mais recentes.',
+        'intake_logged' => 'Registo alimentar guardado.',
         'setup' => 'Adiciona :profile, define um :goal e regista um peso no Hevy — depois os teus alvos aparecem aqui.',
         'setup_profile' => 'altura, idade e sexo',
         'setup_goal' => 'objetivo',
@@ -925,6 +927,9 @@ return [
     ],
 
     'write' => [
+        'pushed' => 'Alteração enviada para o Hevy e ressincronizada.',
+        'push_failed' => 'O envio para o Hevy falhou — nada foi alterado lá. Tenta outra vez daqui a um minuto.',
+        'staged' => 'Progressão preparada para ":routine". Revê e confirma para enviar para o Hevy.',
         'confirm' => 'Confirmar e enviar',
         'retry' => 'Repetir',
         'stalled' => 'bloqueada',
@@ -934,6 +939,7 @@ return [
     ],
 
     'photos' => [
+        'deleted' => 'Fotografia apagada.',
         'limit_reached' => 'Atingiste o limite de :limit fotografias de progresso. Apaga algumas mais antigas para adicionares mais.',
         'add' => 'Adicionar fotografia',
         'add_sub' => 'O espelho é a métrica mais honesta',
@@ -1176,6 +1182,7 @@ return [
     ],
 
     'goals' => [
+        'saved' => 'Objetivo atualizado e alvos nutricionais recalculados.',
         'lean_bulk' => 'Ganho limpo',
         'hypertrophy' => 'Hipertrofia / manutenção com ganho',
         'aggressive_bulk' => 'Ganho agressivo',

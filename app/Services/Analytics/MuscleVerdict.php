@@ -29,7 +29,7 @@ class MuscleVerdict
 
     /**
      * @param  array<int, array{muscle: string, per_week: float, status: string, landmarks: array{mv: float, mev: float, mav: float, mrv: float}}>  $weeklySets
-     * @param  array<string, array{ratio: float|null, verdict: string}>  $balance
+     * @param  array<string, array{ratio: float|null, label_a: string, label_b: string, balanced: bool, enough_data: bool}>  $balance
      */
     public function __construct(
         private readonly array $weeklySets,
@@ -141,11 +141,10 @@ class MuscleVerdict
 
         [$key, $ratio] = $worst;
 
-        $sides = [
-            'push_pull' => ['push', 'pull'],
-            'quad_posterior' => ['quads', 'posterior'],
-            'upper_lower' => ['upper', 'lower'],
-        ][$key] ?? null;
+        // The balance row already names its own sides — a local table here
+        // would need manual re-syncing every time a group is added.
+        $row = $this->balance[$key] ?? null;
+        $sides = ($row['label_a'] ?? null) !== null ? [$row['label_a'], $row['label_b']] : null;
 
         if ($sides === null) {
             return null;

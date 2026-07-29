@@ -63,7 +63,6 @@ class RoutineController extends Controller
 
         return view('routines.edit', [
             'routine' => $routine->load('exercises'),
-            'templates' => $request->user()->exerciseTemplates()->orderBy('title')->get(),
             // The recommendations themselves, visible before anything is
             // staged: "what should I do next session" must not require
             // committing to a write-back to find out.

@@ -2,6 +2,7 @@
 
 namespace App\Services\StrengthStandards;
 
+use App\Science\BodyComp\BodyComposition;
 use App\Science\Strength\StrengthStandards;
 
 /**
@@ -130,7 +131,7 @@ class StrengthAssessor
             'e1rm' => round($e1rm, 1),
             'bodyweight' => round($bw, 1),
             'ratio' => round($e1rm / max(0.01, $bw), 2),
-            'sex' => in_array(strtolower($sex), ['female', 'f', 'woman'], true) ? 'female' : 'male',
+            'sex' => BodyComposition::normalizeSex($sex),
             'age' => $age,
         ], $assessment, ['percentile' => $p]);
     }

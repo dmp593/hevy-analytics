@@ -51,12 +51,8 @@
             @else
                 <ul class="space-y-2">
                     @foreach ($effort['flagged'] as $f)
-                        @php
-                            $muscleName = __('app.muscles.'.$f['muscle']);
-                            $muscleName = str_contains($muscleName, 'app.muscles.') ? ucfirst($f['muscle']) : $muscleName;
-                        @endphp
                         <li class="flex items-center justify-between gap-4 text-sm">
-                            <span class="text-ink">{{ $muscleName }}</span>
+                            <span class="text-ink">{{ \App\Support\Labels::muscle($f['muscle']) }}</span>
                             <span class="text-muted">{{ __('app.effort.far_share', ['pct' => $f['far_pct'], 'sets' => $f['sets']]) }}</span>
                         </li>
                     @endforeach

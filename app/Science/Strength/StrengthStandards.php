@@ -2,6 +2,8 @@
 
 namespace App\Science\Strength;
 
+use App\Science\BodyComp\BodyComposition;
+
 /**
  * Per-exercise strength standards used to place a lifter on a
  * Beginner → Novice → Intermediate → Advanced → Elite scale and derive a
@@ -204,6 +206,6 @@ class StrengthStandards
 
     private static function normalizeSex(string $sex): string
     {
-        return in_array(strtolower($sex), ['female', 'f', 'woman'], true) ? 'female' : 'male';
+        return BodyComposition::normalizeSex($sex);
     }
 }

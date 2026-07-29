@@ -149,6 +149,19 @@ implementado. caso não esteja, implementa". A análise exaustiva encontrou:
 Apagar treinos importados (limpa o "Prod Probe" de 2026-07-20 na conta do
 dono); validação fina dos dialetos com ficheiros reais.
 
+## Dívida de legibilidade conhecida (auditoria 2026-07-29, passe 2 pendente)
+
+Dois revisores independentes: veredicto "não é esparguete, arquitetura boa,
+mas a mesma regra escrita em vários sítios". Corrigido no passe 1: sexo
+normalizado num único sítio (era 7), regra de "lift estagnado" unificada,
+CompareController extraído para CheckInComparison, top-lift dedupe,
+status() 3×→1, MuscleVerdict lê labels do MuscleBalance, 6 strings inglesas
+hardcoded traduzidas, 3 métodos mortos apagados, .form-file no CSS.
+Fica para um passe 2 (médio, sem urgência): extrair um CsvReader comum aos
+3 importadores; BodyCompAnalytics::status() reusar os próprios acessores
+(fat-source e sítio Navy duplicados internamente); partir GoalAlerts::all()
+em famílias; 4 botões feitos à mão → x-ui.button.
+
 ## Regras operacionais que já custaram caro (não repetir)
 
 - O ambiente das sessões renasce em snapshots antigos: **começar QUALQUER

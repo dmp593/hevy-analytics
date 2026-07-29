@@ -8,19 +8,6 @@ class PeriodService
 {
     public const PERIODS = ['week', 'month', 'quarter', 'semester', 'year'];
 
-    /** Number of days in a projection horizon. */
-    public static function horizonDays(string $period): int
-    {
-        return match ($period) {
-            'week' => 7,
-            'month' => 30,
-            'quarter' => 91,
-            'semester' => 182,
-            'year' => 365,
-            default => 30,
-        };
-    }
-
     public static function label(string $period): string
     {
         return match ($period) {

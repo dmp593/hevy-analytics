@@ -34,7 +34,6 @@ class NutritionController extends Controller
             'adaptive' => $service->adaptiveMaintenance(),
             'loggedDays' => $loggedDays,
             'verdict' => (new NutritionVerdict($target, $loggedDays))->verdict(),
-            'recentLogs' => $user->intakeLogs()->orderByDesc('date')->limit(14)->get(),
             'history' => $user->nutritionTargets()->orderByDesc('date')->limit(30)->get(),
             'health' => $this->healthSummary($user),
         ]);

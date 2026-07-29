@@ -15,12 +15,10 @@ class PerformanceController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $filter = FilterCriteria::fromRequest($request, $request->user()->resolvedTimezone());
 
         return view('performance.index', array_merge(
             $this->payload($request),
             [
-                'filter' => $filter,
                 'routines' => $user->routines()->orderBy('title')->get(),
                 'muscles' => MuscleLandmarks::GROUPS,
             ]
