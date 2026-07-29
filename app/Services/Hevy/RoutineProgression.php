@@ -52,6 +52,16 @@ class RoutineProgression
     /** Sets within 1% of the prescribed load count as "at the prescribed load". */
     private const WEIGHT_TOLERANCE = 0.99;
 
+    /**
+     * Back-off applied when a lift is both stalled and being ground out at
+     * RPE 9.5+: the load comes down ~7.5% (rounded to 2.5 kg) to rebuild with
+     * a rep or two in reserve. Refalo 2024 found 1-2 RIR grows muscle the
+     * same as failure — the grinding buys fatigue, not size.
+     */
+    private const BACKOFF_FACTOR = 0.925;
+
+    private const STALL_MIN_SESSIONS = 6;
+
     public function __construct(private readonly User $user) {}
 
     /**
@@ -64,14 +74,22 @@ class RoutineProgression
 
         $routine->load('exercises');
         $performance = $this->recentPerformance($routine);
+        $trends = $this->trends();
 
         foreach ($routine->exercises as $exercise) {
             $e1rm = $this->recentBestE1rm($exercise->exercise_template_hevy_id);
             $actual = $performance[$exercise->exercise_template_hevy_id] ?? null;
 
+            // Stalled means the same thing here as on the dashboard alert:
+            // enough sessions, and an e1RM trend that is not going up.
+            $trend = $trends[$exercise->exercise_template_hevy_id ?? $exercise->title] ?? null;
+            $stalled = $trend !== null
+                && $trend['sessions'] >= self::STALL_MIN_SESSIONS
+                && $trend['direction'] !== 'up';
+
             $sets = [];
             foreach ($exercise->sets ?? [] as $set) {
-                $sets[] = $this->progressSet($set, $exercise->title, $e1rm, $actual, $changes);
+                $sets[] = $this->progressSet($set, $exercise->title, $e1rm, $actual, $stalled, $changes);
             }
 
             $exercises[] = [
@@ -180,6 +198,17 @@ class RoutineProgression
         return 'met';
     }
 
+    /** Eight-week e1RM trends for every exercise, keyed like the alerts are. */
+    private function trends(): array
+    {
+        $filter = new FilterCriteria(
+            from: Carbon::now()->subWeeks(8),
+            to: Carbon::now(),
+        );
+
+        return (new StrengthAnalytics($this->user, $filter))->exerciseTrends();
+    }
+
     private function recentBestE1rm(?string $templateHevyId): ?float
     {
         if (! $templateHevyId) {
@@ -199,7 +228,7 @@ class RoutineProgression
      * @param  array<int, object>|null  $actual  last logged session's sets for this exercise
      * @param  array<int, string>  $changes  (mutated by reference)
      */
-    private function progressSet(array $set, ?string $title, ?float $e1rm, ?array $actual, array &$changes): array
+    private function progressSet(array $set, ?string $title, ?float $e1rm, ?array $actual, bool $stalled, array &$changes): array
     {
         $type = SetType::fromRaw($set['type'] ?? null);
 
@@ -223,6 +252,18 @@ class RoutineProgression
             }
 
             if ($verdict === 'maxed') {
+                // Grinding at RPE 9.5+ once earns a repeat. Grinding while the
+                // eight-week trend is flat earns a back-off: the load is likely
+                // past what technique and recovery can progress from. Below
+                // 10 kg a 2.5 kg step is a quarter of the bar — hold instead.
+                if ($stalled && $weight >= 10) {
+                    $newWeight = $this->backoff((float) $weight);
+                    $changes[] = "{$title}: back off {$weight}kg×{$reps} → {$newWeight}kg×{$reps} (stalled while grinding at RPE 9.5+ — rebuild with 1-2 reps in reserve)";
+                    $set['weight_kg'] = $newWeight;
+
+                    return $this->normalizeSet($set);
+                }
+
                 $changes[] = "{$title}: keep {$weight}kg×{$reps} (met at RPE 9.5+ — consolidate before adding)";
 
                 return $this->normalizeSet($set);
@@ -258,6 +299,17 @@ class RoutineProgression
     private function roundToPlate(float $weight): float
     {
         return round($weight * 2) / 2;
+    }
+
+    /**
+     * ~7.5% off, rounded to a 2.5 kg plate step, always at least one step
+     * down — a back-off that rounds back to the same bar is not one.
+     */
+    private function backoff(float $weight): float
+    {
+        $reduced = round($weight * self::BACKOFF_FACTOR / 2.5) * 2.5;
+
+        return min($reduced, $weight - self::LOAD_STEP_KG);
     }
 
     /** Shape a set for the Hevy routine payload. */

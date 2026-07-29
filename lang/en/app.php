@@ -209,6 +209,17 @@ return [
      */
     'mail' => [
         'signoff' => 'Keep lifting,',
+        'weekly' => [
+            'subject' => 'Your week, measured — :app',
+            'preheader' => 'Trend weight, consistency, and what to act on this week.',
+            'heading' => 'Morning, :name',
+            'weight_line' => 'Trend weight: **:weight** (:rate).',
+            'no_rate' => 'not enough recent readings for a rate',
+            'week_abbr' => 'wk',
+            'consistency_line' => 'Training: :sessions session(s) this week so far, averaging :avg/week over the last month — :streak week(s) in a row.',
+            'cta' => 'Open your dashboard',
+            'opt_out' => 'One email a week, only when there is data. Turn it off any time in your [profile](:url).',
+        ],
         'footer_reason' => 'You are receiving this because you have a Hevy Analytics account. This is an account notice, not marketing.',
         'trial_ending' => [
             'preheader' => 'Nothing breaks when it ends — here is exactly what changes.',
@@ -1111,6 +1122,14 @@ return [
         'stalled_deload' => 'Effort is also climbing at the same load (top-set RPE +:delta) — the classic accumulated-fatigue picture. A deload week costs no muscle (Coleman 2024); it buys recovery.',
         'no_data' => 'Not enough data yet',
         'no_data_body' => 'Log a few more body measurements over time to unlock trend-based alerts.',
+    ],
+
+    'emails' => [
+        'title' => 'Emails',
+        'subtitle' => 'What lands in your inbox — nothing you did not choose',
+        'weekly' => 'Weekly check-in (Mondays)',
+        'weekly_sub' => 'Trend weight, consistency and the top guidance from your dashboard. Sent only when your account has data.',
+        'saved' => 'Email preferences saved.',
     ],
 
     'consistency' => [

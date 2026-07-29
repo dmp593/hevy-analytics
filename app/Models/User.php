@@ -36,6 +36,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'comped_until' => 'datetime',
             'is_admin' => 'boolean',
             'is_demo' => 'boolean',
+            'weekly_email' => 'boolean',
             'trial_ending_notified_at' => 'datetime',
             'past_due_notified_at' => 'datetime',
             'password' => 'hashed',

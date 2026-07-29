@@ -20,6 +20,10 @@ Schedule::command('fatsecret:sync')->dailyAt('03:30')->withoutOverlapping();
 // cadence choice, not a correctness requirement.
 Schedule::command('app:send-trial-emails')->dailyAt('09:00');
 
+// The Monday check-in: the dashboard's top guidance, in the inbox. Also
+// watermarked per user, so the schedule is cadence, not correctness.
+Schedule::command('app:send-weekly-checkins')->weeklyOn(1, '08:00');
+
 // Reseed the public demo weekly so its dates never age into "last workout
 // 5 months ago" — a stale demo quietly argues against the product.
 Schedule::command('app:demo')->weeklyOn(1, '04:00');

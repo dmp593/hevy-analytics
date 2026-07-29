@@ -4,7 +4,7 @@
 > sessões: estado real, pendentes de cada lado, e planos discutidos mas ainda
 > não executados. Em português porque o dono do produto lê em português.
 
-## Em produção (tudo verde, 994 testes)
+## Em produção (tudo verde, 1011 testes)
 
 | Área | Estado |
 |---|---|
@@ -127,9 +127,17 @@ implementado. caso não esteja, implementa". A análise exaustiva encontrou:
   5. Import CSV de passos/sono (Health Auto Export, Fitbit, genérico) para
      o intake log + médias de 14 dias na página de Nutrição + verificação
      do nível de atividade vs. passos observados.
-- **Adiado com fundamento**: check-in semanal por email (sem Resend ativo não
-  há canal; o in-app já recalcula a cada visita); "frescura muscular" tipo
-  Fitbod (heurística vestida de fisiologia — só com pedido explícito).
+- **Emails prontos (2026-07-29, pedido do dono)**: check-in semanal construído
+  e agendado (segundas 08:00, com watermark idempotente, opt-out no perfil,
+  bilingue). Com MAIL_MAILER=log tudo corre inofensivo; ativar Resend
+  (docs/SERVICES.md) liga a entrega sem mais deploys.
+- **Progressão visível + back-off (2026-07-29)**: as recomendações de peso ×
+  reps aparecem na página da rotina antes de qualquer staging; nova regra —
+  lift estagnado (8 sem) + última sessão a RPE 9,5+ → recuar ~7,5% (arredondado
+  a 2,5 kg) para reconstruir com 1-2 reps na reserva (Refalo 2024). É o
+  "desce 10 kg no deadlift" do DeepSeek, sistematizado.
+- **Recusado/adiado**: "frescura muscular" tipo Fitbod (heurística vestida de
+  fisiologia — só com pedido explícito).
 
 ### 4. Ideias sem compromisso
 

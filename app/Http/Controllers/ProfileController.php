@@ -56,6 +56,16 @@ class ProfileController extends Controller
     /**
      * Delete the user's account.
      */
+    /** Email preferences: one honest toggle, saved on its own. */
+    public function updateEmails(Request $request): RedirectResponse
+    {
+        $request->user()->forceFill([
+            'weekly_email' => $request->boolean('weekly_email'),
+        ])->save();
+
+        return Redirect::route('profile.edit')->with('status', __('app.emails.saved'));
+    }
+
     public function destroy(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [

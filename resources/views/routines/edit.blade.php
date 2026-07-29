@@ -9,6 +9,18 @@
          believe. --}}
     <x-panel :title="__('app.routines.progression_title')" :subtitle="__('app.routines.progression_sub')" class="mb-6">
         <p class="text-sm text-body mb-4">{{ __('app.routines.progression_body') }}</p>
+
+        {{-- The recommendations, readable before anything is staged. Each line
+             says what to do next session and why — including the honest ones:
+             repeat what was missed, back off what is stalled and ground out. --}}
+        @if (count($suggestions))
+            <ul class="mb-4 space-y-1.5 rounded-lg bg-surface-sunk px-4 py-3">
+                @foreach ($suggestions as $line)
+                    <li class="text-sm text-body">{{ $line }}</li>
+                @endforeach
+            </ul>
+        @endif
+
         <form method="POST" action="{{ route('write.progression', $routine->hevy_id) }}">
             @csrf
             <button class="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-on-fill hover:bg-brand-hover">

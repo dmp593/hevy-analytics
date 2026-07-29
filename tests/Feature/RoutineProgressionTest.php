@@ -146,4 +146,26 @@ class RoutineProgressionTest extends TestCase
 
         $this->assertSame(9, $set['reps']);
     }
+
+    public function test_grinding_at_a_stalled_lift_earns_a_back_off(): void
+    {
+        $user = User::factory()->create();
+        $routine = $this->routineWith($user, [
+            ['type' => 'normal', 'weight_kg' => 100, 'reps' => 5],
+        ]);
+
+        // Eight weeks of the same bar: a flat trend by the same definition
+        // the dashboard alert uses, ending in a session ground out at RPE 10.
+        foreach (range(2, 8) as $week) {
+            $this->seedWorkout($user, Carbon::now()->subWeeks($week)->addDay(), ['BENCH'], 3, 100.0, 5, rpe: 8.0);
+        }
+        $this->seedWorkout($user, Carbon::now()->subDays(2), ['BENCH'], 1, 100.0, 5, rpe: 10.0);
+
+        $result = (new RoutineProgression($user))->build($routine);
+        $set = $result['payload']['routine']['exercises'][0]['sets'][0];
+
+        $this->assertEquals(92.5, $set['weight_kg']);
+        $this->assertSame(5, $set['reps']);
+        $this->assertStringContainsString('back off', $result['changes'][0]);
+    }
 }

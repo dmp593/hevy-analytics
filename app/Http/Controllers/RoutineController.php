@@ -7,6 +7,7 @@ use App\Services\Analytics\FilterCriteria;
 use App\Services\Analytics\RoutineAnalytics;
 use App\Services\Analytics\StrengthAnalytics;
 use App\Services\Analytics\VolumeAnalytics;
+use App\Services\Hevy\RoutineProgression;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -63,6 +64,10 @@ class RoutineController extends Controller
         return view('routines.edit', [
             'routine' => $routine->load('exercises'),
             'templates' => $request->user()->exerciseTemplates()->orderBy('title')->get(),
+            // The recommendations themselves, visible before anything is
+            // staged: "what should I do next session" must not require
+            // committing to a write-back to find out.
+            'suggestions' => (new RoutineProgression($request->user()))->build($routine)['changes'],
         ]);
     }
 }

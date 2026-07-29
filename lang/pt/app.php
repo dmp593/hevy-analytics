@@ -209,6 +209,17 @@ return [
      */
     'mail' => [
         'signoff' => 'Bons treinos,',
+        'weekly' => [
+            'subject' => 'A tua semana, medida — :app',
+            'preheader' => 'Peso de tendência, consistência e o que merece ação esta semana.',
+            'heading' => 'Bom dia, :name',
+            'weight_line' => 'Peso de tendência: **:weight** (:rate).',
+            'no_rate' => 'ainda sem leituras suficientes para um ritmo',
+            'week_abbr' => 'sem',
+            'consistency_line' => 'Treino: :sessions sessão(ões) esta semana até agora, média de :avg/semana no último mês — :streak semana(s) seguidas.',
+            'cta' => 'Abrir o dashboard',
+            'opt_out' => 'Um email por semana, só quando há dados. Desliga quando quiseres no teu [perfil](:url).',
+        ],
         'footer_reason' => 'Recebes isto porque tens uma conta no Hevy Analytics. É um aviso de conta, não publicidade.',
         'trial_ending' => [
             'preheader' => 'Não se parte nada quando terminar — aqui fica o que muda exatamente.',
@@ -1112,6 +1123,14 @@ return [
         'stalled_deload' => 'O esforço também está a subir com a mesma carga (RPE da série principal +:delta) — o retrato clássico de fadiga acumulada. Uma semana de deload não custa músculo (Coleman 2024); compra recuperação.',
         'no_data' => 'Ainda sem dados suficientes',
         'no_data_body' => 'Registe mais algumas medições corporais ao longo do tempo para desbloquear alertas baseados em tendências.',
+    ],
+
+    'emails' => [
+        'title' => 'Emails',
+        'subtitle' => 'O que chega à tua caixa de entrada — nada que não tenhas escolhido',
+        'weekly' => 'Check-in semanal (às segundas)',
+        'weekly_sub' => 'Peso de tendência, consistência e a principal orientação do teu dashboard. Enviado só quando a conta tem dados.',
+        'saved' => 'Preferências de email guardadas.',
     ],
 
     'consistency' => [
