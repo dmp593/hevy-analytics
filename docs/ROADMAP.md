@@ -169,6 +169,25 @@ peso×reps, timeline de PRs por mês, analytics por equipamento. Recusado:
 dashboard de widgets drag-and-drop (build pesado, zero ciência). CSV do
 dono em scratchpad/hevy.csv (não comitar!).
 
+### 6. Trio "ciência pessoal" — APROVADO ("avança", 2026-07-29), EM CURSO
+
+Plano fechado (implementar exatamente isto):
+- Novo serviço App\Services\Analytics\PersonalScience, 3 leituras sobre
+  SetQuery (janela 6 meses; e1RM fiável por sessão como % da média do
+  próprio levantamento):
+  1. recoveryCurve(): top-3 lifts (≥8 sessões); dias de descanso desde a
+     sessão anterior DESSE lift → e1RM relativo; buckets 1/2/3/4+ dias, só
+     com n≥3; saída "com 2 dias: +1,2% vs média (n=9)".
+  2. timeOfDay(): buckets manhã <12h / tarde 12-17h / noite ≥17h (tz do
+     utilizador); lifts com ≥4 sessões em ≥2 buckets; diferença média
+     ponderada. Citar Grgic 2019 e dizer se NO utilizador se confirma.
+  3. repRangePortfolio(): 12 semanas; bandas 1-5/6-12/13-20/21+; % por
+     músculo; nota goal-aware (força sem 1-5 → aviso; hipertrofia: espetro
+     todo serve, Schoenfeld 2021).
+- UI: Performance ganha secção "A tua ciência" (1+2); Músculos ganha o
+  portfólio (3). Lang EN+PT com fontes. Testes dispara/não-dispara.
+- Depois: suite, pint, commit, push HEAD:main, deploy Render, reporte pt.
+
 ## Dívida de legibilidade conhecida (auditoria 2026-07-29, passe 2 pendente)
 
 Dois revisores independentes: veredicto "não é esparguete, arquitetura boa,
