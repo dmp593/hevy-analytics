@@ -3,13 +3,30 @@
 <span x-data="{
         open: false,
         timer: null,
-        show() { clearTimeout(this.timer); this.open = true; },
+        show() { clearTimeout(this.timer); this.open = true; this.$nextTick(() => this.place()); },
         hide() { this.timer = setTimeout(() => this.open = false, 200); },
+        {{-- Measured on OPEN, not on init: a display:none panel reports a
+             zero rect, so any decision made before it is visible anchors
+             the wrong side and right-column tooltips spill off-screen. --}}
+        place() {
+            const el = this.$refs.panel;
+            if (! el) return;
+            el.classList.remove('left-0', 'right-0');
+            el.classList.add('left-1/2', '-translate-x-1/2');
+            const box = el.getBoundingClientRect();
+            if (box.right > window.innerWidth - 8) {
+                el.classList.remove('left-1/2', '-translate-x-1/2');
+                el.classList.add('right-0');
+            } else if (box.left < 8) {
+                el.classList.remove('left-1/2', '-translate-x-1/2');
+                el.classList.add('left-0');
+            }
+        },
     }"
     class="relative inline-flex items-center align-middle">
     <button type="button"
             @mouseenter="show()" @mouseleave="hide()"
-            @focus="show()" @blur="hide()" @click.prevent="open = !open"
+            @focus="show()" @blur="hide()" @click.prevent="open ? open = false : show()"
             @keydown.escape.window="open = false"
             :aria-expanded="open"
             {{-- The circle stays visually small; the HIT AREA does not. Padding
@@ -27,19 +44,9 @@
          pushed the document wider than the viewport, so every page scrolled
          sideways. Clamping the width and letting it flip sides keeps it inside. --}}
     <span x-show="open" x-cloak x-transition.opacity
-          role="tooltip"
+          role="tooltip" x-ref="panel"
           @mouseenter="show()" @mouseleave="hide()"
-          class="absolute z-30 bottom-full left-1/2 -translate-x-1/2 pb-2 w-[min(16rem,calc(100vw-2rem))] max-w-[16rem] text-left font-normal normal-case"
-          x-init="$nextTick(() => {
-              const box = $el.getBoundingClientRect();
-              if (box.right > window.innerWidth - 8) {
-                  $el.classList.remove('left-1/2', '-translate-x-1/2');
-                  $el.classList.add('right-0');
-              } else if (box.left < 8) {
-                  $el.classList.remove('left-1/2', '-translate-x-1/2');
-                  $el.classList.add('left-0');
-              }
-          })">
+          class="absolute z-30 bottom-full left-1/2 -translate-x-1/2 pb-2 w-[min(16rem,calc(100vw-2rem))] max-w-[16rem] text-left font-normal normal-case">
         <span class="block rounded-lg bg-ink text-canvas text-xs leading-relaxed p-3 shadow-xl">
             @if($title)<span class="block font-semibold mb-1">{{ $title }}</span>@endif
             {{ $text }}

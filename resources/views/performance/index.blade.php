@@ -73,7 +73,7 @@
                                 <td class="py-2 pl-5 pr-4">{{ $row['exercise'] }}</td>
                                 <td class="py-2 pr-4">
                                     <span @class([
-                                        'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold',
+                                        'inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-semibold',
                                         'bg-good/10 text-good' => $row['direction'] === 'up',
                                         'bg-warn/10 text-warn' => $row['direction'] === 'flat',
                                         'bg-bad/10 text-bad' => $row['direction'] === 'down',
