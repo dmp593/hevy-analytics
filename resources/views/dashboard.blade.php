@@ -106,7 +106,9 @@
             <section aria-label="{{ __('app.dashboard.at_a_glance') }}">
                 <h2 class="mb-3 text-xs font-semibold uppercase tracking-wide text-faint">{{ __('app.dashboard.at_a_glance') }}</h2>
                 <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-                    <x-ui.stat :label="__('app.dashboard.weight')" :value="units()->weight($status['weight_kg'] ?? null)" :unit="units()->weightUnit()"
+                    {{-- Smoothed trend, not this morning's reading — a single
+                         weigh-in swings 1-2 kg on water and meal timing. --}}
+                    <x-ui.stat :label="__('app.dashboard.weight')" :value="units()->weight($status['trend_weight_kg'] ?? $status['weight_kg'] ?? null)" :unit="units()->weightUnit()"
                                :sub="$ratePct !== null ? __('app.units.bw_per_week', ['value' => sprintf('%+.2f', $ratePct)]) : null"
                                :tip="__('app.tips.weight')" />
                     <x-ui.stat :label="__('app.dashboard.body_fat')" :value="$status['fat_percent'] ?? null" unit="%"

@@ -250,4 +250,20 @@ class ScienceTest extends TestCase
         // Better to ask for the measurement than to quietly use the men's formula.
         $this->assertNull(BodyComposition::navyBodyFat('female', 32, 76, 165));
     }
+
+    public function test_relative_fat_mass_matches_the_published_equation(): void
+    {
+        // 180 cm, 90 cm waist: 64 - 20*(180/90) = 24.0 for a man; women +12.
+        $this->assertSame(24.0, BodyComposition::relativeFatMass(180, 90, 'male'));
+        $this->assertSame(36.0, BodyComposition::relativeFatMass(180, 90, 'female'));
+    }
+
+    public function test_relative_fat_mass_rejects_impossible_tape_values(): void
+    {
+        $this->assertNull(BodyComposition::relativeFatMass(0, 90, 'male'));
+        $this->assertNull(BodyComposition::relativeFatMass(180, 0, 'male'));
+
+        // A 40 cm "waist" on a 180 cm frame is a typo, not a body.
+        $this->assertNull(BodyComposition::relativeFatMass(180, 40, 'male'));
+    }
 }

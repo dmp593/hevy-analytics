@@ -128,7 +128,7 @@
     <x-panel id="body" :title="__('guide.body.title')">
         <div class="prose prose-sm max-w-none text-body">
             <ul>
-                @foreach (['fat', 'lean', 'navy', 'ffmi', 'waist_height', 'symmetry'] as $item)
+                @foreach (['trend_weight', 'fat', 'lean', 'navy', 'rfm', 'ffmi', 'waist_height', 'waist_hip', 'symmetry'] as $item)
                     <li>{!! __('guide.body.'.$item) !!}</li>
                 @endforeach
             </ul>

@@ -180,4 +180,43 @@ class CompareTest extends TestCase
         $this->assertEqualsWithDelta(176.4, $weight['cells'][0]['display'], 0.1);
         $this->assertSame('+4.4', $weight['cells'][1]['delta']);
     }
+
+    /** @return array<string, mixed> */
+    private function fatRow($response): array
+    {
+        return collect($response->viewData('comparison')['rows'])
+            ->firstWhere('label', __('app.body.measure.fat_percent'));
+    }
+
+    public function test_body_fat_is_judged_against_the_goal(): void
+    {
+        // goal, baseline fat%, later fat%, expected tone. The band is 1pp of
+        // measurement noise; in a bulk a rise is amber past 2pp, never red.
+        $cases = [
+            ['cut', 25.0, 22.0, 'good'],
+            ['cut', 25.0, 25.5, 'warn'],
+            ['cut', 25.0, 27.0, 'bad'],
+            ['recomposition', 20.0, 20.5, 'good'],
+            ['recomposition', 20.0, 22.0, 'bad'],
+            ['lean_bulk', 15.0, 13.0, 'good'],
+            ['lean_bulk', 15.0, 16.5, 'neutral'],
+            ['lean_bulk', 15.0, 18.0, 'warn'],
+        ];
+
+        foreach ($cases as [$goalType, $before, $after, $expected]) {
+            $user = $this->athlete();
+            Goal::factory()->for($user)->create(['type' => $goalType]);
+            $this->measure($user, '2026-05-01', ['weight_kg' => 80, 'fat_percent' => $before]);
+            $this->measure($user, '2026-07-01', ['weight_kg' => 80, 'fat_percent' => $after]);
+
+            $response = $this->actingAs($user)
+                ->get('/compare?dates[]=2026-05-01&dates[]=2026-07-01')->assertOk();
+
+            $this->assertSame(
+                $expected,
+                $this->fatRow($response)['cells'][1]['tone'],
+                "$goalType: $before -> $after",
+            );
+        }
+    }
 }

@@ -13,11 +13,12 @@ use Illuminate\Support\Collection;
  * Check-in comparison: two to four dates side by side, photos aligned by
  * pose, biometric values with their change against the oldest selected date.
  *
- * Judgement is deliberately narrow. Only the weight row is coloured, and only
- * against the active goal — "bicep up" is good in a bulk and ambiguous in a
- * cut, and inventing verdicts for fourteen tape measurements would be
- * guessing. Colour never stands alone: the signed number and arrow carry the
- * same information for anyone who cannot tell red from green.
+ * Judgement is deliberately narrow. Only the weight and body-fat rows are
+ * coloured, and only against the active goal — "bicep up" is good in a bulk
+ * and ambiguous in a cut, and inventing verdicts for fourteen tape
+ * measurements would be guessing. Colour never stands alone: the signed
+ * number and arrow carry the same information for anyone who cannot tell red
+ * from green.
  */
 class CompareController extends Controller
 {
@@ -32,6 +33,16 @@ class CompareController extends Controller
     private const WEIGHT_BAND_PCT = 0.01;
 
     private const WEIGHT_BAND_MIN_KG = 0.5;
+
+    /**
+     * Body-fat bands, in percentage points. Consumer estimates (BIA scales,
+     * tape formulas) carry roughly a point of noise, so nothing inside the
+     * band counts as a real change.
+     */
+    private const FAT_BAND_PP = 1.0;
+
+    /** In a bulk, fat gain past this is flagged amber — never red, because some fat gain is the accepted cost. */
+    private const FAT_BULK_WARN_PP = 2.0;
 
     /** Goal type => which way the goal wants bodyweight to move. */
     private const GOAL_DIRECTION = [
@@ -152,9 +163,11 @@ class CompareController extends Controller
                     'display' => $display,
                     'delta' => sprintf('%+.1f', $deltaDisplay),
                     'arrow' => abs($deltaMetric) < 0.05 ? '→' : ($deltaMetric > 0 ? '↑' : '↓'),
-                    'tone' => $metric['key'] === 'weight_kg'
-                        ? $this->judgeWeight($goalDirection, $deltaMetric, $baseline)
-                        : 'neutral',
+                    'tone' => match ($metric['key']) {
+                        'weight_kg' => $this->judgeWeight($goalDirection, $deltaMetric, $baseline),
+                        'fat_percent' => $this->judgeFat($goalDirection, $deltaMetric),
+                        default => 'neutral',
+                    },
                 ];
             });
 
@@ -194,6 +207,30 @@ class CompareController extends Controller
             'maintain' => $stable ? 'good' : 'bad',
             'gain' => $stable ? 'warn' : ($deltaKg > 0 ? 'good' : 'bad'),
             'lose' => $stable ? 'warn' : ($deltaKg < 0 ? 'good' : 'bad'),
+        };
+    }
+
+    /**
+     * Body-fat% change against the goal, in percentage points. A fall is good
+     * under every goal; in a bulk a rise is only flagged (amber, never red)
+     * once it outruns what a lean bulk needs — inside that, no judgement.
+     */
+    private function judgeFat(?string $direction, float $deltaPp): string
+    {
+        if ($direction === null) {
+            return 'neutral';
+        }
+
+        return match ($direction) {
+            'lose' => abs($deltaPp) <= self::FAT_BAND_PP
+                ? 'warn'
+                : ($deltaPp < 0 ? 'good' : 'bad'),
+            'maintain' => $deltaPp > self::FAT_BAND_PP ? 'bad' : 'good',
+            'gain' => match (true) {
+                $deltaPp < -self::FAT_BAND_PP => 'good',
+                $deltaPp > self::FAT_BULK_WARN_PP => 'warn',
+                default => 'neutral',
+            },
         };
     }
 }

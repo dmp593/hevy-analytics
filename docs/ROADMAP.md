@@ -1,10 +1,10 @@
 # Roadmap & estado — memória durável do projeto
 
-> Atualizado a 2026-07-28. Este ficheiro existe para nada se perder entre
+> Atualizado a 2026-07-29. Este ficheiro existe para nada se perder entre
 > sessões: estado real, pendentes de cada lado, e planos discutidos mas ainda
 > não executados. Em português porque o dono do produto lê em português.
 
-## Em produção (tudo verde, 911 testes)
+## Em produção (tudo verde, 971 testes)
 
 | Área | Estado |
 |---|---|
@@ -15,6 +15,7 @@
 | Comparador | ✓ 2–4 datas, poses alinhadas, só o peso é julgado (contra o objetivo, banda ~1%) |
 | Landing + guia | ✓ refletem tudo o acima, nas duas línguas |
 | Robustez | ✓ app sobrevive a rotação de APP_KEY; testes imunes ao ambiente da máquina |
+| Auditoria científica (2026-07-29) | ✓ as 7 recomendações implementadas — ver secção abaixo |
 
 Infra: Render (srv-d9jtgmvavr4c73a6sd0g) + Neon (Postgres) + R2; variáveis num
 environment group "hevy-analytics" no Render. Preço decidido: €9/mês, trial de
@@ -77,7 +78,33 @@ vetor publicado do OAuth 1.0a E contra o endpoint real (request_token 200).
 PENDENTE DE VALIDAÇÃO REAL: o dono ligar a conta dele em produção (o passo
 authorize/access só se prova com um browser).
 
-### 3. Ideias sem compromisso
+### 3. Auditoria científica — ✓ EM PRODUÇÃO (2026-07-29)
+
+O dono pediu "avança com todas as tuas recomendações". As 7 entregues:
+
+1. **Peso de tendência (EWMA)** nos mostradores do dashboard e da página
+   Corpo — média com meia-vida de 10 dias, consciente de intervalos entre
+   pesagens; os gráficos continuam com as leituras em bruto.
+2. **Cintura/anca exposto** com limiares da OMS por sexo (0,90 H / 0,85 M);
+   sem sexo definido mostra o número sem cor (sem julgamento desonesto).
+3. **RFM** (Woolcott & Bergman 2018) como terceiro estimador de gordura ao
+   lado da balança e do Navy — nunca substituído em silêncio.
+4. **Mistura adaptativa ponderada pelos dados**: o TDEE adaptativo pesa
+   0,35 com 7 dias de registos e até 0,80 com 28 (antes era 50/50 fixo);
+   `basis` guarda peso e nº de dias para transparência.
+5. **Massa gorda julgada no comparador** contra o objetivo (banda 1pp; num
+   bulk a subida só é âmbar acima de 2pp, nunca vermelha).
+6. **Alerta de pico de volume**: séries dos últimos 7 dias ≥1,6× a média
+   semanal do mês anterior (base ≥8 séries/sem; exige ≥3 semanas de
+   histórico para não acusar quem começa a treinar).
+7. **Alerta de estagnação de e1RM**: top-3 levantamentos sem tendência de
+   subida em 8 semanas (≥6 sessões); suprimido em cut, onde manter força
+   já é sucesso.
+
+Recusadas com fundamento (não reabrir sem pedido): idade metabólica, BRI,
+score compósito único.
+
+### 4. Ideias sem compromisso
 
 Apagar treinos importados (limpa o "Prod Probe" de 2026-07-20 na conta do
 dono); validação fina dos dialetos com ficheiros reais.

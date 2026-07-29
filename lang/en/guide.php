@@ -111,11 +111,14 @@ return [
 
     'body' => [
         'title' => 'Body composition',
+        'trend_weight' => '<strong>Trend weight:</strong> the weight tiles show a smoothed average that leans on your recent weigh-ins (half-life about 10 days), because a single reading swings 1–2 kg on water and meal timing alone. The charts still plot every raw reading.',
         'fat' => '<strong>Body fat %:</strong> the share of your weight that is fat. Lower is leaner. During a lean bulk you want this to creep up only slowly.',
         'lean' => '<strong>Lean mass:</strong> everything that is not fat — muscle, bone, water, organs. Growing lean mass while fat stays flat is the whole goal.',
         'navy' => '<strong>Navy body fat %:</strong> an independent estimate from tape measurements (neck, waist, height), shown as a cross-check against your scale or caliper number.',
+        'rfm' => '<strong>RFM (Relative Fat Mass):</strong> a third body-fat estimate from just height and waist (Woolcott &amp; Bergman, 2018), validated against DXA scans. Three imperfect estimators agreeing beats trusting any one of them.',
         'ffmi' => '<strong>FFMI (Fat-Free Mass Index):</strong> your muscularity, adjusted for height — like BMI, but for muscle. <strong>Normalised FFMI</strong> standardises it to 1.80 m so it is comparable. Roughly: 19 is average, 22 is fit, and 25 is around the natural ceiling for most men.',
         'waist_height' => '<strong>Waist-to-height ratio:</strong> waist ÷ height. Keeping it <strong>under 0.5</strong> is a simple health marker. If it climbs during a bulk, you are adding fat around the middle.',
+        'waist_hip' => '<strong>Waist-to-hip ratio:</strong> waist ÷ hips. The WHO flags <strong>0.90 and above</strong> for men and <strong>0.85 and above</strong> for women as elevated cardiometabolic risk. The cut-offs are sex-specific, so the colour only appears once your sex is on file.',
         'symmetry' => '<strong>Left/right symmetry:</strong> the percentage difference between your left and right limb measurements. Over about 5% suggests an imbalance worth some single-arm or single-leg work.',
     ],
 

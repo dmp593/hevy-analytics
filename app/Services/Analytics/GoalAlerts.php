@@ -3,13 +3,31 @@
 namespace App\Services\Analytics;
 
 use App\Models\User;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 /**
  * Goal-aware alerting. Compares observed body-composition trends to the
- * active goal's target rate and flags fat-gain / muscle-loss risks.
+ * active goal's target rate and flags fat-gain / muscle-loss risks, plus
+ * training-load signals read from the workout log itself.
  */
 class GoalAlerts
 {
+    /** Recent-week hard sets at or past this multiple of the baseline weekly mean is a spike. */
+    private const SPIKE_RATIO = 1.6;
+
+    /**
+     * Below this baseline (sets/week) a ratio is noise: going from 3 sets to
+     * 5 is not a training decision worth an alert.
+     */
+    private const SPIKE_MIN_BASE_SETS = 8;
+
+    /**
+     * Sessions before a flat trend is called a stall. Fewer and a deload
+     * plus a holiday reads as one.
+     */
+    private const STALL_MIN_SESSIONS = 6;
+
     public function __construct(private readonly User $user) {}
 
     /**
@@ -110,11 +128,127 @@ class GoalAlerts
             }
         }
 
+        foreach ($this->trainingAlerts() as $a) {
+            $alerts[] = $a;
+        }
+
         if (empty($alerts)) {
             $alerts[] = $this->alert('info', __('app.alerts.no_data'), __('app.alerts.no_data_body'));
         }
 
         return $alerts;
+    }
+
+    /**
+     * Training-load alerts read from the workout log: a sharp week-on-week
+     * volume ramp, and top lifts that have stopped moving. One eight-week
+     * row fetch serves both rules.
+     *
+     * @return array<int, array{level:string, title:string, message:string}>
+     */
+    private function trainingAlerts(): array
+    {
+        $now = Carbon::now($this->user->resolvedTimezone());
+        $filter = new FilterCriteria(
+            from: $now->copy()->subWeeks(8)->startOfDay(),
+            to: $now->copy()->endOfDay(),
+        );
+        $rows = (new SetQuery($this->user, $filter))->rows();
+
+        if ($rows->isEmpty()) {
+            return [];
+        }
+
+        $alerts = [];
+        if ($spike = $this->volumeSpike($rows, $now)) {
+            $alerts[] = $spike;
+        }
+        if ($stalled = $this->stalledLifts($rows, $filter)) {
+            $alerts[] = $stalled;
+        }
+
+        return $alerts;
+    }
+
+    /**
+     * Hard sets in the last seven days against the weekly mean of the four
+     * weeks before them. The injury literature on load spikes is mixed, so
+     * the body text says "associated with", not "causes" — but a >60% ramp
+     * is worth a deliberate look either way.
+     */
+    private function volumeSpike(Collection $rows, Carbon $now): ?array
+    {
+        $boundary = $now->copy()->subDays(7);
+        $windowStart = $now->copy()->subDays(35);
+
+        $recent = 0;
+        $prior = 0;
+        $earliest = null;
+
+        foreach ($rows as $r) {
+            if (! $r->start_time) {
+                continue;
+            }
+            $t = Carbon::parse($r->start_time);
+            if ($earliest === null || $t->lt($earliest)) {
+                $earliest = $t;
+            }
+            if ($t->lt($windowStart)) {
+                continue;
+            }
+            $t->greaterThanOrEqualTo($boundary) ? $recent++ : $prior++;
+        }
+
+        // A spike needs a baseline: at least three weeks of history before
+        // the recent window, else the ramp is just "started training".
+        if ($earliest === null || $earliest->diffInDays($boundary) < 21) {
+            return null;
+        }
+
+        $priorDays = min(28.0, $earliest->diffInDays($boundary));
+        $weeklyMean = $prior / ($priorDays / 7);
+
+        if ($weeklyMean < self::SPIKE_MIN_BASE_SETS || $recent < $weeklyMean * self::SPIKE_RATIO) {
+            return null;
+        }
+
+        return $this->alert('warning', __('app.alerts.volume_spike'),
+            __('app.alerts.volume_spike_body', [
+                'recent' => $recent,
+                'baseline' => (int) round($weeklyMean),
+            ]));
+    }
+
+    /** Top-three lifts by e1RM whose eight-week trend is not going up. */
+    private function stalledLifts(Collection $rows, FilterCriteria $filter): ?array
+    {
+        // In a cut, holding strength in a deficit is success, not a stall.
+        if ($this->user->activeGoal()?->type === 'cut') {
+            return null;
+        }
+
+        $sa = new StrengthAnalytics($this->user, $filter);
+        $prs = array_filter($sa->exercisePrs($rows), fn ($p) => $p['best_e1rm'] > 0);
+        $trends = $sa->exerciseTrends($rows);
+
+        $stalled = [];
+        foreach (array_slice($prs, 0, 3) as $p) {
+            $t = $trends[$p['template_id'] ?? $p['exercise']] ?? null;
+
+            // Reliability (r²) is deliberately not required here: a genuinely
+            // flat line explains no variance, so its r² is near zero and the
+            // flag would exclude exactly the lifts this alert exists to catch.
+            if ($t !== null && $t['sessions'] >= self::STALL_MIN_SESSIONS && $t['direction'] !== 'up') {
+                $stalled[] = $p['exercise'];
+            }
+        }
+
+        if ($stalled === []) {
+            return null;
+        }
+
+        return $this->alert('info', __('app.alerts.stalled_lifts'),
+            __('app.alerts.stalled_lifts_body', ['lifts' => implode(', ', $stalled)]));
     }
 
     private function alert(string $level, string $title, string $message): array

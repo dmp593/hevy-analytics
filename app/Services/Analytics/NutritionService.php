@@ -50,15 +50,22 @@ class NutritionService
         $tdee = $formulaTdee;
 
         // Adaptive correction: if we can estimate real maintenance from intake +
-        // weight change, blend it toward the formula estimate.
+        // weight change, blend it toward the formula estimate. The adaptive
+        // figure earns weight with data: at the 7-day minimum it contributes
+        // 35%, at a full 28 logged days it is capped at 80% — observed intake
+        // should eventually dominate a population formula, but never silence it,
+        // because logging errors are systematic in a way formulas are not.
         //
         // The blend overwrites $tdee, so the formula figure has to be kept
         // separately or it is gone: the stored 'tdee' is then a hybrid wearing a
         // formula's name, and neither half can be recovered to explain the
         // difference to the athlete.
-        $adaptive = $this->adaptiveMaintenance();
+        $adaptiveData = $this->adaptiveData();
+        $adaptive = $adaptiveData['maintenance'] ?? null;
+        $adaptiveWeight = null;
         if ($adaptive !== null) {
-            $tdee = round($formulaTdee * 0.5 + $adaptive * 0.5, 1);
+            $adaptiveWeight = min(0.8, 0.2 + 0.6 * min(1, $adaptiveData['logged_days'] / 28));
+            $tdee = round($formulaTdee * (1 - $adaptiveWeight) + $adaptive * $adaptiveWeight, 1);
         }
 
         $targetCalories = Macros::targetCalories($tdee, $profile->calorie_adjustment_pct);
@@ -82,6 +89,8 @@ class NutritionService
                 'fat_g_per_kg' => $profile->fat_g_per_kg,
                 'fiber_g' => Macros::fiberG($targetCalories),
                 'adaptive_maintenance' => $adaptive,
+                'adaptive_weight' => $adaptiveWeight,
+                'adaptive_logged_days' => $adaptiveData['logged_days'] ?? null,
                 'formula_tdee' => $formulaTdee,
                 'target_rate_pct_bw_per_week' => $profile->target_rate_pct_bw_per_week,
             ],
@@ -99,6 +108,17 @@ class NutritionService
      * change: maintenance = avgIntake − (weeklyΔkg × 7700 / 7).
      */
     public function adaptiveMaintenance(int $days = 28): ?float
+    {
+        return $this->adaptiveData($days)['maintenance'] ?? null;
+    }
+
+    /**
+     * The adaptive-maintenance estimate together with how much data backs it,
+     * so callers can weight the number by the evidence behind it.
+     *
+     * @return array{maintenance: float, logged_days: int}|null
+     */
+    public function adaptiveData(int $days = 28): ?array
     {
         $from = Carbon::now()->subDays($days);
         $logs = $this->user->intakeLogs()
@@ -122,7 +142,10 @@ class NutritionService
 
         $dailyDelta = $rate['kg_per_week'] * Macros::KCAL_PER_KG / 7;
 
-        return round($avgIntake - $dailyDelta, 0);
+        return [
+            'maintenance' => round($avgIntake - $dailyDelta, 0),
+            'logged_days' => $logs->count(),
+        ];
     }
 
     /** Adherence: logged intake vs target over recent days. */

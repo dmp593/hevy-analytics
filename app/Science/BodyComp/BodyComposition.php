@@ -152,6 +152,24 @@ class BodyComposition
             : 0.407 * $w + 0.267 * $h - 19.2, 2);
     }
 
+    /**
+     * Relative Fat Mass (Woolcott & Bergman 2018, Scientific Reports).
+     * RFM = 64 − 20·(height/waist), +12 for women. Tape-only, validated
+     * against DXA — a third estimator to triangulate beside BIA and Navy.
+     */
+    public static function relativeFatMass(float $heightCm, float $waistCm, ?string $sex): ?float
+    {
+        if ($heightCm <= 0 || $waistCm <= 0) {
+            return null;
+        }
+
+        $rfm = 64 - 20 * ($heightCm / $waistCm) + (self::isFemale($sex) ? 12 : 0);
+
+        // Outside any physiological range means a mistyped measurement, not a
+        // body-fat estimate worth showing.
+        return ($rfm < 2 || $rfm > 65) ? null : round($rfm, 1);
+    }
+
     /** Waist-to-height ratio (health risk > 0.5) */
     public static function waistToHeightRatio(float $waistCm, float $heightCm): ?float
     {

@@ -94,6 +94,28 @@ class UrlGuardBypassTest extends TestCase
         }
     }
 
+    /**
+     * Hosts whose raw bytes differ from what curl will actually look up:
+     * exactly the divergence the normalisation exists to close.
+     *
+     * @return array<string, array{string}>
+     */
+    public static function hostsCurlRewrites(): array
+    {
+        return [
+            // U+24DB circled "l" maps to plain "l": the original bypass.
+            'circled letter' => ["\u{24DB}ocalhost.example.com"],
+            // Fullwidth letters map to their ASCII forms.
+            'fullwidth letters' => ["\u{FF41}pi.example.com"],
+            // Case-folding applies before the confusable mapping.
+            'uppercase circled letter' => ["\u{24C1}OCALHOST.EXAMPLE.COM"],
+            // A genuine IDN becomes stable ASCII punycode.
+            'true idn' => ["b\u{00FC}cher.example.com"],
+            // Plain ASCII still normalises: curl looks up lowercase.
+            'ascii uppercase' => ['API.Example.COM'],
+        ];
+    }
+
     public static function rangesPhpCallsPublic(): array
     {
         return [

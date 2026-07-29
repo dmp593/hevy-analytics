@@ -35,8 +35,12 @@
          check every visit, and at six across they crowded out the ones you do. --}}
     <h2 class="mb-3 text-xs font-semibold uppercase tracking-wide text-faint">{{ __('app.dashboard.at_a_glance') }}</h2>
     <div class="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <x-ui.stat :label="__('app.dashboard.weight')" :value="units()->weight($status['weight_kg'] ?? null) ?? '—'" :unit="units()->weightUnit()"
-                   :sub="isset($rate['kg_per_week']) ? sprintf('%+.2f %s/wk', units()->weight($rate['kg_per_week'], 2), units()->weightUnit()) : null" />
+        {{-- The tile shows the smoothed trend, not this morning's reading: a
+             single weigh-in swings 1-2 kg on water alone. The raw number is
+             one line below so nothing is hidden. --}}
+        <x-ui.stat :label="__('app.dashboard.weight')" :value="units()->weight($status['trend_weight_kg'] ?? $status['weight_kg'] ?? null) ?? '—'" :unit="units()->weightUnit()"
+                   :sub="isset($rate['kg_per_week']) ? sprintf('%+.2f %s/wk', units()->weight($rate['kg_per_week'], 2), units()->weightUnit()) : null"
+                   :tip="__('app.tips.weight')" />
         <x-ui.stat :label="__('app.dashboard.body_fat')" :value="$status['fat_percent'] ?? '—'" unit="%"
                    :sub="$status['navy_fat_percent'] ? 'Navy '.$status['navy_fat_percent'].'%' : null"
                    :tip="__('app.tips.body_fat')" />
@@ -125,7 +129,7 @@
         </summary>
 
         <div class="space-y-6 border-t border-line px-5 py-5">
-            <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <div class="grid grid-cols-2 gap-4 lg:grid-cols-3">
                 <x-ui.stat :label="__('app.body.ffmi')" :value="$status['ffmi_normalized'] ?? '—'"
                            :sub="$status['ffmi'] ? __('app.body.ffmi_raw', ['value' => $status['ffmi']]) : null"
                            :tip="__('app.tips.ffmi')" />
@@ -139,6 +143,18 @@
                                default => 'good',
                            }"
                            :tip="__('app.tips.waist_height')" />
+                {{-- Risk tone needs a stated sex (WHO cut-offs differ); without
+                     one the ratio is shown untoned rather than misjudged. --}}
+                <x-ui.stat :label="__('app.body.waist_hip')" :value="$status['waist_to_hip'] ?? '—'"
+                           :tone="match ($status['waist_to_hip_risk'] ?? null) {
+                               null => null,
+                               true => 'warn',
+                               false => 'good',
+                           }"
+                           :tip="__('app.tips.waist_hip')" />
+                <x-ui.stat :label="__('app.body.rfm')" :value="$status['rfm_percent'] ?? '—'"
+                           :unit="($status['rfm_percent'] ?? null) !== null ? '%' : ''"
+                           :tip="__('app.tips.rfm')" />
                 <x-ui.stat :label="__('app.body.p_ratio')" :value="$partitioning['p_ratio'] ?? '—'"
                            :sub="$partitioning['p_ratio'] !== null
                                ? ($partitioning['reliable'] ?? false

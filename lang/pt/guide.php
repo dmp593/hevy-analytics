@@ -105,11 +105,14 @@ return [
 
     'body' => [
         'title' => 'Composição corporal',
+        'trend_weight' => '<strong>Peso de tendência:</strong> os mostradores de peso apresentam uma média suavizada que dá mais peso às pesagens recentes (meia-vida de cerca de 10 dias), porque uma única pesagem oscila 1–2 kg só com água e refeições. Os gráficos continuam a mostrar todas as leituras em bruto.',
         'fat' => '<strong>% de gordura corporal:</strong> a parte do teu peso que é gordura. Mais baixo é mais seco. Durante um ganho limpo queres que suba só devagar.',
         'lean' => '<strong>Massa magra:</strong> tudo o que não é gordura — músculo, osso, água, órgãos. Aumentar massa magra com a gordura estável é o objetivo todo.',
         'navy' => '<strong>% de gordura Navy:</strong> uma estimativa independente a partir de medições com fita (pescoço, cintura, altura), mostrada como contraprova ao número da tua balança ou adipómetro.',
+        'rfm' => '<strong>RFM (Relative Fat Mass):</strong> uma terceira estimativa de gordura corporal apenas com altura e cintura (Woolcott &amp; Bergman, 2018), validada contra DXA. Três estimadores imperfeitos a concordar vale mais do que confiar num só.',
         'ffmi' => '<strong>FFMI (índice de massa livre de gordura):</strong> a tua muscularidade, ajustada à altura — como o IMC, mas para músculo. O <strong>FFMI normalizado</strong> padroniza para 1,80 m para ser comparável. Grosso modo: 19 é médio, 22 é em forma, e 25 anda perto do teto natural para a maioria dos homens.',
         'waist_height' => '<strong>Rácio cintura-altura:</strong> cintura ÷ altura. Mantê-lo <strong>abaixo de 0,5</strong> é um indicador simples de saúde. Se subir durante um ganho, estás a acumular gordura na zona abdominal.',
+        'waist_hip' => '<strong>Rácio cintura-anca:</strong> cintura ÷ anca. A OMS assinala <strong>0,90 ou mais</strong> nos homens e <strong>0,85 ou mais</strong> nas mulheres como risco cardiometabólico elevado. Os limiares dependem do sexo, por isso a cor só aparece com o sexo definido no perfil.',
         'symmetry' => '<strong>Simetria esquerda/direita:</strong> a diferença percentual entre as medições dos membros esquerdo e direito. Acima de cerca de 5% sugere um desequilíbrio que merece trabalho unilateral.',
     ],
 

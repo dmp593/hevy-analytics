@@ -331,4 +331,78 @@ class AnalyticsCorrectnessTest extends TestCase
         $this->assertNotNull($status['navy_fat_percent']);
         $this->assertGreaterThan(25.0, $status['navy_fat_percent']);
     }
+
+    public function test_trend_weight_agrees_with_a_steady_scale(): void
+    {
+        $user = $this->makeAthlete();
+        $this->seedWeightTrend($user, 80.0, 0.0, 5);
+
+        $this->assertEqualsWithDelta(80.0, (new BodyCompAnalytics($user))->trendWeightKg(), 0.01);
+    }
+
+    public function test_trend_weight_absorbs_a_single_spike_instead_of_jumping_to_it(): void
+    {
+        $user = $this->makeAthlete();
+        $this->seedWeightTrend($user, 80.0, 0.0, 4, endingOn: Carbon::now()->subWeek());
+        $user->bodyMeasurements()->create([
+            'date' => Carbon::now()->toDateString(),
+            'weight_kg' => 84.0,
+        ]);
+
+        $trend = (new BodyCompAnalytics($user))->trendWeightKg();
+
+        // Pulled toward the new reading, but nowhere near swallowing it whole:
+        // that gap is the whole point of showing a trend instead of a weigh-in.
+        $this->assertGreaterThan(80.3, $trend);
+        $this->assertLessThan(82.5, $trend);
+
+        $this->assertEqualsWithDelta($trend, (new BodyCompAnalytics($user))->status()['trend_weight_kg'], 0.01);
+    }
+
+    public function test_waist_to_hip_risk_uses_who_sex_specific_cutoffs(): void
+    {
+        // 0.86 sits between the WHO cut-offs: risk for a woman (0.85), not
+        // yet for a man (0.90).
+        foreach (['male' => false, 'female' => true] as $sex => $expected) {
+            $user = $this->makeAthlete(['sex' => $sex]);
+            $user->bodyMeasurements()->create([
+                'date' => Carbon::now()->toDateString(),
+                'waist' => 86.0,
+                'hips' => 100.0,
+            ]);
+
+            $status = (new BodyCompAnalytics($user))->status();
+
+            $this->assertEqualsWithDelta(0.86, $status['waist_to_hip'], 0.001);
+            $this->assertSame($expected, $status['waist_to_hip_risk'], $sex);
+        }
+    }
+
+    public function test_waist_to_hip_risk_is_withheld_without_a_stated_sex(): void
+    {
+        $user = $this->makeAthlete(['sex' => null]);
+        $user->bodyMeasurements()->create([
+            'date' => Carbon::now()->toDateString(),
+            'waist' => 95.0,
+            'hips' => 100.0,
+        ]);
+
+        $status = (new BodyCompAnalytics($user))->status();
+
+        // The number is shown; the judgement is not — the cut-offs are
+        // sex-specific and guessing would colour it wrong for half of users.
+        $this->assertNotNull($status['waist_to_hip']);
+        $this->assertNull($status['waist_to_hip_risk']);
+    }
+
+    public function test_status_carries_rfm_when_waist_and_height_are_known(): void
+    {
+        $user = $this->makeAthlete(['height_cm' => 180.0]);
+        $user->bodyMeasurements()->create([
+            'date' => Carbon::now()->toDateString(),
+            'waist' => 90.0,
+        ]);
+
+        $this->assertEqualsWithDelta(24.0, (new BodyCompAnalytics($user))->status()['rfm_percent'], 0.01);
+    }
 }

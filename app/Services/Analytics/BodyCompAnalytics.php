@@ -214,18 +214,31 @@ class BodyCompAnalytics
             $lean = BodyComposition::boerLbm($weight, $height, $this->user->sex ?? 'male');
         }
 
+        $whr = ($waist && $hips) ? BodyComposition::waistToHipRatio($waist, $hips) : null;
+
         return [
             'weight_kg' => $weight,
+            'trend_weight_kg' => $this->trendWeightKg(),
             'fat_percent' => $fat,
             'fat_source' => $this->bodyFatSource(),
             'scale_fat_percent' => $scaleFat,
             'navy_fat_percent' => $navyBf,
+            // A third, tape-only estimator shown for triangulation — never
+            // silently substituted for the chosen source.
+            'rfm_percent' => ($waist && $height)
+                ? BodyComposition::relativeFatMass((float) $height, $waist, $this->user->sex)
+                : null,
             'lean_mass_kg' => $lean,
             'fat_mass_kg' => ($weight && $fat !== null) ? BodyComposition::fatMassKg($weight, $fat) : null,
             'ffmi' => ($lean && $height) ? BodyComposition::ffmi($lean, $height) : null,
             'ffmi_normalized' => ($lean && $height) ? BodyComposition::ffmiNormalized($lean, $height) : null,
             'waist_to_height' => ($waist && $height) ? BodyComposition::waistToHeightRatio($waist, $height) : null,
-            'waist_to_hip' => ($waist && $hips) ? BodyComposition::waistToHipRatio($waist, $hips) : null,
+            'waist_to_hip' => $whr,
+            // WHO cut-offs are sex-specific (0.90 men / 0.85 women); with no
+            // stated sex there is no honest judgement, only the number.
+            'waist_to_hip_risk' => ($whr !== null && $this->user->sex !== null)
+                ? $whr >= (BodyComposition::isFemale($this->user->sex) ? 0.85 : 0.90)
+                : null,
             'symmetry' => $this->symmetry(),
         ];
     }
@@ -250,6 +263,45 @@ class BodyCompAnalytics
         }
 
         return $out;
+    }
+
+    /**
+     * Trend weight: a time-aware exponential moving average of the recent
+     * scale readings (half-life 10 days).
+     *
+     * The classic trend-weight method: a single reading swings 1-2 kg on
+     * water and meal timing alone, so the number a tile shows should be the
+     * trend, not this morning's noise. Calculations keep using the raw
+     * series — the regressions already smooth — this exists for display.
+     */
+    public function trendWeightKg(int $days = 35, float $halfLifeDays = 10.0): ?float
+    {
+        $series = $this->series('weight_kg', Carbon::now()->subDays($days));
+
+        if ($series === []) {
+            return null;
+        }
+
+        $trend = null;
+        $previous = null;
+
+        foreach ($series as $point) {
+            $date = Carbon::parse($point['label']);
+
+            if ($trend === null) {
+                $trend = $point['value'];
+            } else {
+                // Gap-aware smoothing: alpha grows with the days elapsed, so
+                // sparse loggers converge at the same rate as daily ones.
+                $gap = max(1, $previous->diffInDays($date));
+                $alpha = 1 - exp(-M_LN2 * $gap / $halfLifeDays);
+                $trend = $trend + $alpha * ($point['value'] - $trend);
+            }
+
+            $previous = $date;
+        }
+
+        return round($trend, 2);
     }
 
     /**
