@@ -107,18 +107,6 @@ class StrengthAnalytics
     }
 
     /**
-     * Slope, as a fraction of the lift's own mean e1RM per week, below which the
-     * lift is called flat. 0.0005 is ~2.6%/year: enough that a 160kg squat has to
-     * be moving more than about 4kg a year to count as progressing, which is a
-     * low bar deliberately — the goal is to catch a genuine stall, not to argue
-     * about whether slow progress is progress.
-     *
-     * Relative rather than absolute, because 2kg/year is a stall on a squat and
-     * respectable on a lateral raise.
-     */
-    public const FLAT_SLOPE_FRACTION = 0.0005;
-
-    /**
      * Below this R², the points are scattered enough that the direction is a
      * hint rather than a measurement, and the UI should say so.
      */
@@ -187,7 +175,12 @@ class StrengthAnalytics
             }
 
             $perWeek = $fit->slope * 7;
-            $threshold = $mean * self::FLAT_SLOPE_FRACTION * 7;
+            // Flat = statistically indistinguishable from zero: the slope must
+            // clear its own standard error. The audit found the old fixed
+            // fraction demanded 7x its documented rate before calling "up";
+            // deriving the band from the fit's noise removes the magic number
+            // and scales itself to how consistent the athlete's data is.
+            $threshold = $fit->slopeStdError * 7;
 
             $out[$key] = [
                 'direction' => match (true) {
@@ -199,6 +192,7 @@ class StrengthAnalytics
                 // The slope as a share of the lift's own size, so a squat and
                 // a lateral raise read on the same scale.
                 'pct_per_week' => round($perWeek / $mean * 100, 2),
+                'se_pct_per_week' => round($threshold / $mean * 100, 2),
                 'sessions' => count($perDay),
                 'r2' => round($fit->r2, 3),
                 'reliable' => $fit->r2 >= self::RELIABLE_R2,

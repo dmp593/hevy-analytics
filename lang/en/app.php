@@ -1180,14 +1180,14 @@ return [
         'up' => 'climbing',
         'flat' => 'flat',
         'down' => 'declining',
-        'explain' => 'Each row is a linear regression over that lift\'s best reliable e1RM per session (Epley/Brzycki, RPE-adjusted). "Flat" means the slope is inside ±0.35% of the lift\'s own e1RM per week — the same band the dashboard\'s stall alert uses.',
+        'explain' => 'Each row is a linear regression over that lift\'s best reliable e1RM per session (Epley/Brzycki, RPE-adjusted). "Flat" means the slope is smaller than its own standard error — statistically indistinguishable from zero, so noisy data reads "flat" instead of earning a fabricated direction.',
     ],
 
     'overload' => [
         'title' => 'Progressive overload by muscle',
         'sub' => 'Set-weighted mean of each lift\'s e1RM slope — 8 weeks',
         'lifts' => ':count lift|:count lifts',
-        'explain' => 'For each muscle: the average of its lifts\' e1RM slopes (% of each lift\'s own e1RM per week), weighted by hard sets. No opaque index — this is the same regression the status board shows per lift, aggregated with stated weights.',
+        'explain' => 'For each muscle: the average of its lifts\' e1RM slopes (% of each lift\'s own e1RM per week), weighted by hard sets; "flat" means inside the lifts\' own aggregated standard error. No opaque index — the same regressions the status board shows, aggregated with stated weights.',
     ],
 
     'rhythm' => [
@@ -1328,7 +1328,7 @@ return [
         'adaptive' => 'What you actually burn, worked out from your logged intake against your measured weight trend. This is the number a formula cannot give you.',
         'blended' => 'A blend of the formula and the measurement, weighted by how much intake data backs the measurement: at a week of logs the formula still dominates; at a full month the measurement carries up to 80%.',
         'strength_level' => 'Your strength in this lift compared to people of the same age, bodyweight and sex. 0% is beginner, 100% is elite.',
-        'ffmi' => 'Muscularity adjusted for height, standardised to 1.80m. Around 19 is average, 22 is fit, and 25 is close to the natural ceiling.',
+        'ffmi' => 'Muscularity adjusted for height, standardised to 1.80m. Around 19 is average, 22 is fit, and 25 is close to the natural ceiling — reference points derived from MALE athletes (Kouri 1995); typical female values run roughly 4-5 lower.',
         'waist_height' => 'Your waist divided by your height. Under 0.5 is the target. Rising during a bulk means the gain is going around your middle.',
         'p_ratio' => 'Of the weight you have gained, the share that was lean mass rather than fat, taken from a trend across many readings. Scale body fat is noisy, so treat it as a direction rather than a measurement.',
         'weight' => "Your trend weight — an average that leans on recent weigh-ins (half-life ~10 days), because a single reading swings 1-2 kg on water and meal timing alone. The sub-line is how fast it's changing; lean-bulk sweet spot: +0.25% to +0.5% of bodyweight per week.",
@@ -1336,7 +1336,7 @@ return [
         'rfm' => 'Relative Fat Mass — a body-fat estimate from height and waist alone (Woolcott & Bergman, 2018), validated against DXA scans. Shown as a third opinion beside the scale and Navy estimates, never silently substituted for them.',
         'body_fat' => 'Percent of your weight that is fat. Navy = an independent tape-measure estimate used as a cross-check.',
         'lean_mass' => "Everything that isn't fat (mostly muscle). FFMI = muscularity adjusted for height; ~25 is near the natural ceiling for men.",
-        'hard_sets' => 'Total working sets (warm-ups excluded) in the last 4 weeks — the main driver of muscle growth.',
+        'hard_sets' => 'Total working sets (warm-ups excluded) in the last 4 weeks — the main driver of muscle growth. Counted by set type, not by RPE: a logged set is trusted to be a working set.',
         'consistency' => 'Distinct training days this calendar week, with your four-week average beside it. The 2026 ACSM guidelines rank consistent sessions above every programming detail.',
         'muscle_frequency' => 'Of the muscles you trained in the last four weeks, how many got about two sessions a week — the frequency the guidelines ask for. Counted by the days a muscle received hard sets, allowing one missed session a month.',
         'landmarks' => "Hard working sets per muscle each week. MEV = minimum to grow, MAV = best-return zone. Aim between them. 'Below maintenance' means too few sets to grow.",

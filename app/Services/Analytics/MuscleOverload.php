@@ -41,11 +41,10 @@ class MuscleOverload
             }
             $muscle = $row['muscle'];
             $byMuscle[$muscle]['weighted'] = ($byMuscle[$muscle]['weighted'] ?? 0) + $row['pct_per_week'] * $row['sets'];
+            $byMuscle[$muscle]['se'] = ($byMuscle[$muscle]['se'] ?? 0) + ($row['se_pct_per_week'] ?? 0) * $row['sets'];
             $byMuscle[$muscle]['sets'] = ($byMuscle[$muscle]['sets'] ?? 0) + $row['sets'];
             $byMuscle[$muscle]['lifts'] = ($byMuscle[$muscle]['lifts'] ?? 0) + 1;
         }
-
-        $flatBand = StrengthAnalytics::FLAT_SLOPE_FRACTION * 7 * 100;
 
         $out = [];
         foreach ($byMuscle as $muscle => $m) {
@@ -53,11 +52,13 @@ class MuscleOverload
                 continue;
             }
             $pct = round($m['weighted'] / $m['sets'], 2);
+            // Flat = inside the set-weighted mean of the lifts' own slope
+            // standard errors — the same "distinguishable from zero" rule
+            // each lift is judged by, aggregated with the same weights.
+            $flatBand = round($m['se'] / $m['sets'], 2);
             $out[] = [
                 'muscle' => $muscle,
                 'pct_per_week' => $pct,
-                // The flat band is StrengthAnalytics's own (±0.35%/week),
-                // derived rather than restated so the two can never drift.
                 'direction' => match (true) {
                     $pct > $flatBand => 'up',
                     $pct < -$flatBand => 'down',

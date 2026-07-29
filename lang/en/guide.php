@@ -72,7 +72,7 @@ return [
 
         'example_title' => 'Reading an example: "Chest 7.9/wk · below maintenance (MEV 10 / MAV 16)"',
         'example_body' => 'You are averaging <strong>7.9 hard chest sets per week</strong>. Chest needs at least <strong>about 8 to maintain</strong> and <strong>about 10 (MEV) to actually grow</strong>, with the best returns up to <strong>about 16 (MAV)</strong>. At 7.9 you are <em>under</em> the growth line, so your chest probably is not developing as fast as it could. The fix: add three to five chest sets a week — one extra press plus one fly session — to reach 11–14, and check again in a few weeks.',
-        'landmark_note' => 'Landmarks per muscle follow Renaissance Periodization (Israetel et al.). They are starting guidelines — individual recovery varies. Secondary muscles count as a half-set by default.',
+        'landmark_note' => 'Landmarks per muscle are ADAPTED from Renaissance Periodization (Israetel et al.) to this app’s counting: RP’s tables count direct work only, while this app credits secondary muscles half a set — so some rows deliberately differ from RP’s published numbers, and a few muscles RP does not table (forearms, lower back) carry our own conservative estimates. Starting guidelines, not physiology — individual recovery varies.',
 
         'tonnage_title' => 'Tonnage (volume-load)',
         'tonnage_body' => '<strong>Tonnage is weight × reps, summed across all your sets.</strong> It is the total work done and a quick proxy for training stimulus. Rising tonnage over weeks and months is progressive overload: you are doing more than before, which is what drives growth.',
@@ -179,7 +179,7 @@ return [
         'schoenfeld' => 'Schoenfeld et al. — dose-response of weekly sets and hypertrophy.',
         'rp' => 'Renaissance Periodization (Israetel et al.) — MV/MEV/MAV/MRV volume landmarks.',
         'epley' => 'Epley (1985) and Brzycki (1998) — 1RM estimation formulas.',
-        'mifflin' => 'Mifflin-St Jeor (1990), Katch-McArdle/Cunningham — BMR and energy expenditure.',
+        'mifflin' => 'Mifflin-St Jeor (1990) and Katch-McArdle — BMR and energy expenditure.',
         'helms' => 'Helms, Aragon, Morton et al. — protein intake and lean-gain rate guidelines.',
         'kouri' => 'Kouri et al. — FFMI and the natural muscular ceiling.',
         'disclaimer' => 'Educational only — not medical advice.',

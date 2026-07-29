@@ -168,4 +168,16 @@ class GoalAlertsTest extends TestCase
         $this->assertNotNull($stall);
         $this->assertStringNotContainsString('Coleman', $stall['message']);
     }
+
+    public function test_without_a_goal_no_rate_verdict_is_invented(): void
+    {
+        $user = $this->makeAthlete();
+        $this->seedWeightTrend($user, 80.0, 0.4, 8); // gaining, but toward WHAT?
+
+        $titles = $this->titles($user);
+
+        $this->assertNotContains(__('app.alerts.on_track'), $titles);
+        $this->assertNotContains(__('app.alerts.gaining_too_fast'), $titles);
+        $this->assertNotContains(__('app.alerts.bulk_stalling'), $titles);
+    }
 }

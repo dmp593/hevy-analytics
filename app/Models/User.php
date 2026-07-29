@@ -104,10 +104,22 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Goal::class);
     }
 
+    /** Memoized per request: the dashboard asks three services this question. */
+    private ?Goal $activeGoalMemo = null;
+
+    private bool $activeGoalResolved = false;
+
     public function activeGoal(): ?Goal
     {
-        return $this->goals()->where('is_active', true)->latest('id')->first()
-            ?? $this->goals()->latest('id')->first();
+        if ($this->activeGoalResolved) {
+            return $this->activeGoalMemo;
+        }
+        $this->activeGoalResolved = true;
+
+        return $this->activeGoalMemo = (function (): ?Goal {
+            return $this->goals()->where('is_active', true)->latest('id')->first()
+                ?? $this->goals()->latest('id')->first();
+        })();
     }
 
     public function nutritionTargets(): HasMany

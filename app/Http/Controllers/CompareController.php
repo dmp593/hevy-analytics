@@ -33,7 +33,7 @@ class CompareController extends Controller
         // Through the entitlement chokepoint on purpose: measurements beyond
         // the free tier's history window stay behind the same wall here as on
         // every chart. Photos are not gated anywhere, so they show regardless.
-        $measurementsByDate = (new BodyCompAnalytics($user))->measurements()
+        $measurementsByDate = (BodyCompAnalytics::for($user))->measurements()
             ->keyBy(fn ($m) => $m->date->toDateString());
 
         $candidates = $photosByDate->keys()

@@ -44,13 +44,16 @@ class GoalAlerts
         $alerts = [];
         $goal = $this->user->activeGoal();
         $profile = $goal?->profile();
-        $targetRate = $profile?->target_rate_pct_bw_per_week ?? 0.35;
+        // No goal, no judgement: grading a goalless athlete against a
+        // default bulk target told people cutting on purpose they were
+        // "stalling". Body-fat partitioning below keys off the same null.
+        $targetRate = $profile?->target_rate_pct_bw_per_week;
 
-        $bc = new BodyCompAnalytics($this->user);
+        $bc = BodyCompAnalytics::for($this->user);
         $rate = $bc->weightRateKgPerWeek();
         $part = $bc->partitioning();
 
-        if ($rate && $rate['pct_bw_per_week'] !== null) {
+        if ($rate && $rate['pct_bw_per_week'] !== null && $targetRate !== null) {
             $observed = $rate['pct_bw_per_week'];
             $isBulk = $targetRate > 0.05;
             $isCut = $targetRate < -0.05;
@@ -80,7 +83,7 @@ class GoalAlerts
             }
         }
 
-        if ($part && $part['p_ratio'] !== null && $targetRate > 0.05 && $part['p_ratio'] < 0.5) {
+        if ($part && $part['p_ratio'] !== null && $targetRate !== null && $targetRate > 0.05 && $part['p_ratio'] < 0.5) {
             $caveat = ($part['source'] ?? 'scale') === 'scale'
                 ? ' '.__('app.alerts.bia_caveat')
                 : '';

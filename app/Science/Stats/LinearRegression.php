@@ -16,6 +16,9 @@ class LinearRegression
 
     public float $stdError = 0.0;
 
+    /** Standard error of the slope itself — what "is this trend real" needs. */
+    public float $slopeStdError = 0.0;
+
     public int $n = 0;
 
     /**
@@ -69,6 +72,9 @@ class LinearRegression
             $ssRes += ($y[$i] - $pred) ** 2;
         }
         $model->stdError = $n > 2 ? sqrt($ssRes / ($n - 2)) : 0.0;
+        // SE(slope) = residual variance over the spread of x: the yardstick
+        // for whether a fitted slope is distinguishable from zero at all.
+        $model->slopeStdError = $n > 2 ? sqrt(($ssRes / ($n - 2)) / $sxx) : 0.0;
 
         return $model;
     }

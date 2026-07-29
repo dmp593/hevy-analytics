@@ -3,6 +3,7 @@
 namespace App\Services\FatSecret;
 
 use App\Models\User;
+use App\Support\AnalyticsCache;
 use Illuminate\Support\Carbon;
 
 /**
@@ -45,6 +46,8 @@ class FatSecretSync
         }
 
         $user->forceFill(['fatsecret_synced_at' => now()])->save();
+
+        AnalyticsCache::bump($user);
 
         return $written;
     }

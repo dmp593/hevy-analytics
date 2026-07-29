@@ -6,6 +6,7 @@ use App\Models\Goal;
 use App\Science\Goals\GoalProfile;
 use App\Science\Goals\GoalType;
 use App\Services\Analytics\NutritionService;
+use App\Support\AnalyticsCache;
 use Illuminate\Http\Request;
 
 class GoalController extends Controller
@@ -43,6 +44,8 @@ class GoalController extends Controller
         // Recompute nutrition targets for the new goal.
         (new NutritionService($user))->computeTargets();
 
-        return redirect()->route('goals')->with('status', 'Goal updated and nutrition targets recomputed.');
+        AnalyticsCache::bump($request->user());
+
+        return redirect()->route('goals')->with('status', __('app.goals.saved'));
     }
 }

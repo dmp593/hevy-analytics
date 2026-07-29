@@ -26,8 +26,10 @@ use Illuminate\Support\Carbon;
  *  - No logged session for the exercise → progress on faith (the old
  *    behaviour), because refusing to progress an unlogged exercise would
  *    punish people who only just connected their account.
- *  - Rep-range only (no load): prescribe a load from recent e1RM at the top of
- *    the range with a small (+2%) progressive-overload bump.
+ *  - Rep-range with NO planned load: prescribe from recent e1RM for the
+ *    BOTTOM of the range with ~2 reps in reserve — double progression starts
+ *    at the floor of the range, not past predicted failure at its ceiling.
+ *    A set that already has a planned load is never overwritten.
  *  - Warm-ups are left untouched.
  *
  * Pure of side effects: returns a Hevy routine.update payload + a human-readable
@@ -40,8 +42,6 @@ class RoutineProgression
     private const REP_CAP = 12;
 
     private const REP_RESET = 8;
-
-    private const OVERLOAD_FACTOR = 1.02;
 
     /** How far back a logged session still counts as "recent performance". */
     private const PERFORMANCE_WINDOW_DAYS = 45;
@@ -277,12 +277,14 @@ class RoutineProgression
             return $this->normalizeSet($set);
         }
 
-        // Rep-range target with no load → prescribe a load from recent e1RM.
-        if ($range && $e1rm) {
-            $targetReps = (int) ($range['end'] ?? $range['start'] ?? 10);
-            $prescribed = $this->roundToPlate(OneRepMax::loadForReps($e1rm, $targetReps) * self::OVERLOAD_FACTOR);
+        // Rep-range with no planned load → prescribe from recent e1RM, at the
+        // bottom of the range with ~2 reps in reserve (loadForReps returns the
+        // predicted MAX load for those reps; asking it for reps+2 leaves room).
+        if (! $weight && $range && $e1rm) {
+            $targetReps = (int) ($range['start'] ?? $range['end'] ?? 10);
+            $prescribed = $this->roundToPlate(OneRepMax::loadForReps($e1rm, $targetReps + 2));
             if ($prescribed > 0) {
-                $changes[] = "{$title}: prescribe {$prescribed}kg × {$targetReps} (from e1RM {$e1rm}kg)";
+                $changes[] = "{$title}: prescribe {$prescribed}kg × {$targetReps} (from e1RM {$e1rm}kg, ~2 in reserve)";
                 $set['weight_kg'] = $prescribed;
             }
         }

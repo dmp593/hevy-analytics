@@ -18,7 +18,7 @@ class Bmr
     }
 
     /**
-     * Katch-McArdle / Cunningham — uses lean body mass, best for lean trainees
+     * Katch-McArdle — uses lean body mass (Cunningham 1980 is a DIFFERENT equation: 500 + 22*FFM), best for lean trainees
      * where body composition is known. P = 370 + 21.6·LBM
      */
     public static function katchMcArdle(float $leanMassKg): float

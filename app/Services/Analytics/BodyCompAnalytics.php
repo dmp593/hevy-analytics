@@ -11,6 +11,39 @@ use Illuminate\Support\Collection;
 
 class BodyCompAnalytics
 {
+    /**
+     * One instance per user per request. A dashboard render used to build
+     * five of these across controllers, alerts and nutrition — each re-running
+     * the same measurement queries. Same lifecycle as SetQuery's memo:
+     * per-process, flushed by tests via flushMemo().
+     *
+     * @var array<int, self>
+     */
+    private static array $instances = [];
+
+    /** All of this user's measurements, fetched once, oldest first. */
+    private ?Collection $allMeasurements = null;
+
+    /** Nutrition-page weigh-ins (date => kg), fetched once. */
+    private ?array $intakeWeights = null;
+
+    public static function for(User $user): self
+    {
+        return self::$instances[$user->id] ??= new self($user);
+    }
+
+    public static function flushMemo(): void
+    {
+        self::$instances = [];
+    }
+
+    /** Every measurement, oldest first — the one query the others derive from. */
+    private function all(): Collection
+    {
+        return $this->allMeasurements ??= $this->user->bodyMeasurements()
+            ->orderBy('date')->get();
+    }
+
     private ?Collection $manualFatMap = null;
 
     public function __construct(private readonly User $user) {}
@@ -103,33 +136,60 @@ class BodyCompAnalytics
     {
         $from = $this->user->entitlements()->clampFrom($from);
 
-        return $this->user->bodyMeasurements()
-            ->when($from, fn ($q) => $q->where('date', '>=', $from))
-            ->when($to, fn ($q) => $q->where('date', '<=', $to))
-            ->orderBy('date')
-            ->get();
+        return $this->all()
+            ->when($from, fn ($c) => $c->filter(fn ($m) => $m->date->greaterThanOrEqualTo($from)))
+            ->when($to, fn ($c) => $c->filter(fn ($m) => $m->date->lessThanOrEqualTo($to)))
+            ->values();
     }
 
     public function latest(): ?object
     {
-        return $this->user->bodyMeasurements()->orderByDesc('date')->first();
+        return $this->all()->last();
     }
 
     /** Latest known value for a column (searching back in time). */
     private function latestValue(string $column): ?float
     {
-        $v = $this->user->bodyMeasurements()
-            ->whereNotNull($column)->orderByDesc('date')->value($column);
+        $m = $this->all()->reverse()->first(fn ($m) => $m->{$column} !== null);
 
-        return $v !== null ? (float) $v : null;
+        return $m !== null ? (float) $m->{$column} : null;
     }
 
     /** Time series for one measurement column. */
     public function series(string $column, ?Carbon $from = null, ?Carbon $to = null): array
     {
-        return $this->measurements($from, $to)
+        $points = $this->measurements($from, $to)
             ->filter(fn ($m) => $m->{$column} !== null)
-            ->map(fn ($m) => ['label' => $m->date->toDateString(), 'value' => (float) $m->{$column}])
+            ->mapWithKeys(fn ($m) => [$m->date->toDateString() => (float) $m->{$column}]);
+
+        // Bodyweight has a second honest source: weigh-ins typed on the
+        // Nutrition page. The guide promises they count, so they do — for
+        // the trend, the EWMA and the charts alike. A synced measurement
+        // wins on a shared date; the entitlement floor applies equally.
+        if ($column === 'weight_kg') {
+            $floor = $this->user->entitlements()->clampFrom($from);
+            $this->intakeWeights ??= $this->user->intakeLogs()
+                ->whereNotNull('weight_kg')->orderBy('date')
+                ->get(['date', 'weight_kg'])
+                ->mapWithKeys(fn ($l) => [$l->date->toDateString() => (float) $l->weight_kg])
+                ->all();
+
+            foreach ($this->intakeWeights as $key => $kg) {
+                if ($points->has($key)) {
+                    continue;
+                }
+                if ($floor && $key < $floor->toDateString()) {
+                    continue;
+                }
+                if ($to && $key > $to->toDateString()) {
+                    continue;
+                }
+                $points->put($key, $kg);
+            }
+        }
+
+        return $points->sortKeys()
+            ->map(fn ($value, $label) => ['label' => $label, 'value' => $value])
             ->values()->all();
     }
 
@@ -245,7 +305,7 @@ class BodyCompAnalytics
 
     public function symmetry(): array
     {
-        $m = $this->user->bodyMeasurements()->orderByDesc('date')->get();
+        $m = $this->all()->reverse()->values();
         $pairs = [
             'bicep' => ['left_bicep_cm', 'right_bicep_cm'],
             'forearm' => ['left_forearm_cm', 'right_forearm_cm'],
@@ -358,7 +418,10 @@ class BodyCompAnalytics
 
         return [
             'slope_per_day' => $reg->slope,
-            'delta' => $reg->slope * $days,
+            // Over the OBSERVED span, not the requested window: 30 days of
+            // measurements inside a 90-day window must not report a delta
+            // extrapolated across days nobody measured.
+            'delta' => $reg->slope * max($x),
             'r2' => round($reg->r2, 3),
             'n' => count($series),
         ];

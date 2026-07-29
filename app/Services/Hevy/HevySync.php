@@ -4,6 +4,7 @@ namespace App\Services\Hevy;
 
 use App\Models\SyncLog;
 use App\Models\User;
+use App\Support\AnalyticsCache;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -67,6 +68,8 @@ class HevySync
             $log->update(['status' => 'failed', 'counts' => $counts, 'error' => $e->getMessage(), 'finished_at' => now()]);
             throw $e;
         }
+
+        AnalyticsCache::bump($this->user);
 
         return $counts;
     }

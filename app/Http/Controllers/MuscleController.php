@@ -10,6 +10,7 @@ use App\Services\Analytics\MuscleOverload;
 use App\Services\Analytics\MuscleVerdict;
 use App\Services\Analytics\PersonalScience;
 use App\Services\Analytics\VolumeAnalytics;
+use App\Support\AnalyticsCache;
 use Illuminate\Http\Request;
 
 class MuscleController extends Controller
@@ -37,15 +38,29 @@ class MuscleController extends Controller
     {
         $user = $request->user();
         $filter = FilterCriteria::fromRequest($request, $request->user()->resolvedTimezone());
-        $volume = new VolumeAnalytics($user, $filter);
 
-        $weeklySets = $volume->weeklySetsPerMuscle();
-        $balance = (new MuscleBalance($user, $filter))->ratios();
+        $computed = AnalyticsCache::remember(
+            $user,
+            'muscle:'.md5(serialize($filter->toArray())),
+            function () use ($user, $filter) {
+                $volume = new VolumeAnalytics($user, $filter);
+                $weeklySets = $volume->weeklySetsPerMuscle();
+                $balance = (new MuscleBalance($user, $filter))->ratios();
+
+                return [
+                    'weeklySetsPerMuscle' => $weeklySets,
+                    'volumePerMuscle' => $volume->volumePerMuscle(),
+                    'balance' => $balance,
+                ];
+            },
+        );
+        $weeklySets = $computed['weeklySetsPerMuscle'];
+        $balance = $computed['balance'];
 
         return [
             'filter' => $filter,
             'weeklySetsPerMuscle' => $weeklySets,
-            'volumePerMuscle' => $volume->volumePerMuscle(),
+            'volumePerMuscle' => $computed['volumePerMuscle'],
             'balance' => $balance,
             'landmarks' => MuscleLandmarks::LANDMARKS,
             // Does the MEV subtraction the athlete would otherwise do by hand,

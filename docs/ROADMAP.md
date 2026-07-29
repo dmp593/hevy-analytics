@@ -189,13 +189,13 @@ Plano fechado (implementar exatamente isto):
 - Entregue como especificado: PersonalScience + secção "A tua ciência"
   na Performance + portfólio na página de Músculos, 6 testes.
 
-### 7. Dupla auditoria (ciência + escala) — PLANO, aguarda "avança" (2026-07-29)
+### 7. Dupla auditoria — PLANO INTEIRO APROVADO; C1+E1 ✓ ENTREGUES (2026-07-29)
 
 Nota: auditores correram em snapshot antigo; achados revalidados linha a
 linha contra o HEAD. Core científico confirmado correto (Epley/Brzycki,
 Mifflin, Katch, Navy, Boer, FFMI, Wilks 2020, DOTS coefs, OLS, adaptativo).
 
-**FASE C1 — correções científicas (1 dia):**
+**FASE C1 — correções científicas — ✓ FEITO (flat=1×SE da regressão; DOTS 150F; range→fundo+RIR2; delta×span; pesos de intake na tendência; sem goal sem veredicto; floor gordura; presets alinhados; atribuições honestas RP/FFMI/Cunningham/percentil):**
 a) StrengthAnalytics:174 banda "flat" vale 7× o documentado. Fix
    principiado: flat = |slope| < 1×SE da regressão; atualizar lang de
    board/overload + testes.
@@ -213,7 +213,7 @@ i) MuscleLandmarks: alinhar com RP publicado ou "adaptado de RP" no guia;
    nota 0,5 secundários vs landmarks diretos; caveat FFMI feminino;
    guia "percentil literal"→aproximação.
 
-**FASE E1 — ~10× mais barato por pedido (2-3 dias):**
+**FASE E1 — ✓ FEITO (BodyCompAnalytics::for + all() 1 query; activeGoal memo; computeTargets persist:false em GET + updateOrCreate; índices sync_logs/goals/routine_exercises/photos/write_ops + prune 14d; AnalyticsCache versão+data com bumps em sync/intake/measurements/goals/imports/fatsecret; dashboard+muscle cacheados):**
 a) BodyCompAnalytics memoizado por request (measurements() 1 query) +
    app()->scoped(); activeGoal() memoizado.
 b) computeTargets read-only em GET (persistir só em POST/sync/intake).
@@ -223,13 +223,13 @@ c) Índices: sync_logs(user_id,id), goals(user_id), routine_exercises
 d) Cache de payloads por página: user:{id}:v{ver}:{filtro}, TTL 24h,
    versão bumpada em sync/intake/measurements/goals/imports.
 
-**FASE E2 — antes de centenas de utilizadores (1 semana):**
+**FASE E2 — SEGUINTE (aprovada, por fazer):**
 a) Agregação em SQL (SUM/COUNT/date_trunc) para tonelagem/séries.
 b) Rollup workout_set_rollups(user, dia, exercício, músculo, sets, reps,
    tonnage, best_e1rm) mantido no HevySync.
 c) FitnessVolt fora do request path (chave arredondada + refresh na queue).
 
-**FASE E3 — infra por patamar:**
+**FASE E3 — infra por patamar (aprovada; passos do dono quando houver tráfego):**
 - Já: Render pago + worker/scheduler dedicado (hoje NÃO há worker em
   prod!), Neon pooled (PgBouncer); PHOTO_DISK=r2 confirmado.
 - ~500-2000: Redis (cache+sessions+queue), FrankenPHP worker/Octane.

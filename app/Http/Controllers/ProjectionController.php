@@ -15,7 +15,7 @@ class ProjectionController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $bc = new BodyCompAnalytics($user);
+        $bc = BodyCompAnalytics::for($user);
         $projector = new ProjectionService;
         $from = Carbon::now()->subMonths(12);
 

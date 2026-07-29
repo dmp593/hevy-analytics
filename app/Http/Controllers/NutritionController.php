@@ -7,6 +7,7 @@ use App\Services\Analytics\NutritionVerdict;
 use App\Services\Import\HealthCsvImport;
 use App\Services\Import\ImportException;
 use App\Services\Import\NutritionCsvImport;
+use App\Support\AnalyticsCache;
 use App\Support\Units;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -17,7 +18,7 @@ class NutritionController extends Controller
     {
         $user = $request->user();
         $service = new NutritionService($user);
-        $target = $service->computeTargets();
+        $target = $service->computeTargets(persist: false);
 
         // The measurement needs 7 logged days to exist. Counting them here lets
         // the page say how many are still missing rather than only that the
@@ -82,7 +83,7 @@ class NutritionController extends Controller
     {
         (new NutritionService($request->user()))->computeTargets();
 
-        return redirect()->route('nutrition')->with('status', 'Targets recomputed from your latest body data.');
+        return redirect()->route('nutrition')->with('status', __('app.nutrition.recomputed'));
     }
 
     public function storeIntake(Request $request)
@@ -111,8 +112,9 @@ class NutritionController extends Controller
         $log = $request->user()->intakeLogs()->whereDate('date', $data['date'])->first()
             ?? $request->user()->intakeLogs()->make(['date' => $data['date']]);
         $log->fill($data)->save();
+        AnalyticsCache::bump($request->user());
 
-        return redirect()->route('nutrition')->with('status', 'Intake logged.');
+        return redirect()->route('nutrition')->with('status', __('app.nutrition.intake_logged'));
     }
 
     /**
@@ -142,6 +144,8 @@ class NutritionController extends Controller
             $message .= ' '.__('app.import.done_skipped', ['count' => number_format($result['skipped'])]);
         }
 
+        AnalyticsCache::bump($request->user());
+
         return redirect()->route('nutrition')->with('status', $message);
     }
 
@@ -166,6 +170,8 @@ class NutritionController extends Controller
         if ($result['skipped'] > 0) {
             $message .= ' '.__('app.import.done_skipped', ['count' => number_format($result['skipped'])]);
         }
+
+        AnalyticsCache::bump($request->user());
 
         return redirect()->route('nutrition')->with('status', $message);
     }

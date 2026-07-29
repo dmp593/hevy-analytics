@@ -405,4 +405,57 @@ class AnalyticsCorrectnessTest extends TestCase
 
         $this->assertEqualsWithDelta(24.0, (new BodyCompAnalytics($user))->status()['rfm_percent'], 0.01);
     }
+
+    public function test_nutrition_page_weigh_ins_feed_the_weight_trend(): void
+    {
+        $user = $this->makeAthlete();
+
+        // ONLY intake-log weigh-ins — no synced body measurements at all.
+        foreach (range(0, 4) as $i) {
+            $user->intakeLogs()->create([
+                'date' => Carbon::now()->subWeeks(4 - $i)->toDateString(),
+                'weight_kg' => 80.0 + 0.25 * $i,
+            ]);
+        }
+
+        $bc = new BodyCompAnalytics($user);
+
+        $rate = $bc->weightRateKgPerWeek();
+        $this->assertNotNull($rate);
+        $this->assertEqualsWithDelta(0.25, $rate['kg_per_week'], 0.05);
+        $this->assertNotNull($bc->trendWeightKg());
+    }
+
+    public function test_a_synced_measurement_outranks_an_intake_weigh_in_on_the_same_day(): void
+    {
+        $user = $this->makeAthlete();
+        $day = Carbon::now()->toDateString();
+        $user->intakeLogs()->create(['date' => $day, 'weight_kg' => 79.0]);
+        $user->bodyMeasurements()->create(['date' => $day, 'weight_kg' => 81.0]);
+
+        $series = (new BodyCompAnalytics($user))->series('weight_kg');
+
+        $this->assertCount(1, $series);
+        $this->assertEqualsWithDelta(81.0, $series[0]['value'], 0.01);
+    }
+
+    public function test_partitioning_deltas_cover_the_measured_span_not_the_window(): void
+    {
+        $user = $this->makeAthlete();
+
+        // Two weeks of data inside the 90-day partitioning window, gaining
+        // 0.5 kg/week: the honest delta is ~1 kg, not ~6.5 kg extrapolated.
+        foreach (range(0, 14, 2) as $daysAgo) {
+            $user->bodyMeasurements()->create([
+                'date' => Carbon::now()->subDays(14 - $daysAgo)->toDateString(),
+                'weight_kg' => 80.0 + 0.5 * $daysAgo / 7,
+                'fat_percent' => 15.0,
+            ]);
+        }
+
+        $part = (new BodyCompAnalytics($user))->partitioning();
+
+        $this->assertNotNull($part['delta_weight_kg']);
+        $this->assertEqualsWithDelta(1.0, $part['delta_weight_kg'], 0.2);
+    }
 }

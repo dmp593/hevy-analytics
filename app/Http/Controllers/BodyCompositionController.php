@@ -7,6 +7,7 @@ use App\Services\Analytics\BodyCompAnalytics;
 use App\Services\Analytics\BodyVerdict;
 use App\Services\Analytics\FilterCriteria;
 use App\Services\Analytics\StrengthAnalytics;
+use App\Support\AnalyticsCache;
 use App\Support\Units;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -17,7 +18,7 @@ class BodyCompositionController extends Controller
     {
         $user = $request->user();
         $from = $request->query('from') ? Carbon::parse($request->query('from')) : Carbon::now()->subMonths(12);
-        $bc = new BodyCompAnalytics($user);
+        $bc = BodyCompAnalytics::for($user);
 
         // Corroborating trend signals (triangulation) so no single BIA number dominates.
         $topLift = (new StrengthAnalytics(
@@ -131,6 +132,8 @@ class BodyCompositionController extends Controller
         }
 
         $m->save();
+
+        AnalyticsCache::bump($request->user());
 
         return redirect()->route('body')->with('status', __('app.body.measure.saved'));
     }

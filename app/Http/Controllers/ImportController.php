@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\Import\CsvImport;
 use App\Services\Import\ImportException;
 use App\Services\Import\UnknownCsvFormat;
+use App\Support\AnalyticsCache;
 use App\Support\Units;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -54,6 +55,8 @@ class ImportController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
+        AnalyticsCache::bump($request->user());
+
         return redirect()->route('dashboard')->with('status', $this->doneMessage($result));
     }
 
@@ -91,6 +94,8 @@ class ImportController extends Controller
         } finally {
             Storage::disk('local')->delete($path);
         }
+
+        AnalyticsCache::bump($request->user());
 
         return redirect()->route('dashboard')->with('status', $this->doneMessage($result));
     }

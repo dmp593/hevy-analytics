@@ -46,7 +46,9 @@ class StrengthScore
             return null;
         }
         $c = self::DOTS[self::normalizeSex($sex)];
-        $x = min(max($bodyweightKg, 40), 210);
+        // OpenPowerlifting clamps the polynomial's domain per sex: 40-210 kg
+        // for men, 40-150 kg for women (coefficients/src/dots.rs).
+        $x = min(max($bodyweightKg, 40), self::normalizeSex($sex) === 'female' ? 150 : 210);
         $denom = $c[0] + $c[1] * $x + $c[2] * $x ** 2 + $c[3] * $x ** 3 + $c[4] * $x ** 4;
 
         if ($denom == 0.0) {

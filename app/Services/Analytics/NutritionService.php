@@ -18,7 +18,7 @@ class NutritionService
      * active goal, applying adaptive-TDEE correction from the observed weight
      * trend when intake data is available. Persists a NutritionTarget row.
      */
-    public function computeTargets(?Carbon $date = null): ?NutritionTarget
+    public function computeTargets(?Carbon $date = null, bool $persist = true): ?NutritionTarget
     {
         $date ??= Carbon::today();
         $goal = $this->user->activeGoal();
@@ -27,7 +27,7 @@ class NutritionService
         }
         $profile = $goal->profile();
 
-        $bc = new BodyCompAnalytics($this->user);
+        $bc = BodyCompAnalytics::for($this->user);
         // One snapshot: status() runs a batch of queries per call, and three
         // calls here were three identical batches.
         $status = $bc->status();
@@ -99,11 +99,20 @@ class NutritionService
             ],
         ];
 
-        $target = $this->user->nutritionTargets()->whereDate('date', $date)->first()
-            ?? $this->user->nutritionTargets()->make(['date' => $date->toDateString()]);
-        $target->fill($attributes)->save();
+        // GET pages pass persist:false — a page view must not write, and the
+        // old first-or-make/save raced two concurrent loads into a duplicate
+        // key. Persistence belongs to the POST recompute, intake writes and
+        // sync completions, where updateOrCreate settles the race.
+        if (! $persist) {
+            return $this->user->nutritionTargets()
+                ->make(['date' => $date->toDateString()])
+                ->fill($attributes);
+        }
 
-        return $target;
+        return $this->user->nutritionTargets()->updateOrCreate(
+            ['date' => $date->toDateString()],
+            $attributes,
+        );
     }
 
     /**
@@ -137,7 +146,7 @@ class NutritionService
         $avgIntake = $logs->avg('calories');
 
         // Weight change over the same window (prefer intake-log weights, else body measurements).
-        $bc = new BodyCompAnalytics($this->user);
+        $bc = BodyCompAnalytics::for($this->user);
         $rate = $bc->weightRateKgPerWeek($days);
         if (! $rate) {
             return null;

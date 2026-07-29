@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {
@@ -23,6 +24,12 @@ Schedule::command('app:send-trial-emails')->dailyAt('09:00');
 // The Monday check-in: the dashboard's top guidance, in the inbox. Also
 // watermarked per user, so the schedule is cadence, not correctness.
 Schedule::command('app:send-weekly-checkins')->weeklyOn(1, '08:00');
+
+// sync_logs grows ~24 rows per user per day and is read on every
+// dashboard; two weeks of history is plenty for the status banner.
+Schedule::call(fn () => DB::table('sync_logs')
+    ->where('created_at', '<', now()->subDays(14))->delete())
+    ->dailyAt('04:30')->name('prune-sync-logs');
 
 // Reseed the public demo weekly so its dates never age into "last workout
 // 5 months ago" — a stale demo quietly argues against the product.

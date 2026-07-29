@@ -117,6 +117,6 @@ class ProgressPhotoController extends Controller
         // enough — and is the one path that also covers the account cascade.
         $photo->delete();
 
-        return redirect()->route('photos')->with('status', 'Photo deleted.');
+        return redirect()->route('photos')->with('status', __('app.photos.deleted'));
     }
 }

@@ -5,7 +5,10 @@ namespace App\Science\Volume;
 /**
  * Muscle group taxonomy (matching Hevy's MuscleGroup enum) plus weekly volume
  * landmarks in "hard sets per week", per Renaissance Periodization
- * (Israetel et al.): MV (maintenance), MEV (minimum effective), MAV
+ * (Israetel et al.) — ADAPTED, not copied: RP tables count direct sets only,
+ * this app credits secondaries 0.5, so several rows deliberately differ and
+ * untabled muscles carry conservative in-house values.
+ * MV (maintenance), MEV (minimum effective), MAV
  * (maximum adaptive), MRV (maximum recoverable).
  */
 class MuscleLandmarks

@@ -36,7 +36,7 @@ class WeeklyCheckin extends Mailable
 
     public function content(): Content
     {
-        $bc = new BodyCompAnalytics($this->user);
+        $bc = BodyCompAnalytics::for($this->user);
         $status = $bc->status();
         $units = Units::for($this->user);
 

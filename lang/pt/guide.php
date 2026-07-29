@@ -66,7 +66,7 @@ return [
 
         'example_title' => 'Ler um exemplo: "Peito 7,9/sem · abaixo da manutenção (MEV 10 / MAV 16)"',
         'example_body' => 'Estás a fazer em média <strong>7,9 séries duras de peito por semana</strong>. O peito precisa de pelo menos <strong>cerca de 8 para manter</strong> e <strong>cerca de 10 (MEV) para crescer mesmo</strong>, com o melhor retorno até <strong>cerca de 16 (MAV)</strong>. A 7,9 estás <em>abaixo</em> da linha de crescimento, por isso o teu peito provavelmente não está a desenvolver-se ao ritmo que podia. A correção: acrescenta três a cinco séries de peito por semana — um press extra mais uma sessão de aberturas — para chegar a 11–14, e volta a ver daqui a algumas semanas.',
-        'landmark_note' => 'Os landmarks por músculo seguem a Renaissance Periodization (Israetel et al.). São orientações de partida — a recuperação varia de pessoa para pessoa. Os músculos secundários contam como meia série por omissão.',
+        'landmark_note' => 'Os landmarks por músculo são ADAPTADOS da Renaissance Periodization (Israetel et al.) para a contagem desta app: as tabelas da RP contam só trabalho direto, enquanto esta app credita meia série aos secundários — por isso algumas linhas diferem de propósito dos números publicados, e músculos sem tabela RP (antebraços, lombar) usam estimativas conservadoras nossas. Orientações de partida, não fisiologia — a recuperação varia.',
 
         'tonnage_title' => 'Tonelagem (volume-carga)',
         'tonnage_body' => '<strong>Tonelagem é carga × repetições, somada em todas as tuas séries.</strong> É o trabalho total feito e serve de aproximação rápida ao estímulo de treino. Tonelagem a subir ao longo de semanas e meses é sobrecarga progressiva: estás a fazer mais do que antes, e é isso que provoca crescimento.',
@@ -173,7 +173,7 @@ return [
         'schoenfeld' => 'Schoenfeld et al. — relação dose-resposta entre séries semanais e hipertrofia.',
         'rp' => 'Renaissance Periodization (Israetel et al.) — landmarks de volume MV/MEV/MAV/MRV.',
         'epley' => 'Epley (1985) e Brzycki (1998) — fórmulas de estimativa de 1RM.',
-        'mifflin' => 'Mifflin-St Jeor (1990), Katch-McArdle/Cunningham — BMR e gasto energético.',
+        'mifflin' => 'Mifflin-St Jeor (1990) e Katch-McArdle — BMR e gasto energético.',
         'helms' => 'Helms, Aragon, Morton et al. — ingestão de proteína e ritmo de ganho magro.',
         'kouri' => 'Kouri et al. — FFMI e o teto muscular natural.',
         'disclaimer' => 'Apenas educativo — não é aconselhamento médico.',

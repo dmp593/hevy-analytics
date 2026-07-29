@@ -266,4 +266,25 @@ class ScienceTest extends TestCase
         // A 40 cm "waist" on a 180 cm frame is a typo, not a body.
         $this->assertNull(BodyComposition::relativeFatMass(180, 40, 'male'));
     }
+
+    public function test_dots_clamps_bodyweight_per_sex(): void
+    {
+        // OPL clamps women at 150 kg, men at 210: past the clamp the score
+        // must stop changing, and the two sexes stop at different points.
+        $this->assertSame(
+            StrengthScore::dots(100, 150, 'female'),
+            StrengthScore::dots(100, 200, 'female'),
+        );
+        $this->assertNotEquals(
+            StrengthScore::dots(100, 150, 'male'),
+            StrengthScore::dots(100, 200, 'male'),
+        );
+    }
+
+    public function test_fat_floor_is_enforced_not_just_promised(): void
+    {
+        $split = Macros::split(2500, 80, 2.0, 0.3);
+
+        $this->assertSame(round(0.5 * 80), $split['fat_g']);
+    }
 }

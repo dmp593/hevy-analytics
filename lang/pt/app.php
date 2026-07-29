@@ -1181,14 +1181,14 @@ return [
         'up' => 'a subir',
         'flat' => 'estável',
         'down' => 'a descer',
-        'explain' => 'Cada linha é uma regressão linear sobre o melhor e1RM fiável por sessão desse levantamento (Epley/Brzycki, ajustado a RPE). "Estável" significa declive dentro de ±0,35% do e1RM do próprio levantamento por semana — a mesma banda do alerta de estagnação do dashboard.',
+        'explain' => 'Cada linha é uma regressão linear sobre o melhor e1RM fiável por sessão desse levantamento (Epley/Brzycki, ajustado a RPE). "Estável" significa declive menor do que o seu próprio erro-padrão — estatisticamente indistinguível de zero, para que dados ruidosos leiam "estável" em vez de ganharem uma direção inventada.',
     ],
 
     'overload' => [
         'title' => 'Sobrecarga progressiva por músculo',
         'sub' => 'Média ponderada por séries dos declives de e1RM — 8 semanas',
         'lifts' => ':count levantamento|:count levantamentos',
-        'explain' => 'Para cada músculo: a média dos declives de e1RM dos seus levantamentos (% do e1RM do próprio levantamento por semana), ponderada pelas séries efetivas. Sem índice opaco — é a mesma regressão que o quadro de estado mostra por levantamento, agregada com pesos declarados.',
+        'explain' => 'Para cada músculo: a média dos declives de e1RM dos seus levantamentos (% do e1RM do próprio levantamento por semana), ponderada pelas séries efetivas; "estável" significa dentro do erro-padrão agregado dos próprios levantamentos. Sem índice opaco — as mesmas regressões do quadro de estado, agregadas com pesos declarados.',
     ],
 
     'rhythm' => [
@@ -1323,7 +1323,7 @@ return [
         'adaptive' => 'O que gastas realmente, calculado a partir do consumo registado face à tendência de peso medida. É o número que uma fórmula não te consegue dar.',
         'blended' => 'Uma média entre a fórmula e a medição, ponderada pela quantidade de dados que sustenta a medição: com uma semana de registos a fórmula ainda domina; com um mês completo a medição pesa até 80%.',
         'strength_level' => 'A tua força neste levantamento comparada com pessoas da mesma idade, peso e sexo. 0% é iniciante, 100% é elite.',
-        'ffmi' => 'Musculatura ajustada à altura, padronizada para 1,80 m. Cerca de 19 é a média, 22 é em forma, e 25 está perto do teto natural.',
+        'ffmi' => 'Musculatura ajustada à altura, padronizada para 1,80 m. Cerca de 19 é a média, 22 é em forma, e 25 está perto do teto natural — referências derivadas de atletas HOMENS (Kouri 1995); valores femininos típicos ficam 4-5 pontos abaixo.',
         'waist_height' => 'A tua cintura a dividir pela altura. O alvo é abaixo de 0,5. Se sobe durante um bulk, o ganho está a ir para a barriga.',
         'p_ratio' => 'Do peso que ganhaste, a parte que foi massa magra e não gordura, a partir de uma tendência sobre muitas leituras. A massa gorda da balança é ruidosa, por isso trata isto como uma direção e não como uma medição.',
         'weight' => 'O seu peso de tendência — uma média que dá mais peso às pesagens recentes (meia-vida de ~10 dias), porque uma única pesagem oscila 1-2 kg só com água e refeições. A linha por baixo é o ritmo de mudança; faixa ideal de ganho limpo: +0,25% a +0,5% do peso corporal por semana.',
@@ -1331,7 +1331,7 @@ return [
         'rfm' => 'Relative Fat Mass — uma estimativa de massa gorda apenas com altura e cintura (Woolcott & Bergman, 2018), validada contra DXA. Aparece como terceira opinião ao lado da balança e do método Navy, nunca substituída em silêncio.',
         'body_fat' => 'Percentagem do seu peso que é gordura. Navy = uma estimativa independente com fita métrica, usada como verificação cruzada.',
         'lean_mass' => 'Tudo o que não é gordura (sobretudo músculo). FFMI = musculatura ajustada à altura; ~25 é perto do limite natural nos homens.',
-        'hard_sets' => 'Total de séries efetivas (sem aquecimentos) nas últimas 4 semanas — o principal motor do crescimento muscular.',
+        'hard_sets' => 'Total de séries efetivas (sem aquecimentos) nas últimas 4 semanas — o principal motor do crescimento muscular. Contadas pelo tipo de série, não pelo RPE: uma série registada é tratada como série de trabalho.',
         'consistency' => 'Dias distintos de treino nesta semana de calendário, com a média de quatro semanas ao lado. As guidelines ACSM de 2026 põem a consistência acima de qualquer detalhe de programação.',
         'muscle_frequency' => 'Dos músculos que treinaste nas últimas quatro semanas, quantos tiveram cerca de duas sessões por semana — a frequência que as guidelines pedem. Contado pelos dias em que o músculo recebeu séries efetivas, perdoando uma sessão falhada por mês.',
         'landmarks' => 'Séries efetivas por músculo em cada semana. MEV = mínimo para crescer, MAV = zona de melhor retorno. Fique entre os dois. "Abaixo da manutenção" significa séries a menos para crescer.',

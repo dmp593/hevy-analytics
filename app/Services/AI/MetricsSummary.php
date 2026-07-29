@@ -20,7 +20,7 @@ class MetricsSummary
     {
         $filter = new FilterCriteria(from: now()->subMonths(3), to: now());
         $volume = new VolumeAnalytics($user, $filter);
-        $bc = new BodyCompAnalytics($user);
+        $bc = BodyCompAnalytics::for($user);
         $goal = $user->activeGoal();
         $profile = $goal?->profile();
         $nutrition = $user->nutritionTargets()->latest('date')->first();

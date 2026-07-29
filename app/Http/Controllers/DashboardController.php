@@ -11,6 +11,7 @@ use App\Services\Analytics\NutritionService;
 use App\Services\Analytics\TrainingRhythm;
 use App\Services\Analytics\VolumeAnalytics;
 use App\Services\Hevy\SyncStatus;
+use App\Support\AnalyticsCache;
 use App\Support\DataConfidence;
 use App\Support\Onboarding;
 use Illuminate\Http\Request;
@@ -32,34 +33,41 @@ class DashboardController extends Controller
             return view('dashboard', ['needsSetup' => true, 'onboarding' => $onboarding]);
         }
 
-        $filter = new FilterCriteria(from: Carbon::now()->subDays(28), to: Carbon::now());
-        $volume = new VolumeAnalytics($user, $filter);
-        $bc = new BodyCompAnalytics($user);
+        // Everything expensive lives in one cached, version-keyed payload:
+        // ~70 queries and thousands of aggregated rows become a single cache
+        // read until the next sync/import/log bumps the user's version.
+        $analytics = AnalyticsCache::remember($user, 'dashboard', function () use ($user) {
+            $filter = new FilterCriteria(from: Carbon::now()->subDays(28), to: Carbon::now());
+            $volume = new VolumeAnalytics($user, $filter);
+            $bc = BodyCompAnalytics::for($user);
+            $tonnageFilter = new FilterCriteria(from: Carbon::now()->subMonths(6), to: Carbon::now(), period: 'week');
 
-        $tonnageFilter = new FilterCriteria(from: Carbon::now()->subMonths(6), to: Carbon::now(), period: 'week');
+            return [
+                'status' => $bc->status(),
+                'rate' => $bc->weightRateKgPerWeek(),
+                'partitioning' => $bc->partitioning(),
+                'alerts' => (new GoalAlerts($user))->all(),
+                'consistency' => (new ConsistencyAnalytics($user))->summary(),
+                'rhythm' => (new TrainingRhythm($user))->summary(),
+                'weekVolume' => $volume->tonnage(),
+                'weekSets' => $volume->totalSets(),
+                'weeklySetsPerMuscle' => $volume->weeklySetsPerMuscle(),
+                'tonnageSeries' => (new VolumeAnalytics($user, $tonnageFilter))->tonnageSeries(),
+                'weightSeries' => $bc->series('weight_kg', Carbon::now()->subMonths(12)),
+                'leanSeries' => $bc->leanMassSeries(Carbon::now()->subMonths(12)),
+                'balance' => (new MuscleBalance($user, new FilterCriteria(from: Carbon::now()->subMonths(3))))->ratios(),
+            ];
+        });
 
-        return view('dashboard', [
+        return view('dashboard', array_merge($analytics, [
             'needsSetup' => false,
             'onboarding' => $onboarding,
             'confidence' => DataConfidence::for($user),
-            'status' => $bc->status(),
-            'rate' => $bc->weightRateKgPerWeek(),
-            'partitioning' => $bc->partitioning(),
-            'alerts' => (new GoalAlerts($user))->all(),
-            'consistency' => (new ConsistencyAnalytics($user))->summary(),
-            'rhythm' => (new TrainingRhythm($user))->summary(),
             'goal' => $user->activeGoal(),
-            'weekVolume' => $volume->tonnage(),
-            'weekSets' => $volume->totalSets(),
-            'weeklySetsPerMuscle' => $volume->weeklySetsPerMuscle(),
-            'tonnageSeries' => (new VolumeAnalytics($user, $tonnageFilter))->tonnageSeries(),
-            'weightSeries' => $bc->series('weight_kg', Carbon::now()->subMonths(12)),
-            'leanSeries' => $bc->leanMassSeries(Carbon::now()->subMonths(12)),
-            'balance' => (new MuscleBalance($user, new FilterCriteria(from: Carbon::now()->subMonths(3))))->ratios(),
             'workoutCount' => $user->workouts()->count(),
             'lastSync' => $user->hevy_last_synced_at,
             'syncStatus' => (new SyncStatus($user))->current(),
-            'nutrition' => (new NutritionService($user))->computeTargets(),
-        ]);
+            'nutrition' => (new NutritionService($user))->computeTargets(persist: false),
+        ]));
     }
 }

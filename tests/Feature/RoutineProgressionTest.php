@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Routine;
 use App\Models\User;
+use App\Science\Strength\OneRepMax;
 use App\Services\Hevy\RoutineProgression;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -167,5 +168,44 @@ class RoutineProgressionTest extends TestCase
         $this->assertEquals(92.5, $set['weight_kg']);
         $this->assertSame(5, $set['reps']);
         $this->assertStringContainsString('back off', $result['changes'][0]);
+    }
+
+    public function test_a_rep_range_without_load_is_prescribed_at_the_bottom_with_reps_in_reserve(): void
+    {
+        $user = User::factory()->create();
+        $routine = $this->routineWith($user, [
+            ['type' => 'normal', 'rep_range' => ['start' => 8, 'end' => 12]],
+        ]);
+
+        // Recent history gives the lift an e1RM to prescribe from.
+        $this->seedWorkout($user, Carbon::now()->subDays(3), ['BENCH'], 3, 100.0, 5, rpe: 8.0);
+
+        $result = (new RoutineProgression($user))->build($routine);
+        $set = $result['payload']['routine']['exercises'][0]['sets'][0];
+
+        // Bottom of the range, with a 2-rep reserve discount: the prescribed
+        // load must be BELOW the predicted 8RM, not above it.
+        $e1rm = OneRepMax::estimate(100.0, 5, 8.0);
+        $eightRepMax = OneRepMax::loadForReps($e1rm, 8);
+
+        $this->assertLessThan($eightRepMax, $set['weight_kg']);
+        $this->assertStringContainsString('~2 in reserve', $result['changes'][0]);
+    }
+
+    public function test_a_planned_load_is_never_overwritten_by_the_range_branch(): void
+    {
+        $user = User::factory()->create();
+        $routine = $this->routineWith($user, [
+            ['type' => 'normal', 'weight_kg' => 60, 'reps' => 10, 'rep_range' => ['start' => 8, 'end' => 12]],
+        ]);
+
+        $this->seedWorkout($user, Carbon::now()->subDays(3), ['BENCH'], 3, 60.0, 10, rpe: 8.0);
+
+        $set = (new RoutineProgression($user))->build($routine)['payload']['routine']['exercises'][0]['sets'][0];
+
+        // Double progression applies (60x10 -> 60x11); the e1RM prescription
+        // must not clobber the planned 60 kg with a ~115 kg "suggestion".
+        $this->assertEquals(60.0, $set['weight_kg']);
+        $this->assertSame(11, $set['reps']);
     }
 }

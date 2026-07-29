@@ -41,7 +41,9 @@ class Macros
     public static function split(float $targetCalories, float $bodyweightKg, float $proteinPerKg, float $fatPerKg): array
     {
         $proteinG = round($proteinPerKg * $bodyweightKg, 0);
-        $fatG = round($fatPerKg * $bodyweightKg, 0);
+        // The hormonal floor the docblock promises, enforced: overrides
+        // below 0.5 g/kg are clamped rather than silently honoured.
+        $fatG = round(max($fatPerKg, 0.5) * $bodyweightKg, 0);
 
         $proteinKcal = $proteinG * self::KCAL_PER_G_PROTEIN;
         $fatKcal = $fatG * self::KCAL_PER_G_FAT;

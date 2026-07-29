@@ -15,25 +15,32 @@ use App\Models\Goal;
  * @property-read float  $targetRatePctBwPerWeek
  * @property-read array  $training  {string repRange, int setsMin, int setsMax, float riRMin, float riRMax}
  */
+/*
+ * Preset surpluses are DERIVED from their own target rates by the app's own
+ * arithmetic (rate %BW/wk ≈ adj% × 0.03, since TDEE ≈ 33 kcal/kg and
+ * 7700 kcal ≈ 1 kg): a +0.35%BW/wk lean bulk needs ~+12%, not the +7.5%
+ * the audit found could never reach it. Alerts grade against these rates,
+ * so preset and target must be reachable from each other.
+ */
 class GoalProfile
 {
     private const PRESETS = [
         'lean_bulk' => [
-            'calorie_adjustment_pct' => 7.5,
+            'calorie_adjustment_pct' => 12.0,
             'protein_g_per_kg' => 2.0,
             'fat_g_per_kg' => 0.8,
             'target_rate_pct_bw_per_week' => 0.35,
             'training' => ['rep_range' => '6-12', 'sets_min' => 10, 'sets_max' => 20, 'rir_min' => 1, 'rir_max' => 3, 'name' => 'Hypertrophy'],
         ],
         'hypertrophy' => [
-            'calorie_adjustment_pct' => 2.5,
+            'calorie_adjustment_pct' => 5.0,
             'protein_g_per_kg' => 2.0,
             'fat_g_per_kg' => 0.8,
             'target_rate_pct_bw_per_week' => 0.15,
             'training' => ['rep_range' => '6-15', 'sets_min' => 12, 'sets_max' => 20, 'rir_min' => 0, 'rir_max' => 3, 'name' => 'Hypertrophy'],
         ],
         'aggressive_bulk' => [
-            'calorie_adjustment_pct' => 17.5,
+            'calorie_adjustment_pct' => 25.0,
             'protein_g_per_kg' => 1.8,
             'fat_g_per_kg' => 0.9,
             'target_rate_pct_bw_per_week' => 0.75,
@@ -47,14 +54,14 @@ class GoalProfile
             'training' => ['rep_range' => '6-15', 'sets_min' => 12, 'sets_max' => 18, 'rir_min' => 1, 'rir_max' => 3, 'name' => 'Hypertrophy'],
         ],
         'cut' => [
-            'calorie_adjustment_pct' => -20.0,
+            'calorie_adjustment_pct' => -23.0,
             'protein_g_per_kg' => 2.7,
             'fat_g_per_kg' => 0.6,
             'target_rate_pct_bw_per_week' => -0.7,
             'training' => ['rep_range' => '6-12', 'sets_min' => 8, 'sets_max' => 14, 'rir_min' => 1, 'rir_max' => 3, 'name' => 'Strength-maintenance'],
         ],
         'strength' => [
-            'calorie_adjustment_pct' => 2.5,
+            'calorie_adjustment_pct' => 3.5,
             'protein_g_per_kg' => 1.8,
             'fat_g_per_kg' => 0.8,
             'target_rate_pct_bw_per_week' => 0.1,
