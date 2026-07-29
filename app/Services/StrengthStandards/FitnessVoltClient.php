@@ -57,13 +57,21 @@ class FitnessVoltClient
         }
 
         $sex = BodyComposition::normalizeSex($sex);
-        $key = 'fv:rank:'.md5(implode('|', [$slug, $sex, round($bodyweightKg, 1), round($e1rmKg, 1), $age]));
+        // Coarse key on purpose: at 0.1 kg precision every weigh-in minted a
+        // fresh cache miss and another upstream HTTP call. Percentiles do not
+        // move inside a 2.5 kg bucket, so neither should the cache key — and
+        // a week's TTL fits how often population standards change (never).
+        $bwBucket = round($bodyweightKg / 2.5) * 2.5;
+        $liftBucket = round($e1rmKg / 2.5) * 2.5;
+        $key = 'fv:rank:'.md5(implode('|', [$slug, $sex, $bwBucket, $liftBucket, $age]));
 
-        return Cache::remember($key, now()->addHours(12), function () use ($slug, $sex, $bodyweightKg, $e1rmKg, $age) {
+        return Cache::remember($key, now()->addDays(7), function () use ($slug, $sex, $bodyweightKg, $e1rmKg, $age) {
             try {
+                // 3 s, one try: this runs on the request path and the builtin
+                // standards are a good fallback — a slow upstream must not pin
+                // a PHP worker for 8+ seconds per lift.
                 $response = Http::baseUrl($this->baseUrl())
-                    ->timeout(8)
-                    ->retry(1, 300, throw: false)
+                    ->timeout(3)
                     ->acceptJson()
                     ->get('/public/rank', array_filter([
                         'lift' => $slug,

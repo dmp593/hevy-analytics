@@ -227,7 +227,7 @@ d) Cache de payloads por página: user:{id}:v{ver}:{filtro}, TTL 24h,
 a) Agregação em SQL (SUM/COUNT/date_trunc) para tonelagem/séries.
 b) Rollup workout_set_rollups(user, dia, exercício, músculo, sets, reps,
    tonnage, best_e1rm) mantido no HevySync.
-c) FitnessVolt fora do request path (chave arredondada + refresh na queue).
+c) FitnessVolt ✓ FEITO em versão mínima (chave em buckets de 2,5 kg, TTL 7 dias, timeout 3 s sem retry — fallback builtin cobre o resto); refresh assíncrono fica opcional.
 
 **FASE E3 — infra por patamar (aprovada; passos do dono quando houver tráfego):**
 - Já: Render pago + worker/scheduler dedicado (hoje NÃO há worker em
