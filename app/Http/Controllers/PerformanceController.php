@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Science\Volume\MuscleLandmarks;
 use App\Services\Analytics\FilterCriteria;
+use App\Services\Analytics\PersonalScience;
 use App\Services\Analytics\SetQuery;
 use App\Services\Analytics\StrengthAnalytics;
 use App\Services\Analytics\StrengthVerdict;
@@ -19,6 +20,7 @@ class PerformanceController extends Controller
 
         $boardFilter = new FilterCriteria(from: Carbon::now()->subWeeks(8), to: Carbon::now());
         $statusBoard = (new StrengthAnalytics($user, $boardFilter))->exerciseStatusBoard();
+        $science = new PersonalScience($user);
 
         return view('performance.index', array_merge(
             $this->payload($request),
@@ -26,6 +28,8 @@ class PerformanceController extends Controller
                 'routines' => $user->routines()->orderBy('title')->get(),
                 'muscles' => MuscleLandmarks::GROUPS,
                 'statusBoard' => $statusBoard,
+                'recovery' => $science->recoveryCurve(),
+                'timeOfDay' => $science->timeOfDay(),
             ]
         ));
     }

@@ -8,6 +8,7 @@ use App\Services\Analytics\FilterCriteria;
 use App\Services\Analytics\MuscleBalance;
 use App\Services\Analytics\MuscleOverload;
 use App\Services\Analytics\MuscleVerdict;
+use App\Services\Analytics\PersonalScience;
 use App\Services\Analytics\VolumeAnalytics;
 use Illuminate\Http\Request;
 
@@ -23,6 +24,7 @@ class MuscleController extends Controller
             // property of whatever range the filter above happens to show.
             'effort' => (new EffortAnalysis($user))->summary(),
             'overload' => (new MuscleOverload($user))->perMuscle(),
+            'portfolio' => (new PersonalScience($user))->repRangePortfolio(),
         ]));
     }
 

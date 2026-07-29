@@ -88,4 +88,40 @@
             <p class="mt-3 text-xs text-muted">{{ __('app.overload.explain') }}</p>
         </x-ui.card>
     @endif
+
+    {{-- Where the sets live on the load spectrum. Schoenfeld 2021: growth is
+         similar across rep ranges at matched effort — strength is not. --}}
+    @if ($portfolio)
+        <x-ui.card :title="__('app.science.portfolio_title')" :subtitle="__('app.science.portfolio_sub')" class="mt-6">
+            @if ($portfolio['strength_gap'])
+                <x-ui.insight tone="info" :title="__('app.science.strength_gap')" class="mb-4">
+                    {{ __('app.science.strength_gap_body') }}
+                </x-ui.insight>
+            @endif
+            <div class="space-y-3">
+                @foreach ($portfolio['muscles'] as $m)
+                    <div>
+                        <div class="mb-1 flex items-center justify-between text-xs">
+                            <span class="font-medium text-ink">{{ \App\Support\Labels::muscle($m['muscle']) }}</span>
+                            <span class="text-faint">{{ trans_choice('app.rhythm.sets', $m['sets'], ['count' => $m['sets']]) }}</span>
+                        </div>
+                        <div class="flex h-2.5 w-full overflow-hidden rounded-full bg-surface-sunk" role="img"
+                             aria-label="{{ __('app.science.portfolio_aria', ['muscle' => \App\Support\Labels::muscle($m['muscle'])]) }}">
+                            <div class="bg-brand" style="width: {{ $m['bands']['b1_5'] }}%" title="1-5: {{ $m['bands']['b1_5'] }}%"></div>
+                            <div class="bg-brand/70" style="width: {{ $m['bands']['b6_12'] }}%" title="6-12: {{ $m['bands']['b6_12'] }}%"></div>
+                            <div class="bg-brand/45" style="width: {{ $m['bands']['b13_20'] }}%" title="13-20: {{ $m['bands']['b13_20'] }}%"></div>
+                            <div class="bg-brand/25" style="width: {{ $m['bands']['b21'] }}%" title="21+: {{ $m['bands']['b21'] }}%"></div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            <p class="mt-3 text-xs text-muted">
+                <span class="mr-3"><span class="mr-1 inline-block h-2 w-2 rounded-full bg-brand"></span>1-5</span>
+                <span class="mr-3"><span class="mr-1 inline-block h-2 w-2 rounded-full bg-brand/70"></span>6-12</span>
+                <span class="mr-3"><span class="mr-1 inline-block h-2 w-2 rounded-full bg-brand/45"></span>13-20</span>
+                <span><span class="mr-1 inline-block h-2 w-2 rounded-full bg-brand/25"></span>21+</span>
+            </p>
+            <p class="mt-2 text-xs text-muted">{{ __('app.science.portfolio_explain') }}</p>
+        </x-ui.card>
+    @endif
 </x-ui.page>

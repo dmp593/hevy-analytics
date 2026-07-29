@@ -92,4 +92,46 @@
             <p class="px-5 py-3 text-xs text-muted">{{ __('app.board.explain') }}</p>
         </x-ui.card>
     @endif
+
+    {{-- Your own data, run as the study: population papers say "evening is
+         stronger on average" and "2-3 rest days"; these cards say what YOUR
+         log says, sample sizes included. --}}
+    @if ($recovery || $timeOfDay)
+        <h2 class="mt-8 mb-3 text-xs font-semibold uppercase tracking-wide text-faint">{{ __('app.science.title') }}</h2>
+        <div class="grid gap-6 lg:grid-cols-2">
+            @if ($recovery)
+                <x-ui.card :title="__('app.science.recovery_title')" :subtitle="__('app.science.recovery_sub', ['lifts' => implode(', ', $recovery['lifts'])])">
+                    <ul class="space-y-2">
+                        @foreach ($recovery['buckets'] as $b)
+                            <li class="flex items-center justify-between gap-4 text-sm">
+                                <span class="text-body">{{ trans_choice('app.science.rest_days', (int) $b['days'], ['days' => $b['days']]) }}</span>
+                                <span class="tabular-nums {{ $b['mean_rel'] >= 0 ? 'text-good' : 'text-bad' }} font-semibold">
+                                    {{ sprintf('%+.1f%%', $b['mean_rel']) }}
+                                    <span class="font-normal text-xs text-faint">(n={{ $b['n'] }})</span>
+                                </span>
+                            </li>
+                        @endforeach
+                    </ul>
+                    <p class="mt-3 text-xs text-muted">{{ __('app.science.recovery_explain') }}</p>
+                </x-ui.card>
+            @endif
+
+            @if ($timeOfDay)
+                <x-ui.card :title="__('app.science.time_title')" :subtitle="trans_choice('app.science.time_sub', $timeOfDay['lifts'], ['lifts' => $timeOfDay['lifts']])">
+                    <ul class="space-y-2">
+                        @foreach ($timeOfDay['buckets'] as $name => $b)
+                            <li class="flex items-center justify-between gap-4 text-sm">
+                                <span class="text-body">{{ __('app.science.slot_'.$name) }}</span>
+                                <span class="tabular-nums {{ $b['mean_rel'] >= 0 ? 'text-good' : 'text-bad' }} font-semibold">
+                                    {{ sprintf('%+.1f%%', $b['mean_rel']) }}
+                                    <span class="font-normal text-xs text-faint">(n={{ $b['n'] }})</span>
+                                </span>
+                            </li>
+                        @endforeach
+                    </ul>
+                    <p class="mt-3 text-xs text-muted">{{ __('app.science.time_explain') }}</p>
+                </x-ui.card>
+            @endif
+        </div>
+    @endif
 </x-ui.page>

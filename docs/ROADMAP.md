@@ -4,7 +4,7 @@
 > sessões: estado real, pendentes de cada lado, e planos discutidos mas ainda
 > não executados. Em português porque o dono do produto lê em português.
 
-## Em produção (tudo verde, 1041 testes)
+## Em produção (tudo verde, 1047 testes)
 
 | Área | Estado |
 |---|---|
@@ -169,7 +169,7 @@ peso×reps, timeline de PRs por mês, analytics por equipamento. Recusado:
 dashboard de widgets drag-and-drop (build pesado, zero ciência). CSV do
 dono em scratchpad/hevy.csv (não comitar!).
 
-### 6. Trio "ciência pessoal" — APROVADO ("avança", 2026-07-29), EM CURSO
+### 6. Trio "ciência pessoal" — ✓ EM PRODUÇÃO (2026-07-29)
 
 Plano fechado (implementar exatamente isto):
 - Novo serviço App\Services\Analytics\PersonalScience, 3 leituras sobre
@@ -186,7 +186,8 @@ Plano fechado (implementar exatamente isto):
      todo serve, Schoenfeld 2021).
 - UI: Performance ganha secção "A tua ciência" (1+2); Músculos ganha o
   portfólio (3). Lang EN+PT com fontes. Testes dispara/não-dispara.
-- Depois: suite, pint, commit, push HEAD:main, deploy Render, reporte pt.
+- Entregue como especificado: PersonalScience + secção "A tua ciência"
+  na Performance + portfólio na página de Músculos, 6 testes.
 
 ## Dívida de legibilidade conhecida (auditoria 2026-07-29, passe 2 pendente)
 

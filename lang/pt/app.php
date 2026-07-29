@@ -1143,6 +1143,26 @@ return [
         'saved' => 'Preferências de email guardadas.',
     ],
 
+    'science' => [
+        'title' => 'A tua ciência',
+        'recovery_title' => 'A tua curva de recuperação',
+        'recovery_sub' => 'Como :lifts respondem aos dias de descanso — relativo à média de e1RM de cada levantamento',
+        'rest_days' => 'Após :days dia de descanso|Após :days dias de descanso',
+        'recovery_explain' => 'Cada valor: o e1RM da sessão como ±% da média de 6 meses do próprio levantamento, agrupado pelos dias de descanso desde a última vez que o treinaste. Intervalos acima de uma semana são paragens e ficam de fora. Amostras pequenas mostram-se, não se escondem — trata n abaixo de 10 como pista.',
+        'time_title' => 'Manhã vs noite',
+        'time_sub' => 'De :lifts levantamento treinado a horas diferentes|De :lifts levantamentos treinados a horas diferentes',
+        'slot_morning' => 'Manhã (antes das 12h)',
+        'slot_afternoon' => 'Tarde (12-17h)',
+        'slot_evening' => 'Noite (depois das 17h)',
+        'time_explain' => 'A literatura (Grgic 2019) encontra força máxima ao fim da tarde/noite em média — este cartão diz o que o TEU registo diz, na mesma escala relativa de e1RM, só para levantamentos treinados em pelo menos dois horários.',
+        'portfolio_title' => 'Portfólio de rep-ranges',
+        'portfolio_sub' => 'Onde vivem as tuas séries efetivas no espetro de cargas — últimas 12 semanas',
+        'portfolio_aria' => 'Distribuição de rep-ranges para :muscle',
+        'portfolio_explain' => 'A hipertrofia é semelhante em todo o espetro de repetições com esforço igualado (Schoenfeld 2021), por isso nenhuma mistura é "errada" para crescer — mas a força é específica: um objetivo de força precisa de algum trabalho 1-5.',
+        'strength_gap' => 'Objetivo de força, sem séries pesadas',
+        'strength_gap_body' => 'Menos de 5% das tuas séries recentes estão na faixa 1-5. Para crescer não importa, mas a força é específica — com objetivo de força, duplas e triplas pesadas são o ingrediente em falta.',
+    ],
+
     'calendar' => [
         'title' => 'Estilo do calendário de treino',
         'subtitle' => 'Os mesmos dados, duas leituras — escolhe a que os teus olhos já falam',

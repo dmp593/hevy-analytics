@@ -1142,6 +1142,26 @@ return [
         'saved' => 'Email preferences saved.',
     ],
 
+    'science' => [
+        'title' => 'Your science',
+        'recovery_title' => 'Your recovery curve',
+        'recovery_sub' => 'How :lifts respond to rest days — relative to each lift\'s own average e1RM',
+        'rest_days' => 'After :days rest day|After :days rest days',
+        'recovery_explain' => 'Each value: your session e1RM as ±% of that lift\'s own 6-month average, grouped by the rest days since you last trained that lift. Gaps over a week are layoffs and excluded. Small samples are shown, not hidden — treat n under 10 as a hint.',
+        'time_title' => 'Morning vs evening',
+        'time_sub' => 'From :lifts lift trained at different hours|From :lifts lifts trained at different hours',
+        'slot_morning' => 'Morning (before 12h)',
+        'slot_afternoon' => 'Afternoon (12-17h)',
+        'slot_evening' => 'Evening (after 17h)',
+        'time_explain' => 'The literature (Grgic 2019) finds strength peaks in the late afternoon/evening on average — this card says what YOUR log says, on the same relative-e1RM scale, only for lifts trained in at least two time slots.',
+        'portfolio_title' => 'Rep-range portfolio',
+        'portfolio_sub' => 'Where your working sets live on the load spectrum — last 12 weeks',
+        'portfolio_aria' => 'Rep range distribution for :muscle',
+        'portfolio_explain' => 'Hypertrophy is similar across rep ranges when effort is matched (Schoenfeld 2021), so no mix is "wrong" for growth — but strength is specific: a strength goal needs some 1-5 work.',
+        'strength_gap' => 'Strength goal, no heavy sets',
+        'strength_gap_body' => 'Under 5% of your recent sets are in the 1-5 range. Growth does not care, but strength is specific — with a strength goal, some heavy doubles and triples are the missing ingredient.',
+    ],
+
     'calendar' => [
         'title' => 'Training calendar style',
         'subtitle' => 'Same data, two readings — pick the one your eyes already speak',
