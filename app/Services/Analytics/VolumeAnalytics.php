@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Science\Volume\MuscleLandmarks;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class VolumeAnalytics
 {
@@ -19,9 +20,55 @@ class VolumeAnalytics
         return (new SetQuery($this->user, $this->filter))->rows();
     }
 
+    private ?Collection $rollup = null;
+
+    private bool $rollupResolved = false;
+
+    /**
+     * Daily rollup rows serving this filter, or null when the filter narrows
+     * by something the rollup does not carry. Turns the plain-window
+     * aggregates (the dashboard's shape) into a read over hundreds of daily
+     * rows instead of every raw set.
+     */
+    private function rollupDays(): ?Collection
+    {
+        if ($this->rollupResolved) {
+            return $this->rollup;
+        }
+        $this->rollupResolved = true;
+
+        if (! $this->filter->servableByRollup()) {
+            return $this->rollup = null;
+        }
+
+        $tz = $this->user->resolvedTimezone();
+        $from = $this->user->entitlements()->clampFrom($this->filter->from);
+
+        $query = DB::table('workout_set_rollups')
+            ->where('user_id', $this->user->id)
+            ->when($from, fn ($q) => $q->where('local_date', '>=', $from->copy()->setTimezone($tz)->toDateString()))
+            ->when($this->filter->to, fn ($q) => $q->where('local_date', '<=', $this->filter->to->copy()->setTimezone($tz)->toDateString()))
+            ->orderBy('local_date');
+
+        $rows = $query->get();
+
+        // Backfill-on-first-read: an account that last synced before the
+        // rollup table existed has workouts but no rollups. One rebuild
+        // self-heals it; every later read is pure.
+        if ($rows->isEmpty() && $this->user->workouts()->exists()) {
+            (new RollupBuilder)->rebuild($this->user);
+            $rows = $query->get();
+        }
+
+        return $this->rollup = $rows;
+    }
+
     /** Total tonnage = sum(weight * reps) over working sets. */
     public function tonnage(?Collection $rows = null): float
     {
+        if ($rows === null && ($days = $this->rollupDays()) !== null) {
+            return round($days->sum(fn ($d) => (float) $d->tonnage), 1);
+        }
         $rows ??= $this->rows();
 
         return round($rows->sum(fn ($r) => (float) ($r->weight_kg ?? 0) * (float) ($r->reps ?? 0)), 1);
@@ -29,17 +76,40 @@ class VolumeAnalytics
 
     public function totalSets(?Collection $rows = null): int
     {
+        if ($rows === null && ($days = $this->rollupDays()) !== null) {
+            return (int) $days->sum(fn ($d) => (int) $d->sets);
+        }
+
         return ($rows ?? $this->rows())->count();
     }
 
     public function totalReps(?Collection $rows = null): int
     {
+        if ($rows === null && ($days = $this->rollupDays()) !== null) {
+            return (int) $days->sum(fn ($d) => (int) $d->reps);
+        }
+
         return (int) ($rows ?? $this->rows())->sum(fn ($r) => (float) ($r->reps ?? 0));
     }
 
     /** Tonnage time series bucketed by the filter period. */
     public function tonnageSeries(?Collection $rows = null): array
     {
+        $tz = $this->user->resolvedTimezone();
+
+        if ($rows === null && ($days = $this->rollupDays()) !== null) {
+            $buckets = [];
+            foreach ($days as $d) {
+                // local_date is already in the athlete's zone; parse it there
+                // so bucketKey does not shift it a second time.
+                $key = PeriodService::bucketKey(Carbon::parse((string) $d->local_date, $tz), $this->filter->period, $tz);
+                $buckets[$key] = ($buckets[$key] ?? 0) + (float) $d->tonnage;
+            }
+            ksort($buckets);
+
+            return array_map(fn ($k, $v) => ['label' => $k, 'value' => round($v, 1)], array_keys($buckets), $buckets);
+        }
+
         $rows ??= $this->rows();
         $buckets = [];
         foreach ($rows as $r) {

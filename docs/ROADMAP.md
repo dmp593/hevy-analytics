@@ -229,8 +229,13 @@ best_weight, best_reps, músculo) + RollupBuilder::rebuild() (1 query
 INSERT..SELECT, transacional, idempotente) chamado no HevySync::run e nos
 dois caminhos do ImportController, antes do bump de cache. e1RM fiável
 fica DELIBERADAMENTE fora (precisa dos clamps RPE do OneRepMax — força lê
-raw). Próximo passo: VolumeAnalytics/ConsistencyAnalytics/TrainingRhythm
-lerem do rollup quando não precisam de linhas cruas.
+raw). VolumeAnalytics ✓ LIGADO ao rollup (tonnage/sets/reps/série, com
+backfill-on-first-read para contas que nunca ressincronizaram);
+ConsistencyAnalytics/TrainingRhythm ficam raw de propósito (precisam de
+horas/durações por sessão que o rollup não carrega) — E2 dado por
+CONCLUÍDO. Bootstrap agora cura is_admin + comp de operador em contas
+existentes (as duas contas do dono estavam sem flag/licença por terem
+sido criadas antes das vars — corrige-se sozinho no arranque).
 a) Agregação em SQL (SUM/COUNT/date_trunc) para tonelagem/séries.
 b) Rollup workout_set_rollups(user, dia, exercício, músculo, sets, reps,
    tonnage, best_e1rm) mantido no HevySync.

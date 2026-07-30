@@ -78,6 +78,20 @@ class FilterCriteria
         );
     }
 
+    /**
+     * True when the daily rollup table can answer this filter: no narrowing
+     * the rollup does not carry (routine, single exercise, muscle, equipment)
+     * and warm-ups excluded, which is how rollups are built.
+     */
+    public function servableByRollup(): bool
+    {
+        return $this->routineHevyId === null
+            && $this->exerciseTemplateHevyId === null
+            && $this->muscle === null
+            && $this->equipment === null
+            && ! $this->includeWarmups;
+    }
+
     public function toArray(): array
     {
         return [

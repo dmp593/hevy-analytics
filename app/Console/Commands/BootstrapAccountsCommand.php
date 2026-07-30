@@ -54,8 +54,38 @@ class BootstrapAccountsCommand extends Command
             return 0;
         }
 
-        if (User::where('email', $email)->exists()) {
-            $this->line("{$email} already exists — left untouched.");
+        if ($existing = User::where('email', $email)->first()) {
+            // The env var is authoritative for the ADMIN FLAG even on existing
+            // accounts: an account created before the variables were set (or
+            // recreated during an env outage) must still end up an admin, or
+            // the operator is locked out of their own admin area with no UI
+            // path back in. Promotion only — demotion stays an explicit
+            // app:make-admin decision.
+            $changed = [];
+
+            if ($admin && ! $existing->is_admin) {
+                $existing->forceFill(['is_admin' => true]);
+                $changed[] = 'admin flag';
+            }
+
+            // The operator accounts' complimentary access is part of the same
+            // contract: an account that predates the variables (or survived
+            // an env outage) must still end up comped, or the owner pays for
+            // their own product when the trial lapses.
+            if ($existing->comped_reason === null) {
+                $existing->forceFill([
+                    'comped_reason' => 'Operator account (bootstrap)',
+                    'comped_until' => null,
+                ]);
+                $changed[] = 'complimentary access';
+            }
+
+            if ($changed !== []) {
+                $existing->save();
+                $this->info("{$email} existed — granted: ".implode(', ', $changed).'.');
+            } else {
+                $this->line("{$email} already exists — left untouched.");
+            }
 
             return 0;
         }

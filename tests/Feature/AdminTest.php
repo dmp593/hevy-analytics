@@ -319,4 +319,51 @@ class AdminTest extends TestCase
             ->assertSee($admin->name)
             ->assertSee('Beta tester');
     }
+
+    public function test_bootstrap_promotes_an_existing_account_named_as_admin(): void
+    {
+        $user = User::factory()->create(['email' => 'ops@example.com', 'is_admin' => false]);
+
+        // Laravel's env() reads $_ENV/$_SERVER, not putenv() alone.
+        foreach (['BOOTSTRAP_ADMIN_EMAIL' => 'ops@example.com', 'BOOTSTRAP_ADMIN_PASSWORD' => 'irrelevant-here'] as $k => $v) {
+            $_ENV[$k] = $_SERVER[$k] = $v;
+            putenv("{$k}={$v}");
+        }
+
+        try {
+            $this->artisan('app:bootstrap-accounts')->assertSuccessful();
+        } finally {
+            foreach (['BOOTSTRAP_ADMIN_EMAIL', 'BOOTSTRAP_ADMIN_PASSWORD'] as $k) {
+                unset($_ENV[$k], $_SERVER[$k]);
+                putenv($k);
+            }
+        }
+
+        $this->assertTrue($user->fresh()->is_admin);
+    }
+
+    public function test_bootstrap_restores_the_operator_comp_on_an_existing_account(): void
+    {
+        $user = User::factory()->create(['email' => 'owner@example.com']);
+        $this->assertNull($user->comped_reason);
+
+        foreach (['BOOTSTRAP_OWNER_EMAIL' => 'owner@example.com', 'BOOTSTRAP_OWNER_PASSWORD' => 'irrelevant-here'] as $k => $v) {
+            $_ENV[$k] = $_SERVER[$k] = $v;
+            putenv("{$k}={$v}");
+        }
+
+        try {
+            $this->artisan('app:bootstrap-accounts')->assertSuccessful();
+        } finally {
+            foreach (['BOOTSTRAP_OWNER_EMAIL', 'BOOTSTRAP_OWNER_PASSWORD'] as $k) {
+                unset($_ENV[$k], $_SERVER[$k]);
+                putenv($k);
+            }
+        }
+
+        $fresh = $user->fresh();
+        $this->assertNotNull($fresh->comped_reason);
+        $this->assertNull($fresh->comped_until);
+        $this->assertFalse($fresh->is_admin); // owner is not silently made admin
+    }
 }
