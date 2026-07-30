@@ -259,6 +259,18 @@ mesmo caminho GDPR das fotos, trilho de auditoria sobrevive com o email no
 detalhe). Limite honesto: reembolsos/upgrades de subscrições fazem-se no
 dashboard do Paddle — o admin da app vê estado e cancela no fim do período.
 
+### 9. Admin de billing por API — FILA (pós-Paddle real; decisão 2026-07-30)
+
+Questão do dono respondida: gerir no dashboard do Paddle era o pragmático,
+não um limite — dá quase tudo por API. Quando o Paddle real estiver ativo
+e houver clientes: reembolsos via POST /adjustments (action refund — é um
+PEDIDO que o Paddle aprova, porque é Merchant of Record; mostrar estado
+"pendente" honestamente), upgrades/downgrades com proration, pausar/
+retomar, cancelar-já, lista de transações no detalhe da conta (Cashier +
+API direta). Fica sempre no Paddle: faturas emitidas por eles, disputas,
+método de pagamento (portal hosted — zero PCI nosso). Não construir em
+sandbox.
+
 ## Dívida de legibilidade conhecida (auditoria 2026-07-29, passe 2 pendente)
 
 Dois revisores independentes: veredicto "não é esparguete, arquitetura boa,
