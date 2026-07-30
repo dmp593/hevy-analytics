@@ -4,6 +4,7 @@ namespace App\Services\Hevy;
 
 use App\Models\SyncLog;
 use App\Models\User;
+use App\Services\Analytics\RollupBuilder;
 use App\Support\AnalyticsCache;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -69,6 +70,7 @@ class HevySync
             throw $e;
         }
 
+        (new RollupBuilder)->rebuild($this->user);
         AnalyticsCache::bump($this->user);
 
         return $counts;

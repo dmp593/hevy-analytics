@@ -223,7 +223,14 @@ c) Índices: sync_logs(user_id,id), goals(user_id), routine_exercises
 d) Cache de payloads por página: user:{id}:v{ver}:{filtro}, TTL 24h,
    versão bumpada em sync/intake/measurements/goals/imports.
 
-**FASE E2 — SEGUINTE (aprovada, por fazer):**
+**FASE E2 — rollup ESCRITO ✓ (2026-07-30); falta ligar os LEITORES:**
+Tabela workout_set_rollups (user/dia-local/exercício: sets, reps, tonnage,
+best_weight, best_reps, músculo) + RollupBuilder::rebuild() (1 query
+INSERT..SELECT, transacional, idempotente) chamado no HevySync::run e nos
+dois caminhos do ImportController, antes do bump de cache. e1RM fiável
+fica DELIBERADAMENTE fora (precisa dos clamps RPE do OneRepMax — força lê
+raw). Próximo passo: VolumeAnalytics/ConsistencyAnalytics/TrainingRhythm
+lerem do rollup quando não precisam de linhas cruas.
 a) Agregação em SQL (SUM/COUNT/date_trunc) para tonelagem/séries.
 b) Rollup workout_set_rollups(user, dia, exercício, músculo, sets, reps,
    tonnage, best_e1rm) mantido no HevySync.

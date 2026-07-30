@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Analytics\RollupBuilder;
 use App\Services\Import\CsvImport;
 use App\Services\Import\ImportException;
 use App\Services\Import\UnknownCsvFormat;
@@ -55,6 +56,7 @@ class ImportController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
+        (new RollupBuilder)->rebuild($request->user());
         AnalyticsCache::bump($request->user());
 
         return redirect()->route('dashboard')->with('status', $this->doneMessage($result));
@@ -95,6 +97,7 @@ class ImportController extends Controller
             Storage::disk('local')->delete($path);
         }
 
+        (new RollupBuilder)->rebuild($request->user());
         AnalyticsCache::bump($request->user());
 
         return redirect()->route('dashboard')->with('status', $this->doneMessage($result));
