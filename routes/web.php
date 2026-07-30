@@ -164,6 +164,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/users/{user}/grant', [AdminUserController::class, 'grant'])->name('users.grant');
         Route::post('/users/{user}/revoke', [AdminUserController::class, 'revoke'])->name('users.revoke');
         Route::post('/users/{user}/cancel-subscription', [AdminUserController::class, 'cancelSubscription'])->name('users.cancel');
+        Route::post('/users/{user}/disable', [AdminUserController::class, 'disable'])->name('users.disable');
+        Route::post('/users/{user}/enable', [AdminUserController::class, 'enable'])->name('users.enable');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
     });
 });
 

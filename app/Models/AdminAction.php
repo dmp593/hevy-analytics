@@ -21,6 +21,12 @@ class AdminAction extends Model
 
     public const CANCELLED_SUBSCRIPTION = 'cancelled_subscription';
 
+    public const DISABLED_ACCOUNT = 'disabled_account';
+
+    public const ENABLED_ACCOUNT = 'enabled_account';
+
+    public const DELETED_ACCOUNT = 'deleted_account';
+
     public function admin(): BelongsTo
     {
         return $this->belongsTo(User::class, 'admin_id');

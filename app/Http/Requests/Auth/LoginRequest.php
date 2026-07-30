@@ -50,6 +50,16 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // A disabled account is refused at the door with the honest message,
+        // not silently bounced by the session middleware one request later.
+        if (Auth::user()?->disabled_at !== null) {
+            Auth::guard('web')->logout();
+
+            throw ValidationException::withMessages([
+                'email' => __('app.admin.account_disabled'),
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

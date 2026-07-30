@@ -366,4 +366,74 @@ class AdminTest extends TestCase
         $this->assertNull($fresh->comped_until);
         $this->assertFalse($fresh->is_admin); // owner is not silently made admin
     }
+
+    public function test_a_disabled_account_cannot_log_in_and_live_sessions_end(): void
+    {
+        $admin = $this->admin();
+        $user = User::factory()->create(['password' => bcrypt('secret-pass')]);
+
+        $this->actingAs($admin)->post("/admin/users/{$user->id}/disable")->assertRedirect();
+        $this->assertNotNull($user->fresh()->disabled_at);
+
+        // Live session dies on the next request.
+        $this->actingAs($user->fresh())->get('/dashboard')->assertRedirect(route('login'));
+        $this->assertGuest();
+
+        // And a fresh login is refused with the honest message.
+        $this->post('/login', ['email' => $user->email, 'password' => 'secret-pass'])
+            ->assertSessionHasErrors('email');
+        $this->assertGuest();
+    }
+
+    public function test_enable_restores_access(): void
+    {
+        $admin = $this->admin();
+        $user = User::factory()->create();
+        $user->forceFill(['disabled_at' => now()])->save();
+
+        $this->actingAs($admin)->post("/admin/users/{$user->id}/enable")->assertRedirect();
+
+        $this->assertNull($user->fresh()->disabled_at);
+        $this->actingAs($user->fresh())->get('/dashboard')->assertOk();
+    }
+
+    public function test_admins_cannot_disable_themselves_or_each_other(): void
+    {
+        $admin = $this->admin();
+        $other = $this->admin();
+
+        $this->actingAs($admin)->post("/admin/users/{$admin->id}/disable")->assertStatus(422);
+        $this->actingAs($admin)->post("/admin/users/{$other->id}/disable")->assertStatus(422);
+    }
+
+    public function test_admin_delete_requires_the_typed_email_and_removes_the_account(): void
+    {
+        $admin = $this->admin();
+        $user = User::factory()->create();
+
+        $this->actingAs($admin)->delete("/admin/users/{$user->id}", ['confirm' => 'wrong@x.com'])
+            ->assertSessionHasErrors('confirm');
+        $this->assertNotNull($user->fresh());
+
+        $this->actingAs($admin)->delete("/admin/users/{$user->id}", ['confirm' => $user->email])
+            ->assertRedirect(route('admin.users'));
+        $this->assertNull(User::find($user->id));
+
+        // The trail survives the cascade, carrying the email in its detail.
+        $this->assertTrue(
+            AdminAction::where('action', AdminAction::DELETED_ACCOUNT)
+                ->where('detail', 'like', "%{$user->email}%")->exists()
+        );
+    }
+
+    public function test_a_comped_account_reads_as_comped_on_the_billing_page(): void
+    {
+        $user = User::factory()->create();
+        $user->forceFill(['comped_reason' => 'Gift', 'comped_until' => null])->save();
+
+        $this->actingAs($user)->get('/billing')
+            ->assertOk()
+            ->assertSee(__('app.billing.comped_body'))
+            ->assertDontSee(__('app.billing.free_body', ['days' => 30]));
+    }
 }

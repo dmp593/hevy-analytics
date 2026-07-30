@@ -68,6 +68,36 @@
                     <x-ui.button type="submit" variant="danger" size="sm">{{ __('app.admin.cancel_sub') }}</x-ui.button>
                 </form>
                 <p class="mt-2 text-xs text-muted">{{ __('app.admin.cancel_note') }}</p>
+
+                {{-- Account switch-off and deletion. Same email-typing
+                     confirmation as the cancel above; self and fellow admins
+                     are refused server-side. --}}
+                <div class="mt-6 border-t border-subtle pt-4">
+                    @if ($user->disabled_at)
+                        <p class="text-sm text-warn">{{ __('app.admin.disabled_since', ['date' => $user->disabled_at->isoFormat('D MMM YYYY')]) }}</p>
+                        <form method="POST" action="{{ route('admin.users.enable', $user) }}" class="mt-2">
+                            @csrf
+                            <x-ui.button type="submit" variant="secondary" size="sm">{{ __('app.admin.enable') }}</x-ui.button>
+                        </form>
+                    @elseif (! $user->is_admin && $user->id !== auth()->id())
+                        <form method="POST" action="{{ route('admin.users.disable', $user) }}">
+                            @csrf
+                            <x-ui.button type="submit" variant="secondary" size="sm">{{ __('app.admin.disable') }}</x-ui.button>
+                        </form>
+                        <p class="mt-1 text-xs text-muted">{{ __('app.admin.disable_note') }}</p>
+
+                        <form method="POST" action="{{ route('admin.users.destroy', $user) }}" class="mt-4 flex flex-wrap items-end gap-3">
+                            @csrf
+                            @method('DELETE')
+                            <label class="form-label">
+                                {{ __('app.admin.confirm_email') }}
+                                <input type="text" name="confirm" class="form-control w-64" autocomplete="off" required>
+                            </label>
+                            <x-ui.button type="submit" variant="danger" size="sm">{{ __('app.admin.delete') }}</x-ui.button>
+                        </form>
+                        <p class="mt-1 text-xs text-muted">{{ __('app.admin.delete_note') }}</p>
+                    @endif
+                </div>
             @endif
         </x-ui.card>
     @endif

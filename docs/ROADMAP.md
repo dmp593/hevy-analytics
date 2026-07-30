@@ -247,6 +247,18 @@ c) FitnessVolt ✓ FEITO em versão mínima (chave em buckets de 2,5 kg, TTL 7 d
 - ~500-2000: Redis (cache+sessions+queue), FrankenPHP worker/Octane.
 - ~2000-10000: Neon autoscaling + web horizontal.
 
+### 8. Administração completa + billing comped (2026-07-30)
+
+Perguntas do dono a meio: admin não aparecia (flag curada pelo bootstrap,
+secção 7) e a conta oferecida lia "plano gratuito" no billing. Entregue:
+caso Complimentary na página de subscrição (badge verde + texto próprio,
+com/sem data); desativar/reativar contas (coluna disabled_at, bloqueio no
+login + middleware que termina sessões vivas; nunca a si próprio nem a
+outro admin); apagar contas pelo admin (confirmação por email digitado,
+mesmo caminho GDPR das fotos, trilho de auditoria sobrevive com o email no
+detalhe). Limite honesto: reembolsos/upgrades de subscrições fazem-se no
+dashboard do Paddle — o admin da app vê estado e cancela no fim do período.
+
 ## Dívida de legibilidade conhecida (auditoria 2026-07-29, passe 2 pendente)
 
 Dois revisores independentes: veredicto "não é esparguete, arquitetura boa,

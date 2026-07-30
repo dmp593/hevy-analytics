@@ -13,6 +13,7 @@
                         'bg-good-soft text-good' => $state === \App\Billing\State::Subscribed,
                         'bg-info-soft text-info' => $state === \App\Billing\State::Trialing,
                         'bg-warn-soft text-warn' => in_array($state, [\App\Billing\State::GracePeriod, \App\Billing\State::PastDue], true),
+                        'bg-good-soft text-good' => $state === \App\Billing\State::Complimentary,
                         'bg-surface-sunk text-body' => $state === \App\Billing\State::Free,
                     ])>{{ $state->label() }}</span>
                 </div>
@@ -40,6 +41,12 @@
 
                         @case(\App\Billing\State::PastDue)
                             {{ __('app.billing.past_due_body') }}
+                            @break
+
+                        @case(\App\Billing\State::Complimentary)
+                            {{ auth()->user()->comped_until
+                                ? __('app.billing.comped_body_until', ['date' => auth()->user()->comped_until->isoFormat('D MMMM YYYY')])
+                                : __('app.billing.comped_body') }}
                             @break
 
                         @default

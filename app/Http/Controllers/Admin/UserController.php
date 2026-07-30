@@ -144,6 +144,59 @@ class UserController extends Controller
         return back()->with('status', __('app.admin.cancelled', ['name' => $user->name]));
     }
 
+    /**
+     * Switch an account off. Guards: never yourself (that is how the last
+     * admin locks everyone out), and never another admin — demote first via
+     * app:make-admin, so removing an operator is always a two-step decision.
+     */
+    public function disable(Request $request, User $user)
+    {
+        abort_if($user->id === $request->user()->id, 422);
+        abort_if($user->is_admin, 422);
+
+        $user->forceFill(['disabled_at' => now()])->save();
+
+        AdminAction::record($request->user(), $user, AdminAction::DISABLED_ACCOUNT);
+
+        return back()->with('status', __('app.admin.disabled', ['name' => $user->name]));
+    }
+
+    public function enable(Request $request, User $user)
+    {
+        abort_unless($user->disabled_at !== null, 404);
+
+        $user->forceFill(['disabled_at' => null])->save();
+
+        AdminAction::record($request->user(), $user, AdminAction::ENABLED_ACCOUNT);
+
+        return back()->with('status', __('app.admin.enabled', ['name' => $user->name]));
+    }
+
+    /**
+     * Delete an account and its data, exactly as self-service deletion does
+     * (photos through the model so the files leave the bucket too). Typing
+     * the email is the confirmation. The audit row records the email in its
+     * detail because the target row itself cascades away with the user.
+     */
+    public function destroy(Request $request, User $user)
+    {
+        $request->validate(['confirm' => ['required', Rule::in([$user->email])]]);
+        abort_if($user->id === $request->user()->id, 422);
+        abort_if($user->is_admin, 422);
+
+        AdminAction::record(
+            $request->user(),
+            $request->user(), // target self: the deleted row cannot be referenced
+            AdminAction::DELETED_ACCOUNT,
+            __('app.admin.deleted_detail', ['email' => $user->email]),
+        );
+
+        $user->progressPhotos->each->delete();
+        $user->delete();
+
+        return redirect()->route('admin.users')->with('status', __('app.admin.deleted', ['name' => $user->name]));
+    }
+
     /** @return array<string, int> */
     private function counts(): array
     {
