@@ -1,4 +1,4 @@
-@props(['label', 'value', 'unit' => '', 'sub' => null, 'tone' => 'default', 'tip' => null, 'tipTitle' => null])
+@props(['label', 'value', 'unit' => '', 'sub' => null, 'tone' => 'default', 'tip' => null, 'tipTitle' => null, 'tipAnchor' => null])
 
 @php
 $tones = [
@@ -12,7 +12,7 @@ $tones = [
 
 <div {{ $attributes->merge(['class' => 'rounded-xl border border-line p-4 shadow-xs '.($tones[$tone] ?? $tones['default'])]) }}>
     <div class="text-xs font-medium uppercase tracking-wide text-muted">
-        {{ $label }}@if($tip)<x-info :title="$tipTitle ?? $label" :text="$tip" />@endif
+        {{ $label }}@if($tip)<x-info :title="$tipTitle ?? $label" :text="$tip" :anchor="$tipAnchor" />@endif
     </div>
     <div class="mt-1 flex items-baseline gap-1">
         <span class="text-2xl font-bold text-ink">{{ $value }}</span>

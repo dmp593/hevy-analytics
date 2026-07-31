@@ -1,4 +1,4 @@
-<x-ui.page :title="__('app.pages.write')" :subtitle="__('app.pages.write_sub')" width="5xl">
+<x-ui.page :help="__('app.help.write')" :title="__('app.pages.write')" :subtitle="__('app.pages.write_sub')" width="5xl">
     <x-flash />
     <p class="text-sm text-muted mb-6">{{ __('app.write.intro') }}</p>
 

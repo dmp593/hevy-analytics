@@ -1,4 +1,4 @@
-@props(['text' => '', 'title' => null])
+@props(['text' => '', 'title' => null, 'anchor' => null])
 
 <span x-data="{
         open: false,
@@ -50,7 +50,9 @@
         <span class="block rounded-lg bg-ink text-canvas text-xs leading-relaxed p-3 shadow-xl">
             @if($title)<span class="block font-semibold mb-1">{{ $title }}</span>@endif
             {{ $text }}
-            <a href="{{ route('guide') }}" class="block mt-2 text-brand-ink underline">{{ __('app.common.learn_more') }}</a>
+            {{-- Deep-link to the metric's own guide section: landing on the
+                 top of a long guide page is a search, not an answer. --}}
+            <a href="{{ route('guide') }}{{ $anchor ? '#'.$anchor : '' }}" class="block mt-2 text-brand-ink underline">{{ __('app.common.learn_more') }}</a>
         </span>
     </span>
 </span>

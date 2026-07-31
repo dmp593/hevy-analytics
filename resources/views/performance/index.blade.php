@@ -1,4 +1,4 @@
-<x-ui.page :title="__('app.pages.performance')" :subtitle="__('app.pages.performance_sub')">
+<x-ui.page :help="__('app.help.performance')" help-anchor="strength" :title="__('app.pages.performance')" :subtitle="__('app.pages.performance_sub')">
     <x-flash />
 
     {{-- Results first. Six filter controls used to be the first thing on the

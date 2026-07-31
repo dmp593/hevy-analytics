@@ -5,6 +5,7 @@
     'sub' => null,
     'tone' => 'default',
     'tip' => null,
+    'tipAnchor' => null,
     'trend' => null,
 ])
 
@@ -34,7 +35,7 @@
              Two lines is the lesser evil. --}}
         <span class="min-w-0">{{ $label }}</span>
         @if ($tip)
-            <x-info :text="$tip" :title="$label" />
+            <x-info :text="$tip" :title="$label" :anchor="$tipAnchor" />
         @endif
     </div>
 

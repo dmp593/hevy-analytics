@@ -18,9 +18,18 @@ class RoutineController extends Controller
         $user = $request->user();
         $filter = new FilterCriteria(from: Carbon::now()->subMonths(6), to: Carbon::now());
 
+        // Newest first, grouped by the athlete's own Hevy folders. The
+        // alphabetical flat list made duplicate titles ("Treino A" in two
+        // folders) indistinguishable, and recent routines are almost always
+        // the active programme. groupBy preserves the recency sort, so the
+        // folder holding the newest routine also surfaces first.
+        $routines = $user->routines()->withCount('exercises')->with('folder')->get()
+            ->sortByDesc(fn ($r) => $r->hevy_created_at ?? $r->created_at)
+            ->values();
+
         return view('routines.index', [
             'overview' => (new RoutineAnalytics($user, $filter))->overview(),
-            'routines' => $user->routines()->withCount('exercises')->orderBy('title')->get(),
+            'groups' => $routines->groupBy(fn ($r) => $r->folder?->title ?? ''),
         ]);
     }
 

@@ -1,4 +1,4 @@
-<x-ui.page :title="__('app.pages.body')" :subtitle="__('app.pages.body_sub')">
+<x-ui.page :help="__('app.help.body')" help-anchor="body" :title="__('app.pages.body')" :subtitle="__('app.pages.body_sub')">
     <x-flash />
 
     {{-- The verdict leads.
@@ -40,10 +40,10 @@
              one line below so nothing is hidden. --}}
         <x-ui.stat :label="__('app.dashboard.weight')" :value="units()->weight($status['trend_weight_kg'] ?? $status['weight_kg'] ?? null) ?? '—'" :unit="units()->weightUnit()"
                    :sub="isset($rate['kg_per_week']) ? sprintf('%+.2f %s/wk', units()->weight($rate['kg_per_week'], 2), units()->weightUnit()) : null"
-                   :tip="__('app.tips.weight')" />
+                   :tip="__('app.tips.weight')" tip-anchor="body" />
         <x-ui.stat :label="__('app.dashboard.body_fat')" :value="$status['fat_percent'] ?? '—'" unit="%"
                    :sub="$status['navy_fat_percent'] ? 'Navy '.$status['navy_fat_percent'].'%' : null"
-                   :tip="__('app.tips.body_fat')" />
+                   :tip="__('app.tips.body_fat')" tip-anchor="body" />
         <x-ui.stat :label="__('app.dashboard.lean_mass')" :value="units()->weight($status['lean_mass_kg'] ?? null) ?? '—'" :unit="units()->weightUnit()"
                    :sub="$status['ffmi_normalized'] ? 'FFMI '.$status['ffmi_normalized'] : null" />
         <x-ui.stat :label="__('app.body.fat_mass')" :value="units()->weight($status['fat_mass_kg'] ?? null) ?? '—'" :unit="units()->weightUnit()" />
@@ -132,7 +132,7 @@
             <div class="grid grid-cols-2 gap-4 lg:grid-cols-3">
                 <x-ui.stat :label="__('app.body.ffmi')" :value="$status['ffmi_normalized'] ?? '—'"
                            :sub="$status['ffmi'] ? __('app.body.ffmi_raw', ['value' => $status['ffmi']]) : null"
-                           :tip="__('app.tips.ffmi')" />
+                           :tip="__('app.tips.ffmi')" tip-anchor="body" />
                 {{-- No measurement means no verdict. `?? 0` read as "0 is not
                      over 0.5, so this is fine" and painted an athlete who had
                      never logged a waist a reassuring green. --}}
@@ -142,7 +142,7 @@
                                $status['waist_to_height'] > 0.5 => 'warn',
                                default => 'good',
                            }"
-                           :tip="__('app.tips.waist_height')" />
+                           :tip="__('app.tips.waist_height')" tip-anchor="body" />
                 {{-- Risk tone needs a stated sex (WHO cut-offs differ); without
                      one the ratio is shown untoned rather than misjudged. --}}
                 <x-ui.stat :label="__('app.body.waist_hip')" :value="$status['waist_to_hip'] ?? '—'"
@@ -151,17 +151,17 @@
                                true => 'warn',
                                false => 'good',
                            }"
-                           :tip="__('app.tips.waist_hip')" />
+                           :tip="__('app.tips.waist_hip')" tip-anchor="body" />
                 <x-ui.stat :label="__('app.body.rfm')" :value="$status['rfm_percent'] ?? '—'"
                            :unit="($status['rfm_percent'] ?? null) !== null ? '%' : ''"
-                           :tip="__('app.tips.rfm')" />
+                           :tip="__('app.tips.rfm')" tip-anchor="body" />
                 <x-ui.stat :label="__('app.body.p_ratio')" :value="$partitioning['p_ratio'] ?? '—'"
                            :sub="$partitioning['p_ratio'] !== null
                                ? ($partitioning['reliable'] ?? false
                                    ? __('app.body.sufficient_data', ['count' => $partitioning['fat_points'] ?? 0])
                                    : __('app.body.low_confidence', ['count' => $partitioning['fat_points'] ?? 0]))
                                : null"
-                           :tip="__('app.tips.p_ratio')" />
+                           :tip="__('app.tips.p_ratio')" tip-anchor="leanbulk" />
                 <x-ui.stat :label="__('app.body.source')"
                            :value="__('app.body.source_'.($partitioning['source'] ?? 'scale'))" />
             </div>

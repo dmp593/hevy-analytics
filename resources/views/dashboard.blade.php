@@ -6,7 +6,7 @@
             ]);
 @endphp
 
-<x-ui.page :title="__('app.dashboard.title')" :meta="$meta">
+<x-ui.page :help="__('app.help.dashboard')" :title="__('app.dashboard.title')" :meta="$meta">
     <x-flash />
     <x-sync-banner :status="$syncStatus ?? null" />
 
@@ -110,12 +110,12 @@
                     <div class="grid grid-cols-2 gap-4 lg:grid-cols-3">
                         <x-ui.stat :label="__('app.consistency.sessions_week')" :value="$consistency['sessions_this_week']"
                                    :sub="__('app.consistency.avg_week', ['avg' => $consistency['avg_per_week']])"
-                                   :tip="__('app.tips.consistency')" />
+                                   :tip="__('app.tips.consistency')" tip-anchor="volume" />
                         <x-ui.stat :label="__('app.consistency.streak')" :value="$consistency['streak_weeks']"
                                    :unit="trans_choice('app.consistency.weeks', $consistency['streak_weeks'])" />
                         <x-ui.stat :label="__('app.consistency.muscle_frequency')"
                                    :value="$consistency['muscles_at_frequency'].' / '.$consistency['muscles_trained']"
-                                   :tip="__('app.tips.muscle_frequency')" />
+                                   :tip="__('app.tips.muscle_frequency')" tip-anchor="volume" />
                     </div>
                     @if ($consistency['early_days'])
                         <p class="mt-3 text-xs text-muted">{{ __('app.consistency.early_days') }}</p>
@@ -151,15 +151,15 @@
                          weigh-in swings 1-2 kg on water and meal timing. --}}
                     <x-ui.stat :label="__('app.dashboard.weight')" :value="units()->weight($status['trend_weight_kg'] ?? $status['weight_kg'] ?? null)" :unit="units()->weightUnit()"
                                :sub="$ratePct !== null ? __('app.units.bw_per_week', ['value' => sprintf('%+.2f', $ratePct)]) : null"
-                               :tip="__('app.tips.weight')" />
+                               :tip="__('app.tips.weight')" tip-anchor="body" />
                     <x-ui.stat :label="__('app.dashboard.body_fat')" :value="$status['fat_percent'] ?? null" unit="%"
                                :sub="$status['navy_fat_percent'] ? 'Navy '.$status['navy_fat_percent'].'%' : null"
-                               :tip="__('app.tips.body_fat')" />
+                               :tip="__('app.tips.body_fat')" tip-anchor="body" />
                     <x-ui.stat :label="__('app.dashboard.lean_mass')" :value="units()->weight($status['lean_mass_kg'] ?? null)" :unit="units()->weightUnit()"
                                :sub="$status['ffmi_normalized'] ? 'FFMI '.$status['ffmi_normalized'] : null"
-                               :tip="__('app.tips.lean_mass')" />
+                               :tip="__('app.tips.lean_mass')" tip-anchor="body" />
                     <x-ui.stat :label="__('app.dashboard.hard_sets_4wk')" :value="$weekSets" tone="accent"
-                               :sub="$goalLabel" :tip="__('app.tips.hard_sets')" />
+                               :sub="$goalLabel" :tip="__('app.tips.hard_sets')" tip-anchor="volume" />
                 </div>
             </section>
 
@@ -168,7 +168,7 @@
             <section aria-label="{{ __('app.dashboard.weekly_sets') }}">
                 <x-ui.card :title="__('app.dashboard.weekly_sets')" :subtitle="__('app.dashboard.weekly_sets_sub')">
                     <x-slot name="actions">
-                        <x-info :title="__('app.dashboard.weekly_sets')" :text="__('app.tips.landmarks')" />
+                        <x-info anchor="volume" :title="__('app.dashboard.weekly_sets')" :text="__('app.tips.landmarks')" />
                     </x-slot>
 
                     @if (count($weeklySetsPerMuscle))

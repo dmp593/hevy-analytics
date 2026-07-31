@@ -1,4 +1,4 @@
-<x-ui.page :title="__('app.compare.title')" :subtitle="__('app.compare.subtitle')" width="6xl" class="space-y-6">
+<x-ui.page :help="__('app.help.compare')" help-anchor="checkins" :title="__('app.compare.title')" :subtitle="__('app.compare.subtitle')" width="6xl" class="space-y-6">
     <x-flash />
 
     {{-- Date picker: any check-in date (photo or measurement) is fair game. --}}

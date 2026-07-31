@@ -241,7 +241,9 @@ class RoutineProgression
             $verdict = $this->performanceVerdict($actual, (float) $weight, (int) $reps);
 
             if ($verdict === 'missed') {
-                $changes[] = "{$title}: keep {$weight}kg×{$reps} (last session came up short)";
+                $changes[] = __('app.progression.keep_missed', [
+                    'exercise' => $title, 'current' => "{$weight}kg×{$reps}",
+                ]);
 
                 return $this->normalizeSet($set);
             }
@@ -253,24 +255,38 @@ class RoutineProgression
                 // 10 kg a 2.5 kg step is a quarter of the bar — hold instead.
                 if ($stalled && $weight >= 10) {
                     $newWeight = $this->backoff((float) $weight);
-                    $changes[] = "{$title}: back off {$weight}kg×{$reps} → {$newWeight}kg×{$reps} (stalled while grinding at RPE 9.5+ — rebuild with 1-2 reps in reserve)";
+                    $changes[] = __('app.progression.back_off', [
+                        'exercise' => $title,
+                        'from' => "{$weight}kg×{$reps}",
+                        'to' => "{$newWeight}kg×{$reps}",
+                    ]);
                     $set['weight_kg'] = $newWeight;
 
                     return $this->normalizeSet($set);
                 }
 
-                $changes[] = "{$title}: keep {$weight}kg×{$reps} (met at RPE 9.5+ — consolidate before adding)";
+                $changes[] = __('app.progression.keep_maxed', [
+                    'exercise' => $title, 'current' => "{$weight}kg×{$reps}",
+                ]);
 
                 return $this->normalizeSet($set);
             }
 
             if ($reps >= self::REP_CAP) {
                 $newWeight = $this->roundToPlate($weight + self::LOAD_STEP_KG);
-                $changes[] = "{$title}: {$weight}kg×{$reps} → {$newWeight}kg×".self::REP_RESET;
+                $changes[] = __('app.progression.change', [
+                    'exercise' => $title,
+                    'from' => "{$weight}kg×{$reps}",
+                    'to' => "{$newWeight}kg×".self::REP_RESET,
+                ]);
                 $set['weight_kg'] = $newWeight;
                 $set['reps'] = self::REP_RESET;
             } else {
-                $changes[] = "{$title}: {$weight}kg×{$reps} → {$weight}kg×".($reps + 1);
+                $changes[] = __('app.progression.change', [
+                    'exercise' => $title,
+                    'from' => "{$weight}kg×{$reps}",
+                    'to' => "{$weight}kg×".($reps + 1),
+                ]);
                 $set['reps'] = $reps + 1;
             }
 
@@ -284,7 +300,12 @@ class RoutineProgression
             $targetReps = (int) ($range['start'] ?? $range['end'] ?? 10);
             $prescribed = $this->roundToPlate(OneRepMax::loadForReps($e1rm, $targetReps + 2));
             if ($prescribed > 0) {
-                $changes[] = "{$title}: prescribe {$prescribed}kg × {$targetReps} (from e1RM {$e1rm}kg, ~2 in reserve)";
+                $changes[] = __('app.progression.prescribe', [
+                    'exercise' => $title,
+                    'load' => "{$prescribed}kg",
+                    'reps' => $targetReps,
+                    'e1rm' => "{$e1rm}kg",
+                ]);
                 $set['weight_kg'] = $prescribed;
             }
         }

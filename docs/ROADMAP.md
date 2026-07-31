@@ -1,10 +1,10 @@
 # Roadmap & estado — memória durável do projeto
 
-> Atualizado a 2026-07-29. Este ficheiro existe para nada se perder entre
+> Atualizado a 2026-07-31. Este ficheiro existe para nada se perder entre
 > sessões: estado real, pendentes de cada lado, e planos discutidos mas ainda
 > não executados. Em português porque o dono do produto lê em português.
 
-## Em produção (tudo verde, 1047 testes)
+## Em produção (tudo verde, 1074 testes @ 2026-07-31)
 
 | Área | Estado |
 |---|---|
@@ -16,6 +16,9 @@
 | Landing + guia | ✓ refletem tudo o acima, nas duas línguas |
 | Robustez | ✓ app sobrevive a rotação de APP_KEY; testes imunes ao ambiente da máquina |
 | Auditoria científica (2026-07-29) | ✓ as 7 recomendações implementadas — ver secção abaixo |
+| Rotinas agrupadas por pasta (2026-07-31) | ✓ ordenadas por criação desc, pasta visível na tabela/detalhe (títulos Hevy duplicados deixaram de ser ambíguos) |
+| Documentação in-app (2026-07-31) | ✓ "Para que serve esta página?" fechado por omissão em 15 páginas + tooltips "Saber mais" com âncora para a secção certa do guia |
+| Progressão rebatizada "Progredir" (2026-07-31) | ✓ + linhas de sugestão localizadas (estavam em inglês fixo) + destaque na landing com as MESMAS strings da app |
 
 Infra: Render (srv-d9jtgmvavr4c73a6sd0g) + Neon (Postgres) + R2; variáveis num
 environment group "hevy-analytics" no Render. Preço decidido: €9/mês, trial de
@@ -270,6 +273,46 @@ retomar, cancelar-já, lista de transações no detalhe da conta (Cashier +
 API direta). Fica sempre no Paddle: faturas emitidas por eles, disputas,
 método de pagamento (portal hosted — zero PCI nosso). Não construir em
 sandbox.
+
+### 10. Ajuste inteligente de rotinas — PLANEADO (pedido do dono 2026-07-31)
+
+Sem IA — tudo determinístico e citável (o dono pediu aviso se só desse com
+IA; não é o caso). Três detetores + um só canal de saída (operação de
+escrita pendente, o utilizador confirma sempre; ajustes PEQUENOS, nunca
+rotinas inventadas):
+- a) Músculo a zero/abaixo do MEV nas últimas 4 semanas (rollup + landmarks
+  RP já existentes) → sugerir ADICIONAR 1 exercício (2-3 séries, entrada
+  ao MEV) à rotina ativa mais compatível. Rotina ativa = usada nos últimos
+  21 dias (workouts.routine_hevy_id); compatibilidade = maior sobreposição
+  de grupos musculares primários da sessão. Exercício escolhido de tabela
+  curada por músculo (gémeos → standing calf raise, etc.), preferindo
+  templates que o utilizador já tem no catálogo Hevy.
+- b) Perda de desempenho longa num exercício: slope e1RM negativo com
+  |slope| > 2×slopeStdError durante ≥8 semanas e ≥6 sessões, com adesão
+  mantida (senão é destreino, não estagnação) → sugerir TROCA de estímulo:
+  mesmo músculo primário, padrão/equipamento diferente, da mesma tabela
+  curada. Base: Fonseca 2014 + Baz-Valle 2019 (variação de exercício ajuda
+  força/hipertrofia; evidência moderada — dizer "hipótese razoável", não
+  garantia). Só depois de a progressão já ter aplicado back-off sem efeito.
+- c) Já coberto: back-off por estagnação (em produção via RoutineProgression).
+UI: cartões de sugestão na página da rotina + resumo na página de rotinas;
+cada cartão nomeia a fórmula/fonte e o botão prepara a operação pendente.
+
+### 11. Paleta de comandos Cmd/Ctrl+K — PLANEADO (pedido do dono 2026-07-31)
+
+Spotlight-like, Alpine puro (sem dependência nova), overlay global no
+layout autenticado: Cmd+K (Mac) / Ctrl+K (resto) abre; deteção por
+navigator.platform para mostrar o símbolo certo (⌘K vs Ctrl+K) num botão
+discreto na barra de topo (o dono quer a pista visível "algures lá em
+cima"). Dentro: pesquisa fuzzy sobre um índice estático de destinos
+(páginas + ações: sincronizar, mudar unidades/idioma/calendário) e, fase
+2, resultados dinâmicos (exercícios e rotinas do utilizador via endpoint
+JSON leve). Atalhos de uma tecla com a paleta aberta (g d → dashboard,
+g r → rotinas, etc.); "?" abre a lista de atalhos. Acessível: foco preso,
+Esc fecha, setas navegam, aria-activedescendant. Nada de atalhos globais
+de uma só tecla fora da paleta (colidem com inputs); tudo namespaced atrás
+de Cmd/Ctrl+K. Testes: componente renderiza índice, endpoint dinâmico
+autorizado e limitado.
 
 ## Dívida de legibilidade conhecida (auditoria 2026-07-29, passe 2 pendente)
 

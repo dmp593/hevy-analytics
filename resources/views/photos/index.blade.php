@@ -1,4 +1,4 @@
-<x-ui.page :title="__('app.pages.photos')" :subtitle="__('app.pages.photos_sub')" width="6xl">
+<x-ui.page :help="__('app.help.photos')" help-anchor="accuracy" :title="__('app.pages.photos')" :subtitle="__('app.pages.photos_sub')" width="6xl">
     <x-flash />
 
     <div class="grid lg:grid-cols-3 gap-6">

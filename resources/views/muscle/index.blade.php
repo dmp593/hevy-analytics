@@ -1,4 +1,4 @@
-<x-ui.page :title="__('app.pages.muscle')" :subtitle="__('app.pages.muscle_sub')">
+<x-ui.page :help="__('app.help.muscle')" help-anchor="volume" :title="__('app.pages.muscle')" :subtitle="__('app.pages.muscle_sub')">
     <x-flash />
 
     {{-- Results first, filter second.

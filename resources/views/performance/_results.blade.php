@@ -17,7 +17,7 @@
     @if (! empty($strengthLevel))
         <x-ui.card :title="__('app.pages.levels')">
             <x-slot:actions>
-                <x-info :title="__('app.pages.levels')" :text="__('app.tips.strength_level')" />
+                <x-info anchor="levels" :title="__('app.pages.levels')" :text="__('app.tips.strength_level')" />
             </x-slot:actions>
             <x-strength-bar :eval="$strengthLevel" />
         </x-ui.card>

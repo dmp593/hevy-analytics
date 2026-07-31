@@ -1,6 +1,6 @@
-<x-ui.page :title="__('app.pages.levels')" :subtitle="__('app.pages.levels_sub')" width="4xl">
+<x-ui.page :help="__('app.help.levels')" help-anchor="levels" :title="__('app.pages.levels')" :subtitle="__('app.pages.levels_sub')" width="4xl">
     <x-slot:actions>
-        <x-info :title="__('app.pages.levels')" :text="__('app.tips.strength_level')" />
+        <x-info anchor="levels" :title="__('app.pages.levels')" :text="__('app.tips.strength_level')" />
     </x-slot:actions>
 
     <x-flash />

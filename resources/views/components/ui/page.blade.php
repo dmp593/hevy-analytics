@@ -4,6 +4,8 @@
     'meta' => null,
     'actions' => null,
     'width' => '7xl',
+    'help' => null,
+    'helpAnchor' => null,
 ])
 
 @php
@@ -40,6 +42,26 @@
                 <h1 class="truncate text-xl font-semibold tracking-tight text-ink">{{ $title }}</h1>
                 @if ($subtitle)
                     <p class="mt-0.5 text-sm text-muted">{{ $subtitle }}</p>
+                @endif
+
+                {{-- The page's own documentation, folded away. A native
+                     <details> keeps it one tap from every screen without
+                     adding a line of noise for people who already know —
+                     the complaint this answers was "too much information
+                     per screen AND I don't know what each feature is for",
+                     which only a collapsed explainer satisfies at once. --}}
+                @if ($help)
+                    <details class="mt-1.5 max-w-2xl">
+                        <summary class="inline-flex min-h-8 cursor-pointer list-none items-center text-xs text-muted underline decoration-dotted underline-offset-4 hover:text-body [&::-webkit-details-marker]:hidden">
+                            {{ __('app.help.toggle') }}
+                        </summary>
+                        <div class="mt-2 rounded-lg border border-line bg-surface-sunk px-4 py-3">
+                            <p class="text-sm text-body">{{ $help }}</p>
+                            <a href="{{ route('guide') }}{{ $helpAnchor ? '#'.$helpAnchor : '' }}" class="mt-1 inline-flex min-h-10 items-center text-xs font-medium text-brand-ink">
+                                {{ __('app.help.guide_link') }}
+                            </a>
+                        </div>
+                    </details>
                 @endif
             </div>
 

@@ -1,4 +1,4 @@
-<x-ui.page :title="__('app.import.title')" :subtitle="__('app.import.subtitle')" width="3xl" class="space-y-6">
+<x-ui.page :help="__('app.help.import')" help-anchor="data" :title="__('app.import.title')" :subtitle="__('app.import.subtitle')" width="3xl" class="space-y-6">
     <x-flash />
 
     <x-ui.card :title="__('app.import.how_title')">

@@ -41,7 +41,7 @@
     <div class="grid gap-6 lg:grid-cols-2">
         <x-ui.card :title="__('app.muscle.verdict.full_breakdown')" :subtitle="__('app.dashboard.weekly_sets_sub')">
             <x-slot:actions>
-                <x-info title="MV · MEV · MAV · MRV" :text="__('app.tips.landmarks')" />
+                <x-info anchor="volume" title="MV · MEV · MAV · MRV" :text="__('app.tips.landmarks')" />
             </x-slot:actions>
             <x-muscle-volume-bars :items="$weeklySetsPerMuscle" />
         </x-ui.card>

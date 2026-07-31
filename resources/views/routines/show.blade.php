@@ -1,4 +1,7 @@
-<x-ui.page :title="$routine->title">
+{{-- The folder + creation date in the subtitle: with duplicate Hevy titles,
+     the page heading alone cannot tell the reader which "Treino A" this is. --}}
+<x-ui.page :title="$routine->title"
+           :subtitle="collect([$routine->folder?->title, __('app.routines.created_on', ['date' => ($routine->hevy_created_at ?? $routine->created_at)->translatedFormat('j M Y')])])->filter()->implode(' · ')">
     <x-slot:actions>
         <x-ui.button :href="route('routines.edit', $routine->hevy_id)" variant="secondary" size="sm">
             {{ __('app.routines.edit_progression') }}

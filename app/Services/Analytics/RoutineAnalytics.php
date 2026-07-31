@@ -80,7 +80,7 @@ class RoutineAnalytics
             $byRoutine[$row->routine_hevy_id][] = $row;
         }
 
-        $routines = $this->user->routines()->get();
+        $routines = $this->user->routines()->with('folder')->get();
         $out = [];
         foreach ($routines as $routine) {
             $series = $this->summariseSessions($byRoutine[$routine->hevy_id] ?? []);
@@ -92,6 +92,9 @@ class RoutineAnalytics
 
             $out[] = [
                 'routine' => $routine->title,
+                // Hevy titles are not unique — the folder is what tells two
+                // "Treino A" rows apart in the overview table.
+                'folder' => $routine->folder?->title,
                 'routine_id' => $routine->hevy_id,
                 'sessions' => count($series),
                 'avg_tonnage' => round(array_sum($tonnages) / count($tonnages), 0),

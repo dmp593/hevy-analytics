@@ -1,4 +1,4 @@
-<x-ui.page :title="__('app.pages.nutrition')" :subtitle="__('app.pages.nutrition_sub')">
+<x-ui.page :help="__('app.help.nutrition')" help-anchor="nutrition" :title="__('app.pages.nutrition')" :subtitle="__('app.pages.nutrition_sub')">
     <x-slot:actions>
         <form method="POST" action="{{ route('nutrition.recompute') }}">
             @csrf
@@ -50,13 +50,13 @@
         <div class="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
             <x-ui.stat :label="__('app.nutrition.target_calories')" :value="number_format($target->target_calories)" unit="kcal" tone="accent"
                        :sub="sprintf('%+.0f%%', $basis['adjustment_pct'] ?? 0).' · '.__('app.units.bw_per_week', ['value' => sprintf('%+.2f', $basis['target_rate_pct_bw_per_week'] ?? 0)])"
-                       :tip="__('app.tips.target_calories')" />
+                       :tip="__('app.tips.target_calories')" tip-anchor="nutrition" />
             <x-ui.stat :label="__('app.nutrition.protein')" :value="$target->protein_g" unit="g" tone="good"
-                       :sub="($basis['protein_g_per_kg'] ?? '').' g/kg'" :tip="__('app.tips.protein')" />
+                       :sub="($basis['protein_g_per_kg'] ?? '').' g/kg'" :tip="__('app.tips.protein')" tip-anchor="nutrition" />
             <x-ui.stat :label="__('app.nutrition.fat')" :value="$target->fat_g" unit="g"
-                       :sub="($basis['fat_g_per_kg'] ?? '').' g/kg'" :tip="__('app.tips.fat')" />
+                       :sub="($basis['fat_g_per_kg'] ?? '').' g/kg'" :tip="__('app.tips.fat')" tip-anchor="nutrition" />
             <x-ui.stat :label="__('app.nutrition.carbs')" :value="$target->carb_g" unit="g"
-                       :sub="__('app.nutrition.fiber', ['value' => $basis['fiber_g'] ?? '—'])" :tip="__('app.tips.carbs')" />
+                       :sub="__('app.nutrition.fiber', ['value' => $basis['fiber_g'] ?? '—'])" :tip="__('app.tips.carbs')" tip-anchor="nutrition" />
         </div>
 
         <div class="mb-8 grid gap-6 lg:grid-cols-2">
@@ -147,14 +147,14 @@
                     <x-ui.stat :label="__('app.nutrition.bmr', [
                                    'formula' => $target->bmr_formula === 'katch_mcardle' ? 'Katch-McArdle' : 'Mifflin-St Jeor',
                                ])"
-                               :value="number_format($target->bmr)" unit="kcal" :tip="__('app.tips.bmr')" />
+                               :value="number_format($target->bmr)" unit="kcal" :tip="__('app.tips.bmr')" tip-anchor="nutrition" />
                     <x-ui.stat :label="__('app.nutrition.verdict.formula')" :value="$verdict['formula'] ? number_format($verdict['formula']) : '—'" unit="kcal"
-                               :tip="__('app.tips.formula_tdee')" />
+                               :tip="__('app.tips.formula_tdee')" tip-anchor="nutrition" />
                     <x-ui.stat :label="__('app.nutrition.verdict.measured')" :value="$verdict['measured'] ? number_format($verdict['measured']) : '—'" unit="kcal"
                                :sub="$verdict['measured'] ? __('app.nutrition.from_days', ['days' => $loggedDays]) : null"
-                               :tip="__('app.tips.adaptive')" />
+                               :tip="__('app.tips.adaptive')" tip-anchor="nutrition" />
                     <x-ui.stat :label="__('app.nutrition.used')" :value="number_format($target->tdee)" unit="kcal"
-                               :tip="__('app.tips.blended')" />
+                               :tip="__('app.tips.blended')" tip-anchor="nutrition" />
                 </div>
 
                 @if ($verdict['measured'] !== null)

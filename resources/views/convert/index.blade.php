@@ -1,4 +1,4 @@
-<x-ui.page :title="__('app.convert.title')" :subtitle="__('app.convert.subtitle')" width="3xl" class="space-y-6">
+<x-ui.page :help="__('app.help.convert')" help-anchor="data" :title="__('app.convert.title')" :subtitle="__('app.convert.subtitle')" width="3xl" class="space-y-6">
     <x-flash />
 
     <x-ui.card :title="__('app.convert.pick_title')">

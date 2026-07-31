@@ -104,6 +104,16 @@ return [
 
         'sources_title' => 'Where the numbers come from',
         'sources_body' => 'Volume landmarks follow Renaissance Periodization (Israetel et al.); 1RM estimates use Epley and Brzycki; energy expenditure uses Mifflin-St Jeor, or Katch-McArdle when body fat is known; protein and lean-gain guidance follows Helms, Aragon and Morton et al.; FFMI ceilings follow Kouri et al. Strength percentiles come from OpenPowerlifting competition data and self-reported gym data. Every one of these is named on the page that uses it, with what it can and cannot tell you.',
+
+        'prog_eyebrow' => 'Assisted progression + Hevy write-back',
+        'prog_title' => 'Always know what to do next session',
+        'prog_body' => 'The app reads each exercise\'s recent estimated 1RM and what you actually did last session, then writes the next one — double progression (reps to a cap, then +2.5 kg), with honest rules:',
+        'prog_rule_met' => 'Met it comfortably → add a rep or load.',
+        'prog_rule_missed' => 'Missed the prescription → repeat it, don\'t raise it. Progressing a number your body didn\'t deliver just widens the gap between the routine and reality.',
+        'prog_rule_stalled' => 'Stalled and grinding at RPE 9.5+ → back off ~7.5% and rebuild with 1-2 reps in reserve (Refalo 2024: muscle grows the same without going to failure).',
+        'prog_confirm' => 'Nothing is sent on its own: changes are staged as a pending operation and you confirm before anything reaches Hevy.',
+        'prog_sample_title' => 'Your next session',
+        'prog_sample_note' => 'Illustrative numbers — the sentences are exactly the ones the app writes.',
     ],
 
     /*
@@ -751,7 +761,7 @@ return [
     ],
 
     'routines' => [
-        'edit_progression' => 'Edit / stage progression →',
+        'edit_progression' => 'Progress →',
 
         'performance' => 'Routine performance',
         'performance_sub' => 'Volume progression across sessions (6 months)',
@@ -766,8 +776,12 @@ return [
         'analyse_arrow' => 'Analyse →',
         'none' => 'No routine sessions found. Sync your Hevy data.',
         'all' => 'All routines',
+        'all_sub' => 'Grouped by your Hevy folders — newest first, because those are usually the active ones',
+        'no_folder' => 'No folder',
+        'routine_count' => '{1}1 routine|[2,*]:count routines',
+        'created_on' => 'created :date',
         'exercise_count' => '{1}1 exercise|[2,*]:count exercises',
-        'edit' => 'Edit / progress',
+        'edit' => 'Progress',
 
         'progression_title' => 'Assisted progression',
         'progression_sub' => 'Double progression, staged for your review before anything is sent',
@@ -785,6 +799,19 @@ return [
         'coverage_sub' => 'Prescribed working sets per session against the weekly landmarks',
         'sets_per_session' => ':count sets',
         'weekly_landmarks' => 'weekly MEV :mev · MAV :mav',
+    ],
+
+    /*
+     * The next-session suggestion lines RoutineProgression writes. The
+     * landing page renders these same strings with illustrative numbers,
+     * so the pitch can never drift from what the product actually says.
+     */
+    'progression' => [
+        'change' => ':exercise: :from → :to',
+        'keep_missed' => ':exercise: keep :current (last session came up short)',
+        'keep_maxed' => ':exercise: keep :current (met at RPE 9.5+ — consolidate before adding)',
+        'back_off' => ':exercise: back off :from → :to (stalled while grinding at RPE 9.5+ — rebuild with 1-2 reps in reserve)',
+        'prescribe' => ':exercise: prescribe :load × :reps (from e1RM :e1rm, ~2 in reserve)',
     ],
 
     'performance' => [
@@ -1314,7 +1341,7 @@ return [
         'levels_sub' => 'How your lifts compare to other lifters your age, weight and sex',
         'routines' => 'Routines',
         'routines_sub' => 'Which of your routines are progressing, and which have stalled',
-        'routine_edit' => 'Edit: :name',
+        'routine_edit' => 'Progress: :name',
         'nutrition' => 'Nutrition',
         'nutrition_sub' => 'Calorie and macro targets derived from your own data',
         'photos' => 'Progress photos',
@@ -1330,6 +1357,33 @@ return [
         'write' => 'Write operations',
         'write_sub' => 'Changes staged for Hevy — review the payload before anything is sent',
         'profile' => 'Profile & settings',
+    ],
+
+    /*
+     * The one-paragraph "why does this page exist" texts behind the
+     * collapsed disclosure in every page header. Each names the method
+     * behind the numbers — the product's promise is that nothing on
+     * screen is unexplained.
+     */
+    'help' => [
+        'toggle' => 'What is this page for?',
+        'guide_link' => 'Read the full guide →',
+
+        'dashboard' => 'The weekly summary of everything: consistency, per-muscle volume against scientific landmarks (MEV/MAV/MRV), push/pull balance and your weight trend. Use it to decide what deserves attention this week — every card links to the page where you can dig deeper.',
+        'performance' => 'Shows whether you are actually getting stronger: estimated 1RM (Epley formula), tonnage and working sets per exercise over time. The value is separating real progress from isolated good days — the trend comes from a regression over every session, not from comparing two dates.',
+        'levels' => 'Compares your lifts against strength standards for your sex, body weight and age, so you know where you stand — beginner to elite — and how far the next tier is on each exercise.',
+        'muscle' => 'Weekly sets per muscle against the volume landmarks from the hypertrophy literature (MV, MEV, MAV, MRV). You see at a glance which muscles are under-trained or at risk of junk volume, and which are responding to training.',
+        'body' => 'Weight, body fat and lean mass from validated formulas (Navy, RFM, FFMI), smoothed into a trend so the scale\'s daily noise is ignored. It answers the question that matters: is the weight change fat or muscle?',
+        'compare' => 'Puts 2 to 4 check-ins side by side — measurements and photos aligned by pose — so you see the real change between dates without relying on memory.',
+        'photos' => 'Photos capture what a scale cannot: visual changes in body composition. Take them with consistent light, pose and distance, and use Compare to view them side by side.',
+        'nutrition' => 'Calorie and macro targets computed from your own data (BMR via Mifflin-St Jeor or Katch-McArdle) and adjusted to your actual weight change — not generic multipliers. Log or import your intake so the adaptive adjustment can work.',
+        'projections' => 'Projects where your current pace leads — body weight and lifts — by regression over your own data, with the reliability (R²) always shown. Honest estimates, not promises.',
+        'routines' => 'Every Hevy routine with its real progression: sessions, tonnage and trend. "Analyse" opens the routine\'s charts; "Progress" builds your next session with double progression from your recent estimated 1RM — and you confirm everything before anything is sent to Hevy.',
+        'goals' => 'Set your goal and pace here — every other page (nutrition, projections, alerts) compares you against this target. The proposed rates follow recommendations from the literature, with safety limits applied.',
+        'ai' => 'Generates a written read of your recent data using your own AI key. None of the site\'s numeric analysis depends on it — it is an optional companion, not the source of the numbers.',
+        'import' => 'The no-API-key door: export Hevy\'s CSV (available on every account) and upload it here. Strong and Jefit files work too, and re-importing the same file never duplicates workouts.',
+        'convert' => 'Converts your history into another app\'s CSV format. The preview shows exactly what is lost in translation — before you download, not after.',
+        'write' => 'Nothing reaches Hevy without passing through here: every staged change (a routine progression, for example) stays pending until you review and confirm it. It is the safety net for write operations.',
     ],
 
     'tips' => [

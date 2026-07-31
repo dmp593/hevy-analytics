@@ -1,4 +1,4 @@
-<x-ui.page :title="__('app.pages.goals')" :subtitle="__('app.pages.goals_sub')" width="5xl">
+<x-ui.page :help="__('app.help.goals')" help-anchor="leanbulk" :title="__('app.pages.goals')" :subtitle="__('app.pages.goals_sub')" width="5xl">
     {{-- x-data lives on a plain element, not on <x-ui.page>: the expression
          contains @js(), and routing that through a component attribute
          re-escapes the JSON into something Alpine cannot parse. --}}

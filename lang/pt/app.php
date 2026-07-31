@@ -105,6 +105,16 @@ return [
 
         'sources_title' => 'De onde vêm os números',
         'sources_body' => 'Os landmarks de volume seguem a Renaissance Periodization (Israetel et al.); as estimativas de 1RM usam Epley e Brzycki; o gasto energético usa Mifflin-St Jeor, ou Katch-McArdle quando a gordura corporal é conhecida; as recomendações de proteína e de ritmo de ganho seguem Helms, Aragon e Morton et al.; os tetos de FFMI seguem Kouri et al. Os percentis de força vêm de dados de competição do OpenPowerlifting e de dados de ginásio auto-reportados. Cada uma destas fontes está nomeada na página que a usa, com o que consegue e o que não consegue dizer.',
+
+        'prog_eyebrow' => 'Progressão assistida + escrita no Hevy',
+        'prog_title' => 'Sabes sempre o que fazer na próxima sessão',
+        'prog_body' => 'A app lê o 1RM estimado recente de cada exercício e o que realmente fizeste na última sessão, e escreve a próxima — dupla progressão (repetições até ao teto, depois +2,5 kg), com regras honestas:',
+        'prog_rule_met' => 'Cumpriste com folga → sobe uma repetição ou o peso.',
+        'prog_rule_missed' => 'Falhaste a prescrição → repete, não sobe. Progredir um número que o corpo não entregou só afasta a rotina da realidade.',
+        'prog_rule_stalled' => 'Estagnado a moer a RPE 9,5+ → recua ~7,5% e reconstrói com 1-2 repetições na reserva (Refalo 2024: o músculo cresce o mesmo sem ires à falha).',
+        'prog_confirm' => 'Nada é enviado sozinho: as alterações ficam preparadas como operação pendente e és tu que confirmas antes de chegarem ao Hevy.',
+        'prog_sample_title' => 'A tua próxima sessão',
+        'prog_sample_note' => 'Números ilustrativos — as frases são exatamente as que a app escreve.',
     ],
 
     /*
@@ -752,7 +762,7 @@ return [
     ],
 
     'routines' => [
-        'edit_progression' => 'Editar / preparar progressão →',
+        'edit_progression' => 'Progredir →',
 
         'performance' => 'Desempenho das rotinas',
         'performance_sub' => 'Progressão de volume ao longo das sessões (6 meses)',
@@ -767,8 +777,12 @@ return [
         'analyse_arrow' => 'Analisar →',
         'none' => 'Não foram encontradas sessões de rotinas. Sincroniza os teus dados do Hevy.',
         'all' => 'Todas as rotinas',
+        'all_sub' => 'Agrupadas pelas tuas pastas do Hevy — as mais recentes primeiro, porque normalmente são as ativas',
+        'no_folder' => 'Sem pasta',
+        'routine_count' => '{1}1 rotina|[2,*]:count rotinas',
+        'created_on' => 'criada a :date',
         'exercise_count' => '{1}1 exercício|[2,*]:count exercícios',
-        'edit' => 'Editar / progredir',
+        'edit' => 'Progredir',
 
         'progression_title' => 'Progressão assistida',
         'progression_sub' => 'Dupla progressão, preparada para reveres antes de ser enviada',
@@ -786,6 +800,19 @@ return [
         'coverage_sub' => 'Séries de trabalho prescritas por sessão contra os landmarks semanais',
         'sets_per_session' => ':count séries',
         'weekly_landmarks' => 'semanal MEV :mev · MAV :mav',
+    ],
+
+    /*
+     * The next-session suggestion lines RoutineProgression writes. The
+     * landing page renders these same strings with illustrative numbers,
+     * so the pitch can never drift from what the product actually says.
+     */
+    'progression' => [
+        'change' => ':exercise: :from → :to',
+        'keep_missed' => ':exercise: manter :current (a última sessão ficou aquém)',
+        'keep_maxed' => ':exercise: manter :current (cumprido a RPE 9,5+ — consolida antes de subir)',
+        'back_off' => ':exercise: recuar :from → :to (estagnado a moer a RPE 9,5+ — reconstrói com 1-2 repetições na reserva)',
+        'prescribe' => ':exercise: prescrever :load × :reps (do e1RM :e1rm, ~2 na reserva)',
     ],
 
     'performance' => [
@@ -1309,7 +1336,7 @@ return [
         'levels_sub' => 'Como os teus levantamentos comparam com atletas da tua idade, peso e sexo',
         'routines' => 'Rotinas',
         'routines_sub' => 'Que rotinas estão a progredir, e quais estagnaram',
-        'routine_edit' => 'Editar: :name',
+        'routine_edit' => 'Progredir: :name',
         'nutrition' => 'Nutrição',
         'nutrition_sub' => 'Alvos de calorias e macros derivados dos teus próprios dados',
         'photos' => 'Fotografias de progresso',
@@ -1325,6 +1352,33 @@ return [
         'write' => 'Operações de escrita',
         'write_sub' => 'Alterações preparadas para o Hevy — revê o conteúdo antes de enviar',
         'profile' => 'Perfil e definições',
+    ],
+
+    /*
+     * The one-paragraph "why does this page exist" texts behind the
+     * collapsed disclosure in every page header. Each names the method
+     * behind the numbers — the product's promise is that nothing on
+     * screen is unexplained.
+     */
+    'help' => [
+        'toggle' => 'Para que serve esta página?',
+        'guide_link' => 'Ver o guia completo →',
+
+        'dashboard' => 'O resumo semanal de tudo: consistência, volume por músculo contra referências científicas (MEV/MAV/MRV), equilíbrio push/pull e a tendência do teu peso. Usa-o para decidir o que merece atenção esta semana — cada cartão liga à página onde podes aprofundar.',
+        'performance' => 'Mostra se estás realmente mais forte: 1RM estimado (fórmula de Epley), tonelagem e séries efetivas por exercício ao longo do tempo. A mais-valia é distinguir progresso real de sessões boas isoladas — a tendência é calculada por regressão sobre todas as sessões, não comparando duas datas.',
+        'levels' => 'Compara os teus levantamentos com padrões de força por sexo, peso corporal e idade, para saberes onde estás — de iniciante a elite — e quanto falta para o próximo patamar em cada exercício.',
+        'muscle' => 'Séries semanais por músculo contra os landmarks de volume da literatura de hipertrofia (MV, MEV, MAV, MRV). Vês de imediato que músculos estão sub-treinados ou em risco de volume inútil, e quais estão a responder ao treino.',
+        'body' => 'Peso, massa gorda e massa magra com fórmulas validadas (Navy, RFM, FFMI) e média em tendência, para ignorar o ruído diário da balança. Serve para responder à pergunta que importa: a mudança de peso é gordura ou músculo?',
+        'compare' => 'Coloca 2 a 4 check-ins lado a lado — medidas e fotografias alinhadas por pose — para veres a mudança real entre datas sem depender da memória.',
+        'photos' => 'As fotografias captam o que a balança não mede: mudanças visuais de composição corporal. Tira-as com luz, pose e distância consistentes, e usa o Comparar para as ver lado a lado.',
+        'nutrition' => 'Alvos de calorias e macros calculados a partir dos teus dados (BMR por Mifflin-St Jeor ou Katch-McArdle) e ajustados à tua perda ou ganho real de peso — não a multiplicadores genéricos. Regista ou importa a tua ingestão para o ajuste adaptativo funcionar.',
+        'projections' => 'Projeta onde o teu ritmo atual chega — no peso e nos levantamentos — por regressão sobre os teus próprios dados, com a fiabilidade (R²) sempre visível. Estimativas honestas, não promessas.',
+        'routines' => 'Cada rotina do Hevy com a sua progressão real: sessões, tonelagem e tendência. "Analisar" abre os gráficos da rotina; "Progredir" prepara a próxima sessão com dupla progressão a partir do teu 1RM estimado — e tu confirmas tudo antes de algo ser enviado para o Hevy.',
+        'goals' => 'Define aqui o objetivo e o ritmo — todas as outras páginas (nutrição, projeções, alertas) comparam-te com este alvo. Os ritmos propostos seguem recomendações da literatura, com limites de segurança aplicados.',
+        'ai' => 'Gera uma leitura escrita dos teus dados recentes usando a tua própria chave de IA. Nenhuma análise numérica do site depende disto — é um complemento opcional, não a fonte dos números.',
+        'import' => 'A porta de entrada sem chave da API: exporta o CSV do Hevy (disponível em todas as contas) e carrega-o aqui. Também aceita ficheiros do Strong e do Jefit, e re-importar o mesmo ficheiro nunca duplica treinos.',
+        'convert' => 'Converte o teu histórico para o formato CSV de outra app. A pré-visualização mostra exatamente o que se perde na conversão — antes de descarregares, não depois.',
+        'write' => 'Nada é enviado para o Hevy sem passar por aqui: cada alteração preparada (por exemplo, a progressão de uma rotina) fica pendente até a reveres e confirmares. É a rede de segurança das operações de escrita.',
     ],
 
     'tips' => [

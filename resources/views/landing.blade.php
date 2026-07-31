@@ -212,6 +212,50 @@
         <p class="mt-5 text-xs text-muted">{{ __('app.landing.output_disclaimer') }}</p>
     </section>
 
+    {{-- ------------------------------------------------------- the coach --}}
+    {{-- The feature the others build up to: not just reading the training,
+         writing the next session. The sample lines are rendered from the SAME
+         lang keys RoutineProgression uses, so this card cannot promise
+         behaviour the product no longer has. The deadlift line is the
+         algorithm's real arithmetic: backoff(120) = 110. --}}
+    <section class="mx-auto max-w-5xl px-5 pb-14 sm:pb-20">
+        <div class="overflow-hidden rounded-2xl border-2 border-brand bg-surface shadow-xs lg:grid lg:grid-cols-2">
+            <div class="p-6 sm:p-8">
+                <p class="text-xs font-semibold uppercase tracking-wide text-brand">{{ __('app.landing.prog_eyebrow') }}</p>
+                <h2 class="mt-2 text-2xl font-bold tracking-tight text-ink">{{ __('app.landing.prog_title') }}</h2>
+                <p class="mt-3 text-sm leading-relaxed text-body">{{ __('app.landing.prog_body') }}</p>
+
+                <ul class="mt-4 space-y-2.5 text-sm leading-relaxed text-body">
+                    @foreach (['met' => 'bg-good', 'missed' => 'bg-warn', 'stalled' => 'bg-bad'] as $rule => $dot)
+                        <li class="flex gap-2.5">
+                            <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full {{ $dot }}"></span>
+                            <span>{{ __("app.landing.prog_rule_{$rule}") }}</span>
+                        </li>
+                    @endforeach
+                </ul>
+
+                <p class="mt-5 rounded-lg bg-surface-sunk px-3.5 py-2.5 text-xs leading-relaxed text-muted">
+                    {{ __('app.landing.prog_confirm') }}
+                </p>
+            </div>
+
+            <div class="border-t border-line bg-surface-sunk p-6 sm:p-8 lg:border-l lg:border-t-0">
+                <p class="text-xs font-semibold uppercase tracking-wide text-muted">{{ __('app.landing.prog_sample_title') }}</p>
+                <ul class="mt-3 space-y-2.5">
+                    @foreach ([
+                        __('app.progression.change', ['exercise' => 'Bench Press (Barbell)', 'from' => '72.5kg×8', 'to' => '72.5kg×9']),
+                        __('app.progression.change', ['exercise' => 'Leg Press', 'from' => '180kg×12', 'to' => '182.5kg×8']),
+                        __('app.progression.keep_maxed', ['exercise' => 'Bent Over Row (Barbell)', 'current' => '60kg×10']),
+                        __('app.progression.back_off', ['exercise' => 'Deadlift (Barbell)', 'from' => '120kg×5', 'to' => '110kg×5']),
+                    ] as $line)
+                        <li class="rounded-lg border border-line bg-surface px-3.5 py-2.5 font-mono text-xs leading-relaxed text-body">{{ $line }}</li>
+                    @endforeach
+                </ul>
+                <p class="mt-3 text-xs text-faint">{{ __('app.landing.prog_sample_note') }}</p>
+            </div>
+        </div>
+    </section>
+
     {{-- ------------------------------------------------------------ how --}}
     <section class="border-y border-subtle bg-surface">
         <div class="mx-auto max-w-5xl px-5 py-14 sm:py-16">

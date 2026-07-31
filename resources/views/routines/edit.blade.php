@@ -1,6 +1,7 @@
 {{-- The variable is NOT escaped: `\$routine` compiles to a literal backslash in
      the attribute expression, which is a PHP parse error, and the page 500s. --}}
-<x-ui.page :title="__('app.pages.routine_edit', ['name' => $routine->title])" width="4xl">
+<x-ui.page :title="__('app.pages.routine_edit', ['name' => $routine->title])" width="4xl"
+           :subtitle="collect([$routine->folder?->title, __('app.routines.created_on', ['date' => ($routine->hevy_created_at ?? $routine->created_at)->translatedFormat('j M Y')])])->filter()->implode(' · ')">
     <x-flash />
 
     {{-- Titled "assisted", not "AI-assisted": no model is involved. It is double

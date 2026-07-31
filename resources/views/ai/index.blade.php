@@ -1,4 +1,4 @@
-<x-ui.page :title="__('app.pages.ai')" :subtitle="__('app.pages.ai_sub')" width="4xl">
+<x-ui.page :help="__('app.help.ai')" :title="__('app.pages.ai')" :subtitle="__('app.pages.ai_sub')" width="4xl">
     <x-slot:actions>
         {{-- No force flag.
 

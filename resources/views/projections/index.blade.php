@@ -1,4 +1,4 @@
-<x-ui.page :title="__('app.pages.projections')" :subtitle="__('app.pages.projections_sub')">
+<x-ui.page :help="__('app.help.projections')" help-anchor="projections" :title="__('app.pages.projections')" :subtitle="__('app.pages.projections_sub')">
     <x-flash />
 
     <p class="mb-6 text-sm text-muted">{{ __('app.projections.method') }}</p>
