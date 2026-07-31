@@ -52,7 +52,11 @@
                 <div class="text-[11px] text-faint mt-1">{{ $op->created_at->diffForHumans() }}</div>
             </div>
         @empty
-            <p class="text-sm text-muted">{{ __('app.write.none') }}</p>
+            <p class="text-sm text-muted">
+                {!! __('app.write.none_linked', [
+                    'routines' => '<a href="'.route('routines').'" class="text-brand-ink underline">'.__('app.nav.routines').'</a>',
+                ]) !!}
+            </p>
         @endforelse
     </x-panel>
 </x-ui.page>

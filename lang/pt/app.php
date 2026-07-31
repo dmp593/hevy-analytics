@@ -949,6 +949,7 @@ return [
         'details' => 'detalhes',
         'intro' => 'Todas as alterações ao Hevy passam primeiro por aqui. Revê o conteúdo e confirma para enviar. Um envio bem sucedido despoleta uma nova sincronização automática.',
         'none' => 'Nada preparado. Prepara a progressão de uma rotina a partir da página de edição dessa rotina.',
+        'none_linked' => 'Nada preparado ainda. Abre :routines, escolhe uma rotina, e a página de edição mostra as recomendações da próxima sessão — o botão "preparar" envia-as para aqui, para reveres antes de chegar ao Hevy.',
     ],
 
     'photos' => [

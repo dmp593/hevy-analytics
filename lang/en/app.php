@@ -948,6 +948,7 @@ return [
         'details' => 'details',
         'intro' => 'Every change to Hevy is staged here first. Review the payload, then confirm to push. A successful write triggers an automatic re-sync.',
         'none' => 'Nothing staged. Stage a routine progression from any routine’s edit page.',
+        'none_linked' => 'Nothing staged yet. Open :routines, pick a routine, and its edit page shows the next-session recommendations — the "stage" button there sends them here for review before anything reaches Hevy.',
     ],
 
     'photos' => [
