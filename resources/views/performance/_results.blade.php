@@ -57,13 +57,11 @@
                  that form while living here, so there is still one form and one
                  source of filter state. --}}
             <x-slot:actions>
-                <select name="exercise" form="perf-filters" class="form-control mt-0 w-48 text-xs"
-                        onchange="this.form.requestSubmit()" aria-label="{{ __('app.performance.exercise') }}">
-                    <option value="">{{ __('app.common.all') }}</option>
-                    @foreach ($exercises as $e)
-                        <option value="{{ $e->hevy_id }}" @selected($filter->exerciseTemplateHevyId === $e->hevy_id)>{{ $e->title }}</option>
-                    @endforeach
-                </select>
+                <x-searchable-select name="exercise" form="perf-filters" class="w-56"
+                    :options="collect($exercises)->map(fn ($e) => ['value' => $e->hevy_id, 'label' => $e->title])"
+                    :selected="$filter->exerciseTemplateHevyId"
+                    :all-label="__('app.common.all')" :submit="true"
+                    :label="__('app.performance.exercise')" />
             </x-slot:actions>
 
             <x-line-chart :series="units()->weightSeries($e1rmSeries)" :label="__('app.series.e1rm', ['unit' => units()->weightUnit()])" :color="\App\Support\Chart::series(2)"

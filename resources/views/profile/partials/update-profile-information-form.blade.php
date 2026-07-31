@@ -138,11 +138,11 @@
 
             <div class="mt-4">
                 <x-input-label for="timezone" :value="__('app.profile.timezone')" />
-                <select id="timezone" name="timezone" class="mt-1 block w-full md:w-1/2 rounded-md border-line text-sm">
-                    @foreach(timezone_identifiers_list() as $tz)
-                        <option value="{{ $tz }}" @selected(old('timezone', $user->resolvedTimezone()) === $tz)>{{ str_replace('_', ' ', $tz) }}</option>
-                    @endforeach
-                </select>
+                {{-- ~430 zones is a list to search, not to scroll. --}}
+                <x-searchable-select name="timezone" class="mt-1 w-full md:w-1/2"
+                    :options="collect(timezone_identifiers_list())->map(fn ($tz) => ['value' => $tz, 'label' => str_replace('_', ' ', $tz)])"
+                    :selected="old('timezone', $user->resolvedTimezone())"
+                    :label="__('app.profile.timezone')" />
                 <p class="mt-1 text-xs text-muted">{{ __('app.profile.timezone_help') }}</p>
                 <x-input-error class="mt-2" :messages="$errors->get('timezone')" />
             </div>

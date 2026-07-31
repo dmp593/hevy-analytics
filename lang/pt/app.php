@@ -1351,6 +1351,7 @@ return [
     ],
 
     'common' => [
+        'no_matches' => 'Nada corresponde a essa pesquisa.',
         'and' => 'e',
         'save' => 'Guardar',
         'saved' => 'Guardado.',

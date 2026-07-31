@@ -26,7 +26,9 @@ class SyncController extends Controller
 
         $status = new SyncStatus($user);
         if ($status->isPending()) {
-            return back()->with('status', $status->current()['message']);
+            // The live status banner already says this; a flash on top of it
+            // rendered the same sentence twice in two colours.
+            return back();
         }
 
         // Record the queued state up front so the UI has something to show while
@@ -41,6 +43,6 @@ class SyncController extends Controller
         // what actually holds under concurrent requests.
         SyncHevyJob::dispatch($user->id, $request->boolean('force'), $log->id);
 
-        return back()->with('status', __('app.sync.queued'));
+        return back();
     }
 }

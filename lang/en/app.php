@@ -1356,6 +1356,7 @@ return [
     ],
 
     'common' => [
+        'no_matches' => 'Nothing matches that search.',
         'and' => 'and',
         'save' => 'Save',
         'saved' => 'Saved.',
