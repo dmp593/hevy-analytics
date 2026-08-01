@@ -61,6 +61,9 @@
             @endif
             @include('layouts.navigation')
 
+            {{-- Cmd+K / Ctrl+K, on every page an athlete is signed in to. --}}
+            <x-command-palette />
+
             <!-- Page Heading -->
             @isset($header)
                 <header class="border-b border-line bg-surface">

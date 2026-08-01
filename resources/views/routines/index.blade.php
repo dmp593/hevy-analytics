@@ -1,6 +1,46 @@
 <x-ui.page :title="__('app.pages.routines')" :subtitle="__('app.pages.routines_sub')" :help="__('app.help.routines')">
     <x-flash />
 
+    {{-- Advisor cards: rendered only when a gap or a real decline exists, at
+         most three, each naming its evidence. The form carries WHAT to change
+         (template ids); the payload is rebuilt server-side from the routine. --}}
+    @if (count($advice))
+        <x-panel :title="__('app.advisor.title')" :subtitle="__('app.advisor.sub')" class="mb-6">
+            <ul class="space-y-3">
+                @foreach ($advice as $s)
+                    <li class="rounded-lg border border-line p-4 sm:flex sm:items-center sm:justify-between sm:gap-4">
+                        <div class="min-w-0">
+                            <p class="text-sm font-medium text-ink">
+                                @if ($s['type'] === 'add')
+                                    {{ __('app.advisor.add_headline', ['exercise' => $s['template_title'], 'routine' => $s['routine_title']]) }}
+                                @else
+                                    {{ __('app.advisor.swap_headline', ['old' => $s['template_title'], 'new' => $s['alternative_title'], 'routine' => $s['routine_title']]) }}
+                                @endif
+                            </p>
+                            <p class="mt-1 text-xs leading-relaxed text-muted">
+                                @if ($s['type'] === 'add')
+                                    {{ __('app.advisor.add_reason', ['muscle' => \App\Support\Labels::muscle($s['muscle']), 'per_week' => $s['per_week'], 'mev' => $s['mev']]) }}
+                                @else
+                                    {{ __('app.advisor.swap_reason', ['pct' => abs($s['pct_per_week']), 'weeks' => $s['weeks'], 'sessions' => $s['sessions']]) }}
+                                @endif
+                            </p>
+                        </div>
+                        <form method="POST" action="{{ route('write.adjustment', $s['routine_hevy_id']) }}" class="mt-3 shrink-0 sm:mt-0">
+                            @csrf
+                            <input type="hidden" name="action" value="{{ $s['type'] }}">
+                            <input type="hidden" name="template" value="{{ $s['type'] === 'add' ? $s['template_hevy_id'] : $s['alternative_hevy_id'] }}">
+                            @if ($s['type'] === 'swap')
+                                <input type="hidden" name="replace" value="{{ $s['template_hevy_id'] }}">
+                            @endif
+                            <x-ui.button type="submit" size="sm" variant="secondary">{{ __('app.advisor.stage') }}</x-ui.button>
+                        </form>
+                    </li>
+                @endforeach
+            </ul>
+            <p class="mt-3 text-xs text-faint">{{ __('app.advisor.honesty') }}</p>
+        </x-panel>
+    @endif
+
     <x-panel :title="__('app.routines.performance')" :subtitle="__('app.routines.performance_sub')" class="mb-6">
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">

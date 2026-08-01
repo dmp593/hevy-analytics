@@ -330,22 +330,9 @@ class RoutineProgression
         return min($reduced, $weight - self::LOAD_STEP_KG);
     }
 
-    /** Shape a set for the Hevy routine payload. */
+    /** Shape a set for the Hevy routine payload (shared with adjustments). */
     private function normalizeSet(array $set): array
     {
-        $out = [
-            'type' => SetType::fromRaw($set['type'] ?? null)->value,
-            'weight_kg' => $set['weight_kg'] ?? null,
-            'reps' => isset($set['reps']) ? (int) $set['reps'] : null,
-            'distance_meters' => $set['distance_meters'] ?? null,
-            'duration_seconds' => $set['duration_seconds'] ?? null,
-            'custom_metric' => $set['custom_metric'] ?? null,
-        ];
-
-        if (! empty($set['rep_range'])) {
-            $out['rep_range'] = $set['rep_range'];
-        }
-
-        return $out;
+        return RoutinePayload::normalizeSet($set);
     }
 }

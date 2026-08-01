@@ -7,7 +7,9 @@ use App\Services\Analytics\FilterCriteria;
 use App\Services\Analytics\RoutineAnalytics;
 use App\Services\Analytics\StrengthAnalytics;
 use App\Services\Analytics\VolumeAnalytics;
+use App\Services\Hevy\RoutineAdvisor;
 use App\Services\Hevy\RoutineProgression;
+use App\Support\AnalyticsCache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -30,6 +32,10 @@ class RoutineController extends Controller
         return view('routines.index', [
             'overview' => (new RoutineAnalytics($user, $filter))->overview(),
             'groups' => $routines->groupBy(fn ($r) => $r->folder?->title ?? ''),
+            // Plain arrays, so the advisor's volume + trend passes ride the
+            // analytics cache and cost one read until the next write bumps it.
+            'advice' => AnalyticsCache::remember($user, 'routine-advisor',
+                fn () => (new RoutineAdvisor($user))->suggestions()),
         ]);
     }
 

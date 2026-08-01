@@ -142,18 +142,24 @@ class HevySync
                     ]
                 );
 
-                $routine->exercises()->delete();
-                foreach ($r['exercises'] ?? [] as $ex) {
-                    $routine->exercises()->create([
-                        'index' => $ex['index'] ?? 0,
-                        'title' => $ex['title'] ?? null,
-                        'exercise_template_hevy_id' => $ex['exercise_template_id'] ?? null,
-                        'superset_id' => $ex['supersets_id'] ?? $ex['superset_id'] ?? null,
-                        'rest_seconds' => is_numeric($ex['rest_seconds'] ?? null) ? (int) $ex['rest_seconds'] : null,
-                        'notes' => $ex['notes'] ?? null,
-                        'sets' => $ex['sets'] ?? [],
-                    ]);
-                }
+                // Delete + recreate inside one transaction. A web request
+                // reading this routine mid-sync — staging a progression, say —
+                // would otherwise snapshot an empty exercise list and stage a
+                // payload that truncates the athlete's real Hevy routine.
+                DB::transaction(function () use ($routine, $r) {
+                    $routine->exercises()->delete();
+                    foreach ($r['exercises'] ?? [] as $ex) {
+                        $routine->exercises()->create([
+                            'index' => $ex['index'] ?? 0,
+                            'title' => $ex['title'] ?? null,
+                            'exercise_template_hevy_id' => $ex['exercise_template_id'] ?? null,
+                            'superset_id' => $ex['supersets_id'] ?? $ex['superset_id'] ?? null,
+                            'rest_seconds' => is_numeric($ex['rest_seconds'] ?? null) ? (int) $ex['rest_seconds'] : null,
+                            'notes' => $ex['notes'] ?? null,
+                            'sets' => $ex['sets'] ?? [],
+                        ]);
+                    }
+                });
                 $count++;
             }
             $pageCount = $data['page_count'] ?? 1;

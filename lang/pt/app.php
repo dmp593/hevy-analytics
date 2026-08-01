@@ -411,6 +411,7 @@ return [
         'queued' => 'Sincronização em fila — atualize daqui a pouco para ver os novos dados.',
         'running' => 'A sincronizar os seus dados do Hevy…',
         'stalled' => 'A sincronização está em fila mas ninguém a processou. Se está a correr esta aplicação por si próprio, inicie um worker: php artisan queue:work',
+        'superseded' => 'substituída',
         'failed' => 'A última sincronização falhou: :error',
         'needs_key' => 'Adicione primeiro a sua chave da API do Hevy no Perfil.',
         'last_synced' => 'Última sincronização: :when',
@@ -966,10 +967,53 @@ return [
         ],
     ],
 
+    /*
+     * The Cmd/Ctrl+K command palette.
+     */
+    'palette' => [
+        'hint' => 'Pesquisar',
+        'open_aria' => 'Abrir a paleta de comandos',
+        'placeholder' => 'Pesquisa páginas, rotinas, exercícios e ações…',
+        'no_results' => 'Sem resultados.',
+        'group_pages' => 'Páginas',
+        'group_actions' => 'Ações',
+        'group_routines' => 'Rotinas',
+        'group_exercises' => 'Exercícios',
+        'help_title' => 'Atalhos de teclado',
+        'help_open' => '⌘K (Mac) ou Ctrl+K abre e fecha a paleta em qualquer página.',
+        'help_g' => 'Em qualquer página, fora de campos de texto: g seguido da letra ao lado de cada página salta diretamente (ex.: g r → Rotinas).',
+        'help_arrows' => '↑ e ↓ navegam nos resultados, Enter abre, Esc fecha.',
+        'help_q' => '? (fora de campos de texto) abre a paleta já nesta ajuda.',
+        'action_sync' => 'Sincronizar agora',
+        'action_units_metric' => 'Unidades: métrico (kg)',
+        'action_units_imperial' => 'Unidades: imperial (lb)',
+        'action_lang_pt' => 'Idioma: Português',
+        'action_lang_en' => 'Idioma: English',
+    ],
+
+    /*
+     * Advisor cards: small, evidence-named routine adjustments. The need is
+     * scientific (RP landmarks, e1RM trends); the exercise pick is stated as
+     * convention, and swaps are stated as hypothesis — never guarantee.
+     */
+    'advisor' => [
+        'title' => 'Sugestões de ajuste',
+        'sub' => 'Pequenas alterações às rotinas que usas — nada é enviado sem confirmares',
+        'add_headline' => 'Adicionar :exercise a ":routine"',
+        'swap_headline' => 'Trocar :old por :new em ":routine"',
+        'add_reason' => ':muscle está a :per_week séries por semana nas últimas 4 semanas — abaixo do MEV de :mev (landmarks RP). Sem carga planeada: encontras o peso na primeira sessão e a progressão prescreve a partir daí.',
+        'swap_reason' => 'e1RM a cair :pct% por semana há :weeks semanas (:sessions sessões, adesão mantida). Mudar de estímulo é uma hipótese razoável com evidência moderada (Fonseca 2014; Baz-Valle 2019) — não é uma garantia.',
+        'stage' => 'Preparar alteração',
+        'honesty' => 'A necessidade vem dos landmarks de volume e das tendências de e1RM; a escolha do exercício é convenção de desenho de programas (NSCA/Schoenfeld) sobre o teu próprio catálogo do Hevy. Confirmas tudo em Operações de escrita.',
+        'change_add' => 'Adicionar :exercise (:sets séries × 8-12 repetições, carga à tua escolha)',
+        'change_swap' => 'Trocar :old por :new (:sets séries × 8-12 repetições, carga à tua escolha)',
+    ],
+
     'write' => [
         'pushed' => 'Alteração enviada para o Hevy e ressincronizada.',
         'push_failed' => 'O envio para o Hevy falhou — nada foi alterado lá. Tenta outra vez daqui a um minuto.',
         'staged' => 'Progressão preparada para ":routine". Revê e confirma para enviar para o Hevy.',
+        'staged_replaced' => 'Alteração preparada para ":routine", substituindo a que estava pendente para esta rotina. Só uma alteração pendente por rotina — assim nada se desfaz sozinho.',
         'confirm' => 'Confirmar e enviar',
         'retry' => 'Repetir',
         'stalled' => 'bloqueada',

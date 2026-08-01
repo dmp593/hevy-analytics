@@ -4,7 +4,7 @@
 > sessões: estado real, pendentes de cada lado, e planos discutidos mas ainda
 > não executados. Em português porque o dono do produto lê em português.
 
-## Em produção (tudo verde, 1074 testes @ 2026-07-31)
+## Em produção (tudo verde, 1094 testes @ 2026-08-01)
 
 | Área | Estado |
 |---|---|
@@ -274,7 +274,7 @@ API direta). Fica sempre no Paddle: faturas emitidas por eles, disputas,
 método de pagamento (portal hosted — zero PCI nosso). Não construir em
 sandbox.
 
-### 10. Ajuste inteligente de rotinas — PLANEADO (pedido do dono 2026-07-31)
+### 10. Ajuste inteligente de rotinas — ✓ EM PRODUÇÃO (2026-08-01)
 
 Sem IA — tudo determinístico e citável (o dono pediu aviso se só desse com
 IA; não é o caso). Três detetores + um só canal de saída (operação de
@@ -298,7 +298,23 @@ rotinas inventadas):
 UI: cartões de sugestão na página da rotina + resumo na página de rotinas;
 cada cartão nomeia a fórmula/fonte e o botão prepara a operação pendente.
 
-### 11. Paleta de comandos Cmd/Ctrl+K — PLANEADO (pedido do dono 2026-07-31)
+IMPLEMENTADO: ExerciseChoices (tabela curada por músculo + vizinhos de
+sessão, exclusões por ID de template E título), RoutineAdvisor (gaps abaixo
+do MEV em 4 semanas + declínio de e1RM ≥2×erro-padrão em 8 semanas/≥6
+sessões), RoutineAdjustment + RoutinePayload (payloads add/swap; séries
+novas 8-12 sem carga — a progressão prescreve depois), endpoint
+write.adjustment (validação + authorizeOwner + demo só-leitura), cartões na
+página de rotinas com a fonte nomeada. 9 testes.
+DECISÕES DEFENSIVAS (revisão adversarial antes do deploy encontrou-as):
+(a) UMA alteração pendente por rotina — preparar outra marca a anterior como
+"substituída". Dois snapshots pendentes da mesma rotina descrevem dois
+futuros a partir de hoje: confirmar ambos APAGAVA em silêncio a primeira
+alteração no Hevy real. (b) HevySync passou a apagar+recriar exercícios
+dentro de uma transação: uma leitura a meio do sync podia preparar um
+payload que truncava a rotina real. (c) o swap só dispara em DECLÍNIO real;
+estagnação plana continua a ser território do back-off da progressão.
+
+### 11. Paleta de comandos Cmd/Ctrl+K — ✓ EM PRODUÇÃO (2026-08-01)
 
 Spotlight-like, Alpine puro (sem dependência nova), overlay global no
 layout autenticado: Cmd+K (Mac) / Ctrl+K (resto) abre; deteção por
@@ -313,6 +329,17 @@ Esc fecha, setas navegam, aria-activedescendant. Nada de atalhos globais
 de uma só tecla fora da paleta (colidem com inputs); tudo namespaced atrás
 de Cmd/Ctrl+K. Testes: componente renderiza índice, endpoint dinâmico
 autorizado e limitado.
+
+IMPLEMENTADO: x-command-palette (Alpine puro, x-teleport, combobox acessível
+com aria-activedescendant e foco devolvido ao fechar), botão-pista na barra
+de topo (⌘K no Mac / Ctrl K no resto, por deteção de plataforma; ícone de
+lupa no telemóvel), /palette/data (rotinas + exercícios COM histórico via
+rollups, em cache por versão do utilizador), ações rápidas (sincronizar,
+unidades, idioma) por um único form POST, chords g+letra GLOBAIS estilo
+GitHub e ? para a ajuda. 5 testes.
+LIÇÃO: os chords viviam DENTRO da caixa de pesquisa — procurar "gemeos"
+navegava para outra página à segunda letra. Agora, dentro da paleta escrever
+é sempre pesquisar; os chords só funcionam fora de campos de texto.
 
 ## Dívida de legibilidade conhecida (auditoria 2026-07-29, passe 2 pendente)
 

@@ -16,6 +16,7 @@ use App\Http\Controllers\ImportController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MuscleController;
 use App\Http\Controllers\NutritionController;
+use App\Http\Controllers\PaletteController;
 use App\Http\Controllers\PerformanceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgressPhotoController;
@@ -52,6 +53,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/guide', 'guide.index')->name('guide');
 
     Route::get('/performance', [PerformanceController::class, 'index'])->name('performance');
+
+    // The palette's per-account search index (routines + performed lifts).
+    Route::get('/palette/data', [PaletteController::class, 'data'])->name('palette.data');
     Route::get('/performance/data', [PerformanceController::class, 'data'])->name('performance.data');
 
     Route::get('/strength-levels', [StrengthLevelController::class, 'index'])->name('strength-levels');
@@ -116,6 +120,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/write-operations', [WriteBackController::class, 'index'])->name('write.index');
     Route::post('/write-operations/{operation}/confirm', [WriteBackController::class, 'confirm'])->middleware('throttle:20,1')->name('write.confirm');
     Route::post('/routines/{routine}/stage-progression', [WriteBackController::class, 'stageProgression'])->middleware('throttle:20,1')->name('write.progression');
+    Route::post('/routines/{routine}/stage-adjustment', [WriteBackController::class, 'stageAdjustment'])->middleware('throttle:20,1')->name('write.adjustment');
 });
 
 Route::middleware('auth')->group(function () {

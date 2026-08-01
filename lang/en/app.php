@@ -411,6 +411,7 @@ return [
         'queued' => 'Sync queued — refresh in a moment to see your new data.',
         'running' => 'Syncing your Hevy data…',
         'stalled' => 'Your sync is queued but nothing has picked it up. If you are running this app yourself, start a queue worker: php artisan queue:work',
+        'superseded' => 'superseded',
         'failed' => 'Your last sync failed: :error',
         'needs_key' => 'Add your Hevy API key in Profile first.',
         'last_synced' => 'Last sync: :when',
@@ -965,10 +966,53 @@ return [
         ],
     ],
 
+    /*
+     * The Cmd/Ctrl+K command palette.
+     */
+    'palette' => [
+        'hint' => 'Search',
+        'open_aria' => 'Open the command palette',
+        'placeholder' => 'Search pages, routines, exercises and actions…',
+        'no_results' => 'No results.',
+        'group_pages' => 'Pages',
+        'group_actions' => 'Actions',
+        'group_routines' => 'Routines',
+        'group_exercises' => 'Exercises',
+        'help_title' => 'Keyboard shortcuts',
+        'help_open' => '⌘K (Mac) or Ctrl+K opens and closes the palette on any page.',
+        'help_g' => 'On any page, outside text fields: g then the letter shown next to a page jumps straight there (e.g. g r → Routines).',
+        'help_arrows' => '↑ and ↓ move through results, Enter opens, Esc closes.',
+        'help_q' => '? (outside text fields) opens the palette on this help.',
+        'action_sync' => 'Sync now',
+        'action_units_metric' => 'Units: metric (kg)',
+        'action_units_imperial' => 'Units: imperial (lb)',
+        'action_lang_pt' => 'Language: Português',
+        'action_lang_en' => 'Language: English',
+    ],
+
+    /*
+     * Advisor cards: small, evidence-named routine adjustments. The need is
+     * scientific (RP landmarks, e1RM trends); the exercise pick is stated as
+     * convention, and swaps are stated as hypothesis — never guarantee.
+     */
+    'advisor' => [
+        'title' => 'Adjustment suggestions',
+        'sub' => 'Small changes to the routines you actually run — nothing is sent until you confirm',
+        'add_headline' => 'Add :exercise to ":routine"',
+        'swap_headline' => 'Swap :old for :new in ":routine"',
+        'add_reason' => ':muscle sits at :per_week sets per week over the last 4 weeks — below its MEV of :mev (RP landmarks). No planned load: find the weight in the first session and the progression engine prescribes from there.',
+        'swap_reason' => 'e1RM falling :pct% per week across :weeks weeks (:sessions sessions, adherence maintained). Changing the stimulus is a reasonable hypothesis with moderate evidence (Fonseca 2014; Baz-Valle 2019) — not a guarantee.',
+        'stage' => 'Stage change',
+        'honesty' => 'The need comes from volume landmarks and e1RM trends; the exercise pick is program-design convention (NSCA/Schoenfeld) over your own Hevy catalogue. You confirm everything under Write operations.',
+        'change_add' => 'Add :exercise (:sets sets × 8-12 reps, load your choice)',
+        'change_swap' => 'Swap :old for :new (:sets sets × 8-12 reps, load your choice)',
+    ],
+
     'write' => [
         'pushed' => 'Change pushed to Hevy and re-synced.',
         'push_failed' => 'The push to Hevy failed — nothing was changed there. Try again in a minute.',
         'staged' => 'Progression staged for ":routine". Review and confirm to push to Hevy.',
+        'staged_replaced' => 'Change staged for ":routine", replacing the one already waiting for this routine. One pending change per routine, so nothing quietly undoes itself.',
         'confirm' => 'Confirm & push',
         'retry' => 'Retry',
         'stalled' => 'stalled',

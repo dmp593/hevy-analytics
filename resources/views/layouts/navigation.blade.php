@@ -27,6 +27,20 @@
             </div>
 
             <div class="hidden shrink-0 items-center gap-1 lg:flex">
+                {{-- The palette's visible door: a search pill naming its own
+                     shortcut with the modifier for the keyboard at hand. --}}
+                <button type="button" @click="window.dispatchEvent(new CustomEvent('open-palette'))"
+                        class="mr-1 inline-flex min-h-9 items-center gap-2 rounded-lg border border-line bg-surface-sunk px-3 text-sm text-muted transition hover:text-ink"
+                        aria-label="{{ __('app.palette.open_aria') }}">
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.45 4.4l3.07 3.08a1 1 0 0 1-1.41 1.41l-3.08-3.07A7 7 0 0 1 2 9Z" clip-rule="evenodd" />
+                    </svg>
+                    <span>{{ __('app.palette.hint') }}</span>
+                    <kbd x-data="{ mac: /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent) }"
+                         x-text="mac ? '\u2318K' : 'Ctrl K'"
+                         class="rounded-sm border border-line bg-surface px-1.5 py-0.5 font-mono text-[11px]">Ctrl K</kbd>
+                </button>
+
                 <form method="POST" action="{{ route('sync') }}">
                     @csrf
                     <x-ui.button size="sm" class="whitespace-nowrap">{{ __('app.nav.sync') }}</x-ui.button>
@@ -69,6 +83,13 @@
             </div>
 
             <div class="flex items-center gap-1 lg:hidden">
+                <button type="button" @click="window.dispatchEvent(new CustomEvent('open-palette'))"
+                        class="inline-flex items-center justify-center rounded-lg p-2 text-muted transition hover:bg-surface-sunk hover:text-ink"
+                        aria-label="{{ __('app.palette.open_aria') }}">
+                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.45 4.4l3.07 3.08a1 1 0 0 1-1.41 1.41l-3.08-3.07A7 7 0 0 1 2 9Z" clip-rule="evenodd" />
+                    </svg>
+                </button>
                 <x-theme-toggle />
                 <button type="button" @click="open = ! open" :aria-expanded="open" aria-controls="mobile-menu"
                         aria-label="{{ __('app.nav.toggle') }}"

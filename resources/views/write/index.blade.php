@@ -22,11 +22,15 @@
                                 $op->status === 'success' => 'bg-good-soft text-good',
                                 $op->status === 'failed' => 'bg-bad-soft text-bad',
                                 $op->status === 'pending' => 'bg-warn-soft text-warn',
+                                // Replaced by a newer change for the same routine:
+                                // grey, because nothing failed — it was simply
+                                // superseded before it was ever pushed.
+                                $op->status === 'superseded' => 'bg-surface-sunk text-faint',
                                 $stale => 'bg-bad-soft text-bad',
                                 default => 'bg-surface-sunk text-body',
                             };
                         @endphp
-                        <span class="text-xs px-2 py-0.5 rounded-full {{ $tone }}">{{ $stale ? __('app.write.stalled') : $op->status }}</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full {{ $tone }}">{{ $stale ? __('app.write.stalled') : ($op->status === 'superseded' ? __('app.write.superseded') : $op->status) }}</span>
                         <button @click="open = !open" class="text-xs text-muted">{{ __('app.write.details') }}</button>
                         @if($canPush)
                             <form method="POST" action="{{ route('write.confirm', $op) }}">
